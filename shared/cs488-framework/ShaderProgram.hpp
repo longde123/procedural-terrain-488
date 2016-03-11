@@ -18,10 +18,12 @@ public:
     void generateProgramObject();
 
     void attachVertexShader(const char * filePath);
-    
+
     void attachFragmentShader(const char * filePath);
-    
+
     void attachGeometryShader(const char * filePath);
+
+    void attachComputeShader(const char * filePath);
 
     void link();
 
@@ -49,13 +51,14 @@ private:
     Shader vertexShader;
     Shader fragmentShader;
     Shader geometryShader;
+    Shader computeShader;
 
     GLuint programObject;
     GLuint prevProgramObject;
     GLuint activeProgram;
 
     void extractSourceCode(std::string & shaderSource, const std::string & filePath);
-    
+
     void extractSourceCodeAndCompile(const Shader &shader);
 
     GLuint createShader(GLenum shaderType);

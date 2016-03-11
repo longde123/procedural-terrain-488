@@ -65,6 +65,16 @@ void ShaderProgram::attachGeometryShader (
 }
 
 //------------------------------------------------------------------------------------
+void ShaderProgram::attachComputeShader (
+		const char * filePath
+) {
+    computeShader.shaderObject = createShader(GL_COMPUTE_SHADER);
+    computeShader.filePath = filePath;
+
+    extractSourceCodeAndCompile(computeShader);
+}
+
+//------------------------------------------------------------------------------------
 void ShaderProgram::extractSourceCodeAndCompile (
 		const Shader & shader
 ) {
@@ -79,6 +89,7 @@ void ShaderProgram::recompileShaders() {
     extractSourceCodeAndCompile(vertexShader);
     extractSourceCodeAndCompile(fragmentShader);
     extractSourceCodeAndCompile(geometryShader);
+    extractSourceCodeAndCompile(computeShader);
 }
 
 //------------------------------------------------------------------------------------
@@ -129,6 +140,10 @@ void ShaderProgram::link() {
 
     if(geometryShader.shaderObject != 0) {
         glAttachShader(programObject, geometryShader.shaderObject);
+    }
+
+    if(computeShader.shaderObject != 0) {
+        glAttachShader(programObject, computeShader.shaderObject);
     }
 
     glLinkProgram(programObject);

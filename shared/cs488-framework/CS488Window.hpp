@@ -56,11 +56,11 @@ protected:
 	bool m_paused;
 	bool m_fullScreen;
 
+	static std::string m_exec_dir;
+
 private:
 	static std::shared_ptr<CS488Window> m_instance;
 
-	static std::string m_exec_dir;
-    
     GLFWmonitor * m_monitor;
 
 	static std::shared_ptr<CS488Window> getInstance();
