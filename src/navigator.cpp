@@ -41,8 +41,6 @@ void Navigator::init()
     terrain_renderer.init(m_exec_dir + "/Assets/");
     terrain_generator.init(m_exec_dir + "/Assets/");
 
-    printf("%d %d\n", GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0);
-
 	initGrid();
 
 	// Set up initial view and projection matrices (need to do this here,
@@ -293,9 +291,12 @@ bool Navigator::windowResizeEvent(int width, int height) {
 bool Navigator::keyInputEvent(int key, int action, int mods) {
 	bool eventHandled(false);
 
-	// Fill in with event handling code...
 	if( action == GLFW_PRESS ) {
-		// Respond to some key events.
+        if (key == GLFW_KEY_Q) {
+            glfwSetWindowShouldClose(m_window, GL_TRUE);
+
+            eventHandled = true;
+        }
 	}
 
 	return eventHandled;
