@@ -42,6 +42,7 @@ void Navigator::init()
     terrain_generator.init(m_exec_dir + "/Assets/");
 
 	initGrid();
+    terrain_generator.generateTerrainBlock();
 
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
