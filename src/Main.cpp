@@ -1,4 +1,4 @@
-#include "Navigator.hpp"
+#include "navigator.hpp"
 
 int main( int argc, char **argv )
 {

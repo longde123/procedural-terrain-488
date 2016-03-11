@@ -1,4 +1,4 @@
-#include "Navigator.hpp"
+#include "navigator.hpp"
 #include "cs488-framework/GlErrorCheck.hpp"
 
 #include <iostream>
@@ -37,19 +37,11 @@ void Navigator::init()
 	// Set the background colour.
 	glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
-	// Build the shader
-	m_shader.generateProgramObject();
-	m_shader.attachVertexShader(
-		getAssetFilePath( "VertexShader.vs" ).c_str() );
-	m_shader.attachFragmentShader(
-		getAssetFilePath( "FragmentShader.fs" ).c_str() );
-	m_shader.link();
+	// Build the shaders
+    terrain_renderer.init(m_exec_dir + "/Assets/");
+    terrain_generator.init(m_exec_dir + "/Assets/");
 
-	// Set up the uniforms
-	P_uni = m_shader.getUniformLocation( "P" );
-	V_uni = m_shader.getUniformLocation( "V" );
-	M_uni = m_shader.getUniformLocation( "M" );
-	col_uni = m_shader.getUniformLocation( "colour" );
+    printf("%d %d\n", GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0);
 
 	initGrid();
 
@@ -100,7 +92,7 @@ void Navigator::initGrid()
 		verts, GL_STATIC_DRAW );
 
 	// Specify the means of extracting the position values properly.
-	GLint posAttrib = m_shader.getAttribLocation( "position" );
+	GLint posAttrib = terrain_renderer.renderer_shader.getAttribLocation( "position" );
 	glEnableVertexAttribArray( posAttrib );
 	glVertexAttribPointer( posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr );
 
@@ -193,21 +185,21 @@ void Navigator::draw()
 	mat4 W;
 	W = glm::translate( W, vec3( -float(DIM)/2.0f, 0, -float(DIM)/2.0f ) );
 
-	m_shader.enable();
+	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
 
-		glUniformMatrix4fv( P_uni, 1, GL_FALSE, value_ptr( proj ) );
-		glUniformMatrix4fv( V_uni, 1, GL_FALSE, value_ptr( view ) );
-		glUniformMatrix4fv( M_uni, 1, GL_FALSE, value_ptr( W ) );
+		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
+		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
+		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
 
 		// Just draw the grid for now.
 		glBindVertexArray( m_grid_vao );
-		glUniform3f( col_uni, 1, 1, 1 );
+		glUniform3f( terrain_renderer.col_uni, 1, 1, 1 );
 		glDrawArrays( GL_LINES, 0, (3+DIM)*4 );
 
 		// Draw the cubes
 		// Highlight the active square.
-	m_shader.disable();
+	terrain_renderer.renderer_shader.disable();
 
 	// Restore defaults
 	glBindVertexArray( 0 );

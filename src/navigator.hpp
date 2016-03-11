@@ -7,6 +7,8 @@
 #include "cs488-framework/ShaderProgram.hpp"
 
 #include "grid.hpp"
+#include "terrain_generator.hpp"
+#include "terrain_renderer.hpp"
 
 class Navigator : public CS488Window {
 public:
@@ -32,10 +34,9 @@ private:
 
 	// Fields related to the shader and uniforms.
 	ShaderProgram m_shader;
-	GLint P_uni; // Uniform location for Projection matrix.
-	GLint V_uni; // Uniform location for View matrix.
-	GLint M_uni; // Uniform location for Model matrix.
-	GLint col_uni;   // Uniform location for cube colour.
+
+    TerrainRenderer terrain_renderer;
+    TerrainGenerator terrain_generator;
 
 	// Fields related to grid geometry.
 	GLuint m_grid_vao; // Vertex Array Object
