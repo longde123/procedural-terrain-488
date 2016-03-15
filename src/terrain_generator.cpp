@@ -28,6 +28,7 @@ void TerrainGenerator::generateTerrainBlock()
     glGenTextures(1, &block);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, block);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage3D(GL_TEXTURE_3D,
                  0,                         // level of detail
                  GL_R32F,                   // internal format

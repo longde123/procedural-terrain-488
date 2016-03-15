@@ -10,6 +10,7 @@ void TerrainRenderer::init(string dir)
 {
     renderer_shader.generateProgramObject();
 	renderer_shader.attachVertexShader((dir + "VertexShader.vs").c_str());
+	renderer_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
 	renderer_shader.attachFragmentShader((dir + "FragmentShader.fs").c_str());
 	renderer_shader.link();
 
@@ -18,4 +19,5 @@ void TerrainRenderer::init(string dir)
 	V_uni = renderer_shader.getUniformLocation( "V" );
 	M_uni = renderer_shader.getUniformLocation( "M" );
 	col_uni = renderer_shader.getUniformLocation( "colour" );
+	GLint posAttrib = renderer_shader.getAttribLocation( "position" );
 }

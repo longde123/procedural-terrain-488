@@ -173,7 +173,8 @@ void Navigator::draw()
 {
 	// Create a global transformation for the model (centre it).
 	mat4 W;
-	W = glm::translate( W, vec3( -float(BLOCK_DIMENSION)/2.0f, 0, -float(BLOCK_DIMENSION)/2.0f ) );
+    float offset = -BLOCK_DIMENSION / 2.0f;
+	W = glm::translate(W, vec3(offset, offset, offset));
 
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
@@ -185,7 +186,7 @@ void Navigator::draw()
 		// Just draw the grid for now.
 		glBindVertexArray( m_grid_vao );
 		glUniform3f( terrain_renderer.col_uni, 1, 1, 1 );
-		glDrawArrays( GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION );
+		glDrawArraysInstanced( GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION );
 
 		// Draw the cubes
 		// Highlight the active square.

@@ -4,7 +4,7 @@
 
 #include "cs488-framework/ShaderProgram.hpp"
 
-#define BLOCK_DIMENSION 256
+#define BLOCK_DIMENSION 32
 
 class TerrainGenerator {
 public:
