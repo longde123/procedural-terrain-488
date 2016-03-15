@@ -11,8 +11,6 @@
 using namespace glm;
 using namespace std;
 
-static const size_t DIM = 16;
-
 //----------------------------------------------------------------------------------------
 // Constructor
 Navigator::Navigator()
@@ -47,7 +45,7 @@ void Navigator::init()
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
 	view = glm::lookAt(
-		glm::vec3( 0.0f, float(DIM)*2.0*M_SQRT1_2, float(DIM)*2.0*M_SQRT1_2 ),
+		glm::vec3( 0.0f, float(BLOCK_DIMENSION)*2.0*M_SQRT1_2, float(BLOCK_DIMENSION)*2.0*M_SQRT1_2 ),
 		glm::vec3( 0.0f, 0.0f, 0.0f ),
 		glm::vec3( 0.0f, 1.0f, 0.0f ) );
 	proj = glm::perspective(
@@ -58,27 +56,20 @@ void Navigator::init()
 
 void Navigator::initGrid()
 {
-	size_t sz = 3 * 2 * 2 * (DIM+3);
+	size_t sz = 3 * BLOCK_DIMENSION * BLOCK_DIMENSION;
 
 	float *verts = new float[ sz ];
 	size_t ct = 0;
-	for( int idx = 0; idx < DIM+3; ++idx ) {
-		verts[ ct ] = -1;
-		verts[ ct+1 ] = 0;
-		verts[ ct+2 ] = idx-1;
-		verts[ ct+3 ] = DIM+1;
-		verts[ ct+4 ] = 0;
-		verts[ ct+5 ] = idx-1;
-		ct += 6;
-
-		verts[ ct ] = idx-1;
-		verts[ ct+1 ] = 0;
-		verts[ ct+2 ] = -1;
-		verts[ ct+3 ] = idx-1;
-		verts[ ct+4 ] = 0;
-		verts[ ct+5 ] = DIM+1;
-		ct += 6;
-	}
+    for (int y = 0; y < BLOCK_DIMENSION; y++) {
+        for (int x = 0; x < BLOCK_DIMENSION; x++) {
+            // TODO: For optimization, try swapping x and y and see if that
+            // makes any difference
+            int idx = x + y * BLOCK_DIMENSION;
+            verts[idx * 3] = x;
+            verts[idx * 3 + 1] = 0;
+            verts[idx * 3 + 2] = y;
+        }
+    }
 
 	// Create the vertex array to record buffer assignments.
 	glGenVertexArrays( 1, &m_grid_vao );
@@ -182,7 +173,7 @@ void Navigator::draw()
 {
 	// Create a global transformation for the model (centre it).
 	mat4 W;
-	W = glm::translate( W, vec3( -float(DIM)/2.0f, 0, -float(DIM)/2.0f ) );
+	W = glm::translate( W, vec3( -float(BLOCK_DIMENSION)/2.0f, 0, -float(BLOCK_DIMENSION)/2.0f ) );
 
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
@@ -194,7 +185,7 @@ void Navigator::draw()
 		// Just draw the grid for now.
 		glBindVertexArray( m_grid_vao );
 		glUniform3f( terrain_renderer.col_uni, 1, 1, 1 );
-		glDrawArrays( GL_LINES, 0, (3+DIM)*4 );
+		glDrawArrays( GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION );
 
 		// Draw the cubes
 		// Highlight the active square.
