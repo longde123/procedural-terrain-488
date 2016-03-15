@@ -13,9 +13,9 @@ public:
     void init(std::string dir);
 
     void generateTerrainBlock();
-private:
-    ShaderProgram terrain_shader;
 
     // A 3D cubic block of terrain.
     GLuint block;
+private:
+    ShaderProgram terrain_shader;
 };

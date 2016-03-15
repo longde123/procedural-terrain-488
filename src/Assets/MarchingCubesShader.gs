@@ -7,7 +7,9 @@ uniform mat4 M;
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
-layout(binding = 0) uniform sampler3D density_map;
+layout(r32f, binding = 0) uniform image3D density_map;
+
+out vec3 vertex_color;
 
 // The marching cubes algorithm consists of 256 cases of triangle configurations (each
 // corner can be on or off).
@@ -316,7 +318,27 @@ ivec3 edge_connect_list[256][5] = {
 void main() {
     vec3 coords = vec3(gl_in[0].gl_Position);
 
+    // Use swizzling, avoid typing vector constructors for each corner.
+    vec2 offset = vec2(0, 1);
+
+    //ivec2 dimensions = imageSize(density_map);
+
+    // More efficient to do vector operations.
+    vec4 density0123;
+    vec4 density4567;
+
+    density0123.x = imageLoad(density_map, ivec3(coords + offset.xxx)).x;
+    density0123.y = imageLoad(density_map, ivec3(coords + offset.xyx)).x;
+    density0123.z = imageLoad(density_map, ivec3(coords + offset.yyx)).x;
+    density0123.w = imageLoad(density_map, ivec3(coords + offset.yxx)).x;
+    density4567.x = imageLoad(density_map, ivec3(coords + offset.xxy)).x;
+    density4567.y = imageLoad(density_map, ivec3(coords + offset.xyy)).x;
+    density4567.z = imageLoad(density_map, ivec3(coords + offset.yyy)).x;
+    density4567.w = imageLoad(density_map, ivec3(coords + offset.yxy)).x;
+
+/*
     // To visualize where the input points are.
+    vertex_color = density0123.xxx / 2.0 + 0.5;
 	gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
     EmitVertex();
 	gl_Position = P * V * M * vec4(coords + vec3(0.1, 0.0, 0.0), 1.0);
@@ -324,22 +346,7 @@ void main() {
 	gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.1), 1.0);
     EmitVertex();
     EndPrimitive();
-
-    /*
-    // Use swizzling, avoid typing vector constructors for each corner.
-    vec2 offset = vec2(0, 1);
-
-    // More efficient to do vector operations.
-    vec4 density0123;
-    vec4 density4567;
-    density0123.x = texture(density_map, coords + offset.xxx).x;
-    density0123.y = texture(density_map, coords + offset.xyx).x;
-    density0123.z = texture(density_map, coords + offset.yyx).x;
-    density0123.w = texture(density_map, coords + offset.yxx).x;
-    density4567.x = texture(density_map, coords + offset.xxy).x;
-    density4567.y = texture(density_map, coords + offset.xyy).x;
-    density4567.z = texture(density_map, coords + offset.yyy).x;
-    density4567.w = texture(density_map, coords + offset.yxy).x;
+*/
 
     vec4 divider = vec4(0, 0, 0, 0);
     ivec4 ground0123 = ivec4(lessThan(divider, density0123));
@@ -356,6 +363,10 @@ void main() {
         vec3 v2 = edge_start[edge_indices.y] + edge_dir[edge_indices.y] * 0.5;
         vec3 v3 = edge_start[edge_indices.z] + edge_dir[edge_indices.z] * 0.5;
 
+        v1 += coords;
+        v2 += coords;
+        v3 += coords;
+
         gl_Position = P * V * M * vec4(v1, 1.0);
         EmitVertex();
         gl_Position = P * V * M * vec4(v2, 1.0);
@@ -365,5 +376,4 @@ void main() {
 
         EndPrimitive();
     }
-    */
 }

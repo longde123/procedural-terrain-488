@@ -185,8 +185,8 @@ void Navigator::draw()
 
 		// Just draw the grid for now.
 		glBindVertexArray( m_grid_vao );
-		glUniform3f( terrain_renderer.col_uni, 1, 1, 1 );
 		glDrawArraysInstanced( GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION );
+
 
 		// Draw the cubes
 		// Highlight the active square.
