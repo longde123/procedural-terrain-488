@@ -179,6 +179,8 @@ void Navigator::draw()
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
 
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
 		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
 		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
@@ -194,6 +196,7 @@ void Navigator::draw()
 
 	// Restore defaults
 	glBindVertexArray( 0 );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	CHECK_GL_ERRORS;
 }
