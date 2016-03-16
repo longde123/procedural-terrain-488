@@ -7,7 +7,8 @@ uniform mat4 M;
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
-layout(r32f, binding = 0) uniform image3D density_map;
+//layout(r32f, binding = 0) uniform image3D density_map;
+layout(binding = 0) uniform sampler3D density_map;
 
 out vec3 vertex_color;
 
@@ -15,6 +16,8 @@ out vec3 vertex_color;
 // corner can be on or off).
 
 // Tables by Ryan Geiss.
+
+#define N 32
 
 // Lookup table for many polygons for each of the 256 cases.
 int case_to_numpolys[256] = {
@@ -40,17 +43,11 @@ vec3 edge_dir[12] = {
     vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1)
 };
 
-ivec3 iedge_start[12] = {
-    ivec3(0, 0, 0), ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, 0, 0),
-    ivec3(0, 0, 1), ivec3(0, 1, 1), ivec3(1, 0, 1), ivec3(0, 0, 1),
-    ivec3(0, 0, 0), ivec3(0, 1, 0), ivec3(1, 1, 0), ivec3(1, 0, 0)
-};
-
 // Equal to edge_start + edge_dir
-ivec3 iedge_end[12] = {
-    ivec3(0, 1, 0), ivec3(1, 1, 0), ivec3(1, 1, 0), ivec3(1, 0, 0),
-    ivec3(0, 1, 1), ivec3(1, 1, 1), ivec3(1, 1, 1), ivec3(1, 0, 1),
-    ivec3(0, 0, 1), ivec3(0, 1, 1), ivec3(1, 1, 1), ivec3(1, 0, 1)
+vec3 edge_end[12] = {
+    vec3(0, 1, 0), vec3(1, 1, 0), vec3(1, 1, 0), vec3(1, 0, 0),
+    vec3(0, 1, 1), vec3(1, 1, 1), vec3(1, 1, 1), vec3(1, 0, 1),
+    vec3(0, 0, 1), vec3(0, 1, 1), vec3(1, 1, 1), vec3(1, 0, 1)
 };
 
 vec3 edge_axis[12] = {
@@ -321,12 +318,16 @@ ivec3 edge_connect_list[256][5] = {
     { ivec3(-1, -1, -1), ivec3(-1, -1, -1), ivec3(-1, -1, -1), ivec3(-1, -1, -1), ivec3(-1, -1, -1) },
 };
 
+float density(vec3 coord)
+{
+    return texture(density_map, coord / N).x;
+}
+
 void main() {
     vec3 coords = vec3(gl_in[0].gl_Position);
-    ivec3 icoords = ivec3(gl_in[0].gl_Position);
 
     // Use swizzling, avoid typing vector constructors for each corner.
-    ivec2 offset = ivec2(0, 1);
+    vec2 offset = vec2(0, 1);
 
     //ivec2 dimensions = imageSize(density_map);
 
@@ -334,14 +335,14 @@ void main() {
     vec4 density0123;
     vec4 density4567;
 
-    density0123.x = imageLoad(density_map, icoords + offset.xxx).x;
-    density0123.y = imageLoad(density_map, icoords + offset.xyx).x;
-    density0123.z = imageLoad(density_map, icoords + offset.yyx).x;
-    density0123.w = imageLoad(density_map, icoords + offset.yxx).x;
-    density4567.x = imageLoad(density_map, icoords + offset.xxy).x;
-    density4567.y = imageLoad(density_map, icoords + offset.xyy).x;
-    density4567.z = imageLoad(density_map, icoords + offset.yyy).x;
-    density4567.w = imageLoad(density_map, icoords + offset.yxy).x;
+    density0123.x = density(coords + offset.xxx);
+    density0123.y = density(coords + offset.xyx);
+    density0123.z = density(coords + offset.yyx);
+    density0123.w = density(coords + offset.yxx);
+    density4567.x = density(coords + offset.xxy);
+    density4567.y = density(coords + offset.xyy);
+    density4567.z = density(coords + offset.yyy);
+    density4567.w = density(coords + offset.yxy);
 
     vertex_color = density0123.xxx / 4.0 + 0.25;
     if (false) {
@@ -371,12 +372,12 @@ void main() {
             // So d1 * (1 - t) + d2 * t = 0 => t = d1 / (d1 - d2)
             // e.g. d1 = 0.1, d2 = -0.3 => t = 0.25
 
-            vec3 d1 = vec3(imageLoad(density_map, icoords + iedge_start[edge_index.x]).x,
-                           imageLoad(density_map, icoords + iedge_start[edge_index.y]).x,
-                           imageLoad(density_map, icoords + iedge_start[edge_index.z]).x);
-            vec3 d2 = vec3(imageLoad(density_map, icoords + iedge_end[edge_index.x]).x,
-                           imageLoad(density_map, icoords + iedge_end[edge_index.y]).x,
-                           imageLoad(density_map, icoords + iedge_end[edge_index.z]).x);
+            vec3 d1 = vec3(density(coords + edge_start[edge_index.x]),
+                           density(coords + edge_start[edge_index.y]),
+                           density(coords + edge_start[edge_index.z]));
+            vec3 d2 = vec3(density(coords + edge_end[edge_index.x]),
+                           density(coords + edge_end[edge_index.y]),
+                           density(coords + edge_end[edge_index.z]));
             vec3 t = d1 / (d1 - d2);
 
             vec3 v1 = edge_start[edge_index.x] + edge_dir[edge_index.x] * t.x;
