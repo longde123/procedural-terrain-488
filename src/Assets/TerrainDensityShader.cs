@@ -1,6 +1,6 @@
 #version 430
 
-uniform float frequency;
+uniform float period;
 
 // One work group = 1 slice
 // Note that 32x32 = 1024 which is the typical maximum work group size/block
@@ -40,9 +40,9 @@ float ease(float t)
     return 6 * t5 - 15 * t4 + 10 * t3;
 }
 
-float perlinNoise(ivec3 coords, float cubeSize)
+float perlinNoise(ivec3 coords, float frequency)
 {
-    vec3 scaledCoords = vec3(coords) / cubeSize;
+    vec3 scaledCoords = vec3(coords) * frequency;
     vec3 innerCoords = vec3(mod(scaledCoords, 1.0));
     ivec3 lowerCorner = ivec3(scaledCoords - innerCoords);
 
@@ -76,7 +76,17 @@ void main() {
     // Generate a gradient from [1 to -1]
     float height_gradient = 1.0 - (float(coords.y) / block_dimensions.y) * 2;
 
-    float density = height_gradient + 0.5 * perlinNoise(coords, frequency);
+    float noise = 0.0;
+    float frequency = 1.0 / period;
+    noise += perlinNoise(coords, frequency);
+    frequency *= 1.95;
+    noise += perlinNoise(coords, frequency) / 2;
+    frequency *= 1.95;
+    noise += perlinNoise(coords, frequency) / 4;
+    frequency *= 1.95;
+    noise += perlinNoise(coords, frequency) / 8;
+
+    float density = height_gradient + noise * 0.5;
 
     //imageStore(density_map, coords, mod(vec4(frequency), 1.0));
     //imageStore(density_map, coords, vec4(perlinNoise(coords, frequency)));

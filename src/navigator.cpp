@@ -125,7 +125,7 @@ void Navigator::guiLogic()
 			glfwSetWindowShouldClose(m_window, GL_TRUE);
 		}
 
-        ImGui::SliderFloat("Frequency", &terrain_generator.frequency, 4.0f, 20.0f);
+        ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 20.0f);
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive

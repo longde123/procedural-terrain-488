@@ -11,7 +11,7 @@ using namespace std;
 #define LOCAL_DIM_Z 1
 
 TerrainGenerator::TerrainGenerator()
-: frequency(5.0f)
+: period(4.0f)
 {
     assert(BLOCK_DIMENSION % LOCAL_DIM_X == 0);
     assert(BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
@@ -24,7 +24,7 @@ void TerrainGenerator::init(string dir)
     terrain_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
     terrain_shader.link();
 
-	frequency_uni = terrain_shader.getUniformLocation("frequency");
+	period_uni = terrain_shader.getUniformLocation("period");
 
     // Generate texture object in which to store the terrain block.
     glGenTextures(1, &block);
@@ -59,7 +59,7 @@ void TerrainGenerator::generateTerrainBlock()
     // Generate the density values for the terrain block.
     terrain_shader.enable();
     {
-        glUniform1f(frequency_uni, frequency);
+        glUniform1f(period_uni, period);
 
         glDispatchCompute(BLOCK_DIMENSION / LOCAL_DIM_X,
                           BLOCK_DIMENSION / LOCAL_DIM_Y,
