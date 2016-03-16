@@ -40,11 +40,17 @@ vec3 edge_dir[12] = {
     vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1)
 };
 
+ivec3 iedge_start[12] = {
+    ivec3(0, 0, 0), ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, 0, 0),
+    ivec3(0, 0, 1), ivec3(0, 1, 1), ivec3(1, 0, 1), ivec3(0, 0, 1),
+    ivec3(0, 0, 0), ivec3(0, 1, 0), ivec3(1, 1, 0), ivec3(1, 0, 0)
+};
+
 // Equal to edge_start + edge_dir
-vec3 edge_end[12] = {
-    vec3(0, 1, 0), vec3(1, 1, 0), vec3(1, 1, 0), vec3(1, 0, 0),
-    vec3(0, 1, 1), vec3(1, 1, 1), vec3(1, 1, 1), vec3(1, 0, 1),
-    vec3(0, 0, 1), vec3(0, 1, 1), vec3(1, 1, 1), vec3(1, 0, 1)
+ivec3 iedge_end[12] = {
+    ivec3(0, 1, 0), ivec3(1, 1, 0), ivec3(1, 1, 0), ivec3(1, 0, 0),
+    ivec3(0, 1, 1), ivec3(1, 1, 1), ivec3(1, 1, 1), ivec3(1, 0, 1),
+    ivec3(0, 0, 1), ivec3(0, 1, 1), ivec3(1, 1, 1), ivec3(1, 0, 1)
 };
 
 vec3 edge_axis[12] = {
@@ -317,9 +323,10 @@ ivec3 edge_connect_list[256][5] = {
 
 void main() {
     vec3 coords = vec3(gl_in[0].gl_Position);
+    ivec3 icoords = ivec3(gl_in[0].gl_Position);
 
     // Use swizzling, avoid typing vector constructors for each corner.
-    vec2 offset = vec2(0, 1);
+    ivec2 offset = ivec2(0, 1);
 
     //ivec2 dimensions = imageSize(density_map);
 
@@ -327,18 +334,18 @@ void main() {
     vec4 density0123;
     vec4 density4567;
 
-    density0123.x = imageLoad(density_map, ivec3(coords + offset.xxx)).x;
-    density0123.y = imageLoad(density_map, ivec3(coords + offset.xyx)).x;
-    density0123.z = imageLoad(density_map, ivec3(coords + offset.yyx)).x;
-    density0123.w = imageLoad(density_map, ivec3(coords + offset.yxx)).x;
-    density4567.x = imageLoad(density_map, ivec3(coords + offset.xxy)).x;
-    density4567.y = imageLoad(density_map, ivec3(coords + offset.xyy)).x;
-    density4567.z = imageLoad(density_map, ivec3(coords + offset.yyy)).x;
-    density4567.w = imageLoad(density_map, ivec3(coords + offset.yxy)).x;
+    density0123.x = imageLoad(density_map, icoords + offset.xxx).x;
+    density0123.y = imageLoad(density_map, icoords + offset.xyx).x;
+    density0123.z = imageLoad(density_map, icoords + offset.yyx).x;
+    density0123.w = imageLoad(density_map, icoords + offset.yxx).x;
+    density4567.x = imageLoad(density_map, icoords + offset.xxy).x;
+    density4567.y = imageLoad(density_map, icoords + offset.xyy).x;
+    density4567.z = imageLoad(density_map, icoords + offset.yyy).x;
+    density4567.w = imageLoad(density_map, icoords + offset.yxy).x;
 
+    vertex_color = density0123.xxx / 4.0 + 0.25;
     if (false) {
         // To visualize where the input points are.
-        vertex_color = density0123.xxx / 4.0 + 0.25;
         gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
         EmitVertex();
         gl_Position = P * V * M * vec4(coords + vec3(0.1, 0.0, 0.0), 1.0);
@@ -355,14 +362,26 @@ void main() {
                          (ground4567.x << 4) | (ground4567.y << 5) | (ground4567.z << 6) | (ground4567.w << 7);
         int numpolys = case_to_numpolys[case_index];
 
-        vertex_color = vec3(0);
-
         for (int i = 0; i < numpolys; i++) {
-            ivec3 edge_indices = edge_connect_list[case_index][i];
+            ivec3 edge_index = edge_connect_list[case_index][i];
 
-            vec3 v1 = edge_start[edge_indices.x] + edge_dir[edge_indices.x] * 0.5;
-            vec3 v2 = edge_start[edge_indices.y] + edge_dir[edge_indices.y] * 0.5;
-            vec3 v3 = edge_start[edge_indices.z] + edge_dir[edge_indices.z] * 0.5;
+            // Want to place the vertex where the density is approximately zero.
+            // Note that one side of the edge should always have a positive value
+            // and the other, a negative value.
+            // So d1 * (1 - t) + d2 * t = 0 => t = d1 / (d1 - d2)
+            // e.g. d1 = 0.1, d2 = -0.3 => t = 0.25
+
+            vec3 d1 = vec3(imageLoad(density_map, icoords + iedge_start[edge_index.x]).x,
+                           imageLoad(density_map, icoords + iedge_start[edge_index.y]).x,
+                           imageLoad(density_map, icoords + iedge_start[edge_index.z]).x);
+            vec3 d2 = vec3(imageLoad(density_map, icoords + iedge_end[edge_index.x]).x,
+                           imageLoad(density_map, icoords + iedge_end[edge_index.y]).x,
+                           imageLoad(density_map, icoords + iedge_end[edge_index.z]).x);
+            vec3 t = d1 / (d1 - d2);
+
+            vec3 v1 = edge_start[edge_index.x] + edge_dir[edge_index.x] * t.x;
+            vec3 v2 = edge_start[edge_index.y] + edge_dir[edge_index.y] * t.y;
+            vec3 v3 = edge_start[edge_index.z] + edge_dir[edge_index.z] * t.z;
 
             v1 += coords;
             v2 += coords;
