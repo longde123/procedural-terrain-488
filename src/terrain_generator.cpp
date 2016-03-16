@@ -13,9 +13,9 @@ using namespace std;
 TerrainGenerator::TerrainGenerator()
 : period(4.0f)
 {
-    assert(BLOCK_DIMENSION % LOCAL_DIM_X == 0);
-    assert(BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
-    assert(BLOCK_DIMENSION % LOCAL_DIM_Z == 0);
+    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_X == 0);
+    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_Y == 0);
+    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_Z == 0);
 }
 
 void TerrainGenerator::init(string dir)
@@ -35,10 +35,15 @@ void TerrainGenerator::init(string dir)
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    // Note that we must generate a slightly larger texture than the block
+    // dimension. The reason is that Marching Cubes constructs polygons out
+    // of the 8 corners of a cube, so it needs to sample one grid point beyond
+    // the grid size.
     glTexImage3D(GL_TEXTURE_3D,
                  0,                         // level of detail
                  GL_R32F,                   // internal format
-                 BLOCK_DIMENSION, BLOCK_DIMENSION, BLOCK_DIMENSION,
+                 BLOCK_DIMENSION + 1, BLOCK_DIMENSION + 1, BLOCK_DIMENSION + 1,
                  0,                         // 0 is required
                  GL_RED, GL_FLOAT, NULL     // input format, not applicable
                 );
@@ -61,9 +66,9 @@ void TerrainGenerator::generateTerrainBlock()
     {
         glUniform1f(period_uni, period);
 
-        glDispatchCompute(BLOCK_DIMENSION / LOCAL_DIM_X,
-                          BLOCK_DIMENSION / LOCAL_DIM_Y,
-                          BLOCK_DIMENSION / LOCAL_DIM_Z);
+        glDispatchCompute((BLOCK_DIMENSION + 1) / LOCAL_DIM_X,
+                          (BLOCK_DIMENSION + 1) / LOCAL_DIM_Y,
+                          (BLOCK_DIMENSION + 1) / LOCAL_DIM_Z);
 
         // Block until kernel/shader finishes execution.
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
