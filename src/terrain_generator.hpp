@@ -16,6 +16,10 @@ public:
 
     // A 3D cubic block of terrain.
     GLuint block;
+
+    float frequency;
 private:
     ShaderProgram terrain_shader;
+
+    GLint frequency_uni;
 };

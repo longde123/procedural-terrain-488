@@ -14,11 +14,8 @@ using namespace std;
 //----------------------------------------------------------------------------------------
 // Constructor
 Navigator::Navigator()
-	: current_col( 0 )
 {
-	colour[0] = 0.0f;
-	colour[1] = 0.0f;
-	colour[2] = 0.0f;
+
 }
 
 //----------------------------------------------------------------------------------------
@@ -40,7 +37,6 @@ void Navigator::init()
     terrain_generator.init(m_exec_dir + "/Assets/");
 
 	initGrid();
-    terrain_generator.generateTerrainBlock();
 
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
@@ -129,22 +125,7 @@ void Navigator::guiLogic()
 			glfwSetWindowShouldClose(m_window, GL_TRUE);
 		}
 
-		// Eventually you'll create multiple colour widgets with
-		// radio buttons.  If you use PushID/PopID to give them all
-		// unique IDs, then ImGui will be able to keep them separate.
-		// This is unnecessary with a single colour selector and
-		// radio button, but I'm leaving it in as an example.
-
-		// Prefixing a widget name with "##" keeps it from being
-		// displayed.
-
-		ImGui::PushID( 0 );
-		ImGui::ColorEdit3( "##Colour", colour );
-		ImGui::SameLine();
-		if( ImGui::RadioButton( "##Col", &current_col, 0 ) ) {
-			// Select this colour.
-		}
-		ImGui::PopID();
+        ImGui::SliderFloat("Frequency", &terrain_generator.frequency, 4.0f, 20.0f);
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive
@@ -175,6 +156,8 @@ void Navigator::draw()
 	mat4 W;
     float offset = -BLOCK_DIMENSION / 2.0f;
 	W = glm::translate(W, vec3(offset, offset, offset));
+
+    terrain_generator.generateTerrainBlock();
 
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );

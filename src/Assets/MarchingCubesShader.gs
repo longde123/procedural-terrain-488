@@ -336,44 +336,46 @@ void main() {
     density4567.z = imageLoad(density_map, ivec3(coords + offset.yyy)).x;
     density4567.w = imageLoad(density_map, ivec3(coords + offset.yxy)).x;
 
-/*
-    // To visualize where the input points are.
-    vertex_color = density0123.xxx / 2.0 + 0.5;
-	gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
-    EmitVertex();
-	gl_Position = P * V * M * vec4(coords + vec3(0.1, 0.0, 0.0), 1.0);
-    EmitVertex();
-	gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.1), 1.0);
-    EmitVertex();
-    EndPrimitive();
-*/
-
-    vec4 divider = vec4(0, 0, 0, 0);
-    ivec4 ground0123 = ivec4(lessThan(divider, density0123));
-    ivec4 ground4567 = ivec4(lessThan(divider, density4567));
-
-    int case_index = (ground0123.x << 0) | (ground0123.y << 1) | (ground0123.z << 2) | (ground0123.w << 3) |
-                     (ground4567.x << 4) | (ground4567.y << 5) | (ground4567.z << 6) | (ground4567.w << 7);
-    int numpolys = case_to_numpolys[case_index];
-
-    for (int i = 0; i < numpolys; i++) {
-        ivec3 edge_indices = edge_connect_list[case_index][i];
-
-        vec3 v1 = edge_start[edge_indices.x] + edge_dir[edge_indices.x] * 0.5;
-        vec3 v2 = edge_start[edge_indices.y] + edge_dir[edge_indices.y] * 0.5;
-        vec3 v3 = edge_start[edge_indices.z] + edge_dir[edge_indices.z] * 0.5;
-
-        v1 += coords;
-        v2 += coords;
-        v3 += coords;
-
-        gl_Position = P * V * M * vec4(v1, 1.0);
+    if (false) {
+        // To visualize where the input points are.
+        vertex_color = density0123.xxx / 4.0 + 0.25;
+        gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
         EmitVertex();
-        gl_Position = P * V * M * vec4(v2, 1.0);
+        gl_Position = P * V * M * vec4(coords + vec3(0.1, 0.0, 0.0), 1.0);
         EmitVertex();
-        gl_Position = P * V * M * vec4(v3, 1.0);
+        gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.1), 1.0);
         EmitVertex();
-
         EndPrimitive();
+    } else {
+        vec4 divider = vec4(0, 0, 0, 0);
+        ivec4 ground0123 = ivec4(lessThan(divider, density0123));
+        ivec4 ground4567 = ivec4(lessThan(divider, density4567));
+
+        int case_index = (ground0123.x << 0) | (ground0123.y << 1) | (ground0123.z << 2) | (ground0123.w << 3) |
+                         (ground4567.x << 4) | (ground4567.y << 5) | (ground4567.z << 6) | (ground4567.w << 7);
+        int numpolys = case_to_numpolys[case_index];
+
+        vertex_color = vec3(0);
+
+        for (int i = 0; i < numpolys; i++) {
+            ivec3 edge_indices = edge_connect_list[case_index][i];
+
+            vec3 v1 = edge_start[edge_indices.x] + edge_dir[edge_indices.x] * 0.5;
+            vec3 v2 = edge_start[edge_indices.y] + edge_dir[edge_indices.y] * 0.5;
+            vec3 v3 = edge_start[edge_indices.z] + edge_dir[edge_indices.z] * 0.5;
+
+            v1 += coords;
+            v2 += coords;
+            v3 += coords;
+
+            gl_Position = P * V * M * vec4(v1, 1.0);
+            EmitVertex();
+            gl_Position = P * V * M * vec4(v2, 1.0);
+            EmitVertex();
+            gl_Position = P * V * M * vec4(v3, 1.0);
+            EmitVertex();
+
+            EndPrimitive();
+        }
     }
 }

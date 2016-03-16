@@ -47,7 +47,4 @@ private:
 	// Matrices controlling the camera and projection.
 	glm::mat4 proj;
 	glm::mat4 view;
-
-	float colour[3];
-	int current_col;
 };

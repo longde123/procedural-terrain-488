@@ -11,6 +11,7 @@ using namespace std;
 #define LOCAL_DIM_Z 1
 
 TerrainGenerator::TerrainGenerator()
+: frequency(5.0f)
 {
     assert(BLOCK_DIMENSION % LOCAL_DIM_X == 0);
     assert(BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
@@ -22,10 +23,9 @@ void TerrainGenerator::init(string dir)
     terrain_shader.generateProgramObject();
     terrain_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
     terrain_shader.link();
-}
 
-void TerrainGenerator::generateTerrainBlock()
-{
+	frequency_uni = terrain_shader.getUniformLocation("frequency");
+
     // Generate texture object in which to store the terrain block.
     glGenTextures(1, &block);
     glActiveTexture(GL_TEXTURE0);
@@ -52,10 +52,15 @@ void TerrainGenerator::generateTerrainBlock()
                        0,               // layer
                        GL_READ_WRITE,   // access
                        GL_R32F);
+}
 
+void TerrainGenerator::generateTerrainBlock()
+{
     // Generate the density values for the terrain block.
     terrain_shader.enable();
     {
+        glUniform1f(frequency_uni, frequency);
+
         glDispatchCompute(BLOCK_DIMENSION / LOCAL_DIM_X,
                           BLOCK_DIMENSION / LOCAL_DIM_Y,
                           BLOCK_DIMENSION / LOCAL_DIM_Z);
@@ -64,12 +69,15 @@ void TerrainGenerator::generateTerrainBlock()
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         // For debugging, get the data out of the GPU.
+        /*
         vector<float> data(BLOCK_DIMENSION * BLOCK_DIMENSION * BLOCK_DIMENSION);
         glGetTexImage(GL_TEXTURE_3D, 0, GL_RED, GL_FLOAT, &data[0]);
         for (int i = 0; i < BLOCK_DIMENSION * BLOCK_DIMENSION * BLOCK_DIMENSION; i++) {
-            //assert(data[i] == 1.0);
-        }
-
+            if (!(data[i] >= -1.0 && data[i] <= 1.0)) {
+                printf("%f\n", data[i]);
+                break;
+            }
+        }*/
     }
     terrain_shader.disable();
 
