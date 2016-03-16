@@ -3,14 +3,19 @@
 uniform mat4 P;
 uniform mat4 V;
 uniform mat4 M;
+uniform mat3 NormalMatrix;
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
-//layout(r32f, binding = 0) uniform image3D density_map;
 layout(binding = 0) uniform sampler3D density_map;
 
-out vec3 vertex_color;
+out vertexData
+{
+    vec3 color;
+    vec3 position;
+    vec3 normal;
+} vertex_out;
 
 // The marching cubes algorithm consists of 256 cases of triangle configurations (each
 // corner can be on or off).
@@ -323,6 +328,16 @@ float density(vec3 coord)
     return texture(density_map, coord / N).x;
 }
 
+vec3 normalAtVertex(vec3 vertex)
+{
+    float d = 1.0 / N;
+    vec3 gradient = vec3(
+        density(vertex + vec3(d, 0, 0)) - density(vertex - vec3(d, 0, 0)),
+        density(vertex + vec3(0, d, 0)) - density(vertex - vec3(0, d, 0)),
+        density(vertex + vec3(0, 0, d)) - density(vertex - vec3(0, 0, d)));
+    return -normalize(gradient);
+}
+
 void main() {
     vec3 coords = vec3(gl_in[0].gl_Position);
 
@@ -344,8 +359,9 @@ void main() {
     density4567.z = density(coords + offset.yyy);
     density4567.w = density(coords + offset.yxy);
 
-    vertex_color = density0123.xxx / 4.0 + 0.25;
     if (false) {
+        vertex_out.color = density0123.xxx / 4.0 + 0.25;
+
         // To visualize where the input points are.
         gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
         EmitVertex();
@@ -389,10 +405,16 @@ void main() {
             v3 += coords;
 
             gl_Position = P * V * M * vec4(v1, 1.0);
+            vertex_out.color = vec3(density(v1)) / 4.0 + 0.25;
+            vertex_out.normal = NormalMatrix * normalAtVertex(v1);
             EmitVertex();
             gl_Position = P * V * M * vec4(v2, 1.0);
+            vertex_out.color = vec3(density(v2)) / 4.0 + 0.25;
+            vertex_out.normal = NormalMatrix * normalAtVertex(v2);
             EmitVertex();
             gl_Position = P * V * M * vec4(v3, 1.0);
+            vertex_out.color = vec3(density(v3)) / 4.0 + 0.25;
+            vertex_out.normal = NormalMatrix * normalAtVertex(v3);
             EmitVertex();
 
             EndPrimitive();

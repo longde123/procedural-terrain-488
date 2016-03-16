@@ -194,9 +194,12 @@ void Navigator::draw()
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
 
+        mat3 normalMatrix = mat3(transpose(inverse(view * W)));
+
 		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
 		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
 		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
+		glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
 
 		// Just draw the grid for now.
 		glBindVertexArray( m_grid_vao );

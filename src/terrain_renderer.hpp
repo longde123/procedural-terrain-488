@@ -15,5 +15,6 @@ public:
 	GLint P_uni;    // Uniform location for Projection matrix.
 	GLint V_uni;    // Uniform location for View matrix.
 	GLint M_uni;    // Uniform location for Model matrix.
+	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
 	GLint density_uni;  // Uniform location for the density map.
 };

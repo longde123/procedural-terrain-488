@@ -19,6 +19,7 @@ void TerrainRenderer::init(string dir)
 	P_uni = renderer_shader.getUniformLocation( "P" );
 	V_uni = renderer_shader.getUniformLocation( "V" );
 	M_uni = renderer_shader.getUniformLocation( "M" );
+	NormalMatrix_uni = renderer_shader.getUniformLocation( "NormalMatrix" );
 	density_uni = renderer_shader.getUniformLocation( "density_map" );
 
 	CHECK_GL_ERRORS;
