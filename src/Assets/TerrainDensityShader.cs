@@ -82,9 +82,13 @@ void main() {
     frequency *= 1.95;
     noise += perlinNoise(coords, frequency) / 2;
     frequency *= 1.95;
+    noise += perlinNoise(coords, frequency) / 3;
+    frequency *= 1.95;
     noise += perlinNoise(coords, frequency) / 4;
     frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 8;
+    noise += perlinNoise(coords, frequency) / 5;
+    frequency *= 1.95;
+    noise += perlinNoise(coords, frequency) / 6;
 
     float density = height_gradient + noise * 0.5;
 

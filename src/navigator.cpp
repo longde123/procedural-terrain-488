@@ -153,7 +153,7 @@ void Navigator::guiLogic()
             ImGui::EndMenuBar();
         }
 
-        ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 20.0f);
+        ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 40.0f);
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive
