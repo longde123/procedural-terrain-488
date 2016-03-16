@@ -34,6 +34,8 @@ protected:
 private:
 	void initGrid();
 
+    void makeView();
+
 	// Fields related to the shader and uniforms.
 	ShaderProgram m_shader;
 
@@ -47,4 +49,14 @@ private:
 	// Matrices controlling the camera and projection.
 	glm::mat4 proj;
 	glm::mat4 view;
+
+    float rotation;
+    float rotation_vertical;
+    float distance_factor;
+
+    // If the main mouse is pressed.
+    bool mouse_down;
+    bool mouse_down_with_control;
+    double previous_mouse_x;
+    double previous_mouse_y;
 };

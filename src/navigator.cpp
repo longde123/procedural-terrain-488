@@ -7,15 +7,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 using namespace glm;
 using namespace std;
+
+static const float PI = 3.14159265f;
 
 //----------------------------------------------------------------------------------------
 // Constructor
 Navigator::Navigator()
 {
-
+    rotation = 0.0f;
+    rotation_vertical = 0.0f;
+    distance_factor = 1.0f;
+    mouse_down = false;
+    mouse_down_with_control = false;
 }
 
 //----------------------------------------------------------------------------------------
@@ -40,14 +47,22 @@ void Navigator::init()
 
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
-	view = glm::lookAt(
-		glm::vec3( 0.0f, float(BLOCK_DIMENSION)*2.0*M_SQRT1_2, float(BLOCK_DIMENSION)*2.0*M_SQRT1_2 ),
-		glm::vec3( 0.0f, 0.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    makeView();
 	proj = glm::perspective(
 		glm::radians( 45.0f ),
 		float( m_framebufferWidth ) / float( m_framebufferHeight ),
 		1.0f, 1000.0f );
+}
+
+void Navigator::makeView()
+{
+    vec3 x_axis(1.0f, 0.0f, 0.0f);
+    vec3 y_axis(0.0f, 1.0f, 0.0f);
+    float distance = BLOCK_DIMENSION * 2.0 * M_SQRT1_2 * distance_factor;
+    view = lookAt(
+        rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis),
+        vec3(0.0f, 0.0f, 0.0f),
+        vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Navigator::initGrid()
@@ -211,17 +226,27 @@ bool Navigator::cursorEnterWindowEvent (
  */
 bool Navigator::mouseMoveEvent(double xPos, double yPos)
 {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	if (!ImGui::IsMouseHoveringAnyWindow()) {
-		// Put some code here to handle rotations.  Probably need to
-		// check whether we're *dragging*, not just moving the mouse.
-		// Probably need some instance variables to track the current
-		// rotation amount, and maybe the previous X position (so
-		// that you can rotate relative to the *change* in X.
-	}
+    if (!ImGui::IsMouseHoveringAnyWindow()) {
+        if (mouse_down) {
+            if (mouse_down_with_control) {
+                double dy = yPos - previous_mouse_y;
+                rotation_vertical += -dy / 500.0f;
+                rotation_vertical = std::max(std::min(rotation_vertical, PI / 4.1f), -PI / 4.1f);
+                makeView();
+            } else {
+                double dx = xPos - previous_mouse_x;
+                rotation += -dx / 500.0f;
+                makeView();
+            }
+        }
+    }
 
-	return eventHandled;
+    previous_mouse_x = xPos;
+    previous_mouse_y = yPos;
+
+    return eventHandled;
 }
 
 //----------------------------------------------------------------------------------------
@@ -229,14 +254,22 @@ bool Navigator::mouseMoveEvent(double xPos, double yPos)
  * Event handler.  Handles mouse button events.
  */
 bool Navigator::mouseButtonInputEvent(int button, int actions, int mods) {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	if (!ImGui::IsMouseHoveringAnyWindow()) {
-		// The user clicked in the window.  If it's the left
-		// mouse button, initiate a rotation.
+	if (actions == GLFW_PRESS) {
+		if (!ImGui::IsMouseHoveringAnyWindow()) {
+			mouse_down = true;
+
+            // For rotation in the other angle.
+            mouse_down_with_control = (mods & GLFW_MOD_CONTROL);
+		}
 	}
 
-	return eventHandled;
+	if (actions == GLFW_RELEASE) {
+		mouse_down = false;
+	}
+
+    return eventHandled;
 }
 
 //----------------------------------------------------------------------------------------
@@ -247,6 +280,11 @@ bool Navigator::mouseScrollEvent(double xOffSet, double yOffSet) {
 	bool eventHandled(false);
 
 	// Zoom in or out.
+    distance_factor -= yOffSet / 20.0f;
+    // Put reasonable bounds.
+    distance_factor = std::max(0.1f, std::min(100.0f, distance_factor));
+
+    makeView();
 
 	return eventHandled;
 }
