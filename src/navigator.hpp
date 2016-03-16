@@ -50,6 +50,9 @@ private:
 	glm::mat4 proj;
 	glm::mat4 view;
 
+    // Display options
+    bool wireframe;
+
     float rotation;
     float rotation_vertical;
     float distance_factor;

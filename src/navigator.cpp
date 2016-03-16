@@ -23,6 +23,8 @@ Navigator::Navigator()
     distance_factor = 1.0f;
     mouse_down = false;
     mouse_down_with_control = false;
+
+    wireframe = false;
 }
 
 //----------------------------------------------------------------------------------------
@@ -135,10 +137,21 @@ void Navigator::guiLogic()
 	ImGuiWindowFlags windowFlags(ImGuiWindowFlags_AlwaysAutoResize);
 	float opacity(0.5f);
 
-	ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,100), opacity, windowFlags);
-		if( ImGui::Button( "Quit Application" ) ) {
+    // Without this, menu won't be visible.
+    windowFlags |= ImGuiWindowFlags_MenuBar;
+
+	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,100), opacity, windowFlags)) {
+		if (ImGui::Button("Quit Application")) {
 			glfwSetWindowShouldClose(m_window, GL_TRUE);
 		}
+
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("Options")) {
+                if (ImGui::MenuItem("Wireframe", NULL, &wireframe)) {}
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
 
         ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 20.0f);
 
@@ -152,12 +165,12 @@ void Navigator::guiLogic()
 		}
 */
 
-		ImGui::Text( "Framerate: %.1f FPS", ImGui::GetIO().Framerate );
-
+		ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
+    }
 	ImGui::End();
 
-	if( showTestWindow ) {
-		ImGui::ShowTestWindow( &showTestWindow );
+	if (showTestWindow) {
+		ImGui::ShowTestWindow(&showTestWindow);
 	}
 }
 
@@ -174,10 +187,12 @@ void Navigator::draw()
 
     terrain_generator.generateTerrainBlock();
 
+    if (wireframe) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    }
+
 	terrain_renderer.renderer_shader.enable();
 		glEnable( GL_DEPTH_TEST );
-
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
 		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
