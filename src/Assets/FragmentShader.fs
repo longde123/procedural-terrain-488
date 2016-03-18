@@ -5,6 +5,7 @@ in vertexData
     vec3 position;
     vec3 color;
     vec3 normal;
+    vec3 original_normal;
 } vertex_in;
 
 out vec4 fragColor;
@@ -35,5 +36,22 @@ void main() {
     vec3 specular = light_specular * pow(max(dot(R, E), 0.0), shininess);
     specular = clamp(specular, 0.0, 1.0);
 
-    fragColor = vec4(vertex_in.color * (ambient + diffuse + specular), 1);
+    // Doesn't matter whether the normal is pointing along or opposite to the axes.
+    vec3 blend_weights = abs(normalize(vertex_in.original_normal));
+    // We don't want the blending to happen gradually, only blend in the neighborhood
+    // of 45 degree angles.
+    blend_weights = blend_weights - 0.4;
+    blend_weights = max(blend_weights, 0.0);
+    // Make sure weights sum to one.
+    blend_weights = blend_weights / (blend_weights.x + blend_weights.y + blend_weights.z);
+
+    vec3 color;
+    if (true) {
+        color = blend_weights;
+    } else {
+        // TODO: texture blending
+    }
+
+    fragColor = vec4(color, 1);
+    //fragColor = vec4(vertex_in.color * (ambient + diffuse + specular), 1);
 }
