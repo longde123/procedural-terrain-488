@@ -366,9 +366,28 @@ vec3 normalAtVertex(vec3 vertex)
     return -normalize(gradient);
 }
 
+float ambientOcclusion(vec3 vertex)
+{
+    float visibility = 0.0;
+    for (int i = 0; i < 32; i++) {
+        vec3 ray = random_rays[i];
+        float ray_visibility = 1.0;
+
+        // Short-range samples
+        for (int j = 0; j < 8; j++) {
+            float d = density(vertex + j * ray);
+            ray_visibility *= clamp(d * 8, 0.0, 1.0);
+        }
+
+        visibility += ray_visibility;
+    }
+
+    return (1.0 - visibility / 16.0);
+}
+
 void createVertex(vec3 vertex)
 {
-    ambient_occlusion = density(vertex) / 4.0 + 0.25;
+    ambient_occlusion = ambientOcclusion(vertex);
     position = vertex;
     normal = normalAtVertex(vertex);
     EmitVertex();

@@ -15,6 +15,7 @@ layout(binding = 1) uniform sampler2D rock_texture;
 layout(binding = 2) uniform sampler2D normal_map;
 
 uniform bool triplanar_colors;
+uniform bool use_ambient;
 
 vec3 calculateBlendWeights()
 {
@@ -66,13 +67,18 @@ void main() {
     vec3 specular = light_specular * pow(max(dot(R, E), 0.0), shininess);
     specular = clamp(specular, 0.0, 1.0);
 
+    float ambient_occlusion = 1.0;
+    if (use_ambient) {
+        ambient_occlusion = vertex_in.ambient_occlusion;
+    }
+
     if (triplanar_colors) {
-        fragColor = vec4(blend_weights, 1.0);
+        fragColor = vec4(blend_weights * ambient_occlusion, 1.0);
     } else {
         vec4 texture_color =
             texture(rock_texture, vertex_in.position.yz / 32) * blend_weights.x +
             texture(rock_texture, vertex_in.position.xz / 32) * blend_weights.y +
             texture(rock_texture, vertex_in.position.xy / 32) * blend_weights.z;
-        fragColor = texture_color * vec4((ambient + diffuse + specular), 1.0);
+        fragColor = texture_color * vec4((ambient + diffuse + specular) * ambient_occlusion, 1.0);
     }
 }

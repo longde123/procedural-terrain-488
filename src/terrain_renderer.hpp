@@ -19,6 +19,7 @@ public:
 	GLint M_uni;    // Uniform location for Model matrix.
 	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
     GLint triplanar_colors_uni;
+    GLint use_ambient_uni;
 
     GLint pos_attrib;
     GLint normal_attrib;

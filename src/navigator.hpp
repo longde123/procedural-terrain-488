@@ -50,6 +50,7 @@ private:
     bool triplanar_colors;
     bool show_slicer;
     bool show_terrain;
+    bool use_ambient;
 
     float rotation;
     float rotation_vertical;
