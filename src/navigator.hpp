@@ -48,6 +48,8 @@ private:
     // Display options
     bool wireframe;
     bool triplanar_colors;
+    bool show_slicer;
+    bool show_terrain;
 
     float rotation;
     float rotation_vertical;

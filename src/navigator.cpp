@@ -24,6 +24,8 @@ Navigator::Navigator()
 
     wireframe = false;
     triplanar_colors = false;
+    show_slicer = false;
+    show_terrain = true;
 }
 
 //----------------------------------------------------------------------------------------
@@ -118,6 +120,9 @@ void Navigator::guiLogic()
             terrain_generator.generateTerrainBlock();
         }
 
+        ImGui::Checkbox("Show Slicer", &show_slicer);
+        ImGui::Checkbox("Show Terrain", &show_terrain);
+
 /*
 		// For convenience, you can uncomment this to show ImGui's massive
 		// demonstration window right in your application.  Very handy for
@@ -154,26 +159,30 @@ void Navigator::draw()
 
     glEnable( GL_DEPTH_TEST );
 
-    density_slicer.draw(proj, view, W, terrain_generator.period);
+    if (show_slicer) {
+        density_slicer.draw(proj, view, W, terrain_generator.period);
+    }
 
     mat3 normalMatrix = mat3(transpose(inverse(view * W)));
 
-	terrain_renderer.renderer_shader.enable();
-		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
-		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
-		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
-		glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
+    if (show_terrain) {
+        terrain_renderer.renderer_shader.enable();
+            glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
+            glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
+            glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
+            glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
 
-        glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
-        terrain_renderer.prepareRender();
+            glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
+            terrain_renderer.prepareRender();
 
-		glBindVertexArray(terrain_generator.getVertices());
+            glBindVertexArray(terrain_generator.getVertices());
 
-        glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+            glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
 
-		// Draw the cubes
-		// Highlight the active square.
-	terrain_renderer.renderer_shader.disable();
+            // Draw the cubes
+            // Highlight the active square.
+        terrain_renderer.renderer_shader.disable();
+    }
 
 	// Restore defaults
 	glBindVertexArray( 0 );
