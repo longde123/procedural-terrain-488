@@ -1,28 +1,20 @@
 #version 430
 
-uniform mat4 P;
-uniform mat4 V;
-uniform mat4 M;
-uniform mat3 NormalMatrix;
-
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
 layout(binding = 0) uniform sampler3D density_map;
 
-out vertexData
-{
-    vec3 color;
-    vec3 position;
-    vec3 normal;
-} vertex_out;
+uniform int block_size;
+
+out vec3 position;
+out vec3 color;
+out vec3 normal;
 
 // The marching cubes algorithm consists of 256 cases of triangle configurations (each
 // corner can be on or off).
 
 // Tables by Ryan Geiss.
-
-#define N 32
 
 // Lookup table for many polygons for each of the 256 cases.
 int case_to_numpolys[256] = {
@@ -325,12 +317,12 @@ ivec3 edge_connect_list[256][5] = {
 
 float density(vec3 coord)
 {
-    return texture(density_map, coord / N).x;
+    return texture(density_map, coord / block_size).x;
 }
 
 vec3 normalAtVertex(vec3 vertex)
 {
-    float d = 1.0 / N;
+    float d = 1.0 / block_size;
     vec3 gradient = vec3(
         density(vertex + vec3(d, 0, 0)) - density(vertex - vec3(d, 0, 0)),
         density(vertex + vec3(0, d, 0)) - density(vertex - vec3(0, d, 0)),
@@ -360,14 +352,15 @@ void main() {
     density4567.w = density(coords + offset.yxy);
 
     if (false) {
-        vertex_out.color = density0123.xxx / 4.0 + 0.25;
+        color = density0123.xxx / 4.0 + 0.25;
+        normal = vec3(0);
 
         // To visualize where the input points are.
-        gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.0), 1.0);
+        position = coords + vec3(0.0, 0.0, 0.0);
         EmitVertex();
-        gl_Position = P * V * M * vec4(coords + vec3(0.1, 0.0, 0.0), 1.0);
+        position = coords + vec3(0.1, 0.0, 0.0);
         EmitVertex();
-        gl_Position = P * V * M * vec4(coords + vec3(0.0, 0.0, 0.1), 1.0);
+        position = coords + vec3(0.0, 0.0, 0.1);
         EmitVertex();
         EndPrimitive();
     } else {
@@ -383,7 +376,7 @@ void main() {
             ivec3 edge_index = edge_connect_list[case_index][i];
 
             // Want to place the vertex where the density is approximately zero.
-            // Note that one side of the edge should always have a positive value
+            // block_sizeote that one side of the edge should always have a positive value
             // and the other, a negative value.
             // So d1 * (1 - t) + d2 * t = 0 => t = d1 / (d1 - d2)
             // e.g. d1 = 0.1, d2 = -0.3 => t = 0.25
@@ -404,20 +397,21 @@ void main() {
             v2 += coords;
             v3 += coords;
 
-            gl_Position = P * V * M * vec4(v1, 1.0);
-            vertex_out.color = vec3(density(v1)) / 4.0 + 0.25;
-            vertex_out.normal = NormalMatrix * normalAtVertex(v1);
+            color = vec3(density(v1)) / 4.0 + 0.25;
+            position = v1;
+            normal = normalAtVertex(v1);
             EmitVertex();
-            gl_Position = P * V * M * vec4(v2, 1.0);
-            vertex_out.color = vec3(density(v2)) / 4.0 + 0.25;
-            vertex_out.normal = NormalMatrix * normalAtVertex(v2);
+            color = vec3(density(v2)) / 4.0 + 0.25;
+            position = v2;
+            normal = normalAtVertex(v2);
             EmitVertex();
-            gl_Position = P * V * M * vec4(v3, 1.0);
-            vertex_out.color = vec3(density(v3)) / 4.0 + 0.25;
-            vertex_out.normal = NormalMatrix * normalAtVertex(v3);
+            color = vec3(density(v3)) / 4.0 + 0.25;
+            position = v3;
+            normal = normalAtVertex(v3);
             EmitVertex();
 
             EndPrimitive();
         }
     }
 }
+

@@ -1,23 +1,21 @@
 #pragma once
 
+#include "cs488-framework/OpenGLImport.hpp"
+#include "cs488-framework/ShaderProgram.hpp"
+
 class Grid
 {
 public:
 	Grid( size_t dim );
-	~Grid();
 
-	void reset();
+    void init(ShaderProgram& shaderProgram);
 
-	size_t getDim() const;
+    GLuint getVertices() { return grid_vao; }
 
-	int getHeight( int x, int y ) const;
-	int getColour( int x, int y ) const;
-
-	void setHeight( int x, int y, int h );
-	void setColour( int x, int y, int c );
-	
 private:
-	size_t m_dim;
-	int *m_heights;
-	int *m_cols;
+	// Fields related to grid geometry.
+	GLuint grid_vao; // Vertex Array Object
+	GLuint grid_vbo; // Vertex Buffer Object
+
+    size_t size;
 };

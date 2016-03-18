@@ -32,8 +32,6 @@ protected:
 	virtual bool keyInputEvent(int key, int action, int mods) override;
 
 private:
-	void initGrid();
-
     void makeView();
 
 	// Fields related to the shader and uniforms.
@@ -41,10 +39,6 @@ private:
 
     TerrainRenderer terrain_renderer;
     TerrainGenerator terrain_generator;
-
-	// Fields related to grid geometry.
-	GLuint m_grid_vao; // Vertex Array Object
-	GLuint m_grid_vbo; // Vertex Buffer Object
 
 	// Matrices controlling the camera and projection.
 	glm::mat4 proj;

@@ -13,7 +13,7 @@ class ShaderProgram {
 public:
     ShaderProgram();
 
-    ~ShaderProgram();
+    virtual ~ShaderProgram();
 
     void generateProgramObject();
 
@@ -25,7 +25,7 @@ public:
 
     void attachComputeShader(const char * filePath);
 
-    void link();
+    virtual void link();
 
     void enable() const;
 
@@ -40,7 +40,7 @@ public:
     GLint getAttribLocation(const char * attributeName) const;
 
 
-private:
+protected:
     struct Shader {
         GLuint shaderObject;
         std::string filePath;
@@ -63,9 +63,11 @@ private:
 
     GLuint createShader(GLenum shaderType);
 
-    void compileShader(GLuint shaderObject, const std::string & shader);
+    void compileShader(GLuint shaderObject, const std::string & shader, const std::string & filePath);
 
-    void checkCompilationStatus(GLuint shaderObject);
+    void checkCompilationStatus(GLuint shaderObject, const std::string & filePath);
+
+    void attachShaders();
 
     void checkLinkStatus();
 

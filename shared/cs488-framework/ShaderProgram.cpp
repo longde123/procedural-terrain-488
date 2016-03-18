@@ -81,7 +81,7 @@ void ShaderProgram::extractSourceCodeAndCompile (
     string shaderSourceCode;
     extractSourceCode(shaderSourceCode, shader.filePath);
 
-    compileShader(shader.shaderObject, shaderSourceCode);
+    compileShader(shader.shaderObject, shaderSourceCode, shader.filePath);
 }
 
 //------------------------------------------------------------------------------------
@@ -125,11 +125,7 @@ void ShaderProgram::extractSourceCode (
 }
 
 //------------------------------------------------------------------------------------
-/*
-* Links all attached shaders within the ShaderProgram.
-* Note: This method must be called once before calling ShaderProgram::enable().
-*/
-void ShaderProgram::link() {
+void ShaderProgram::attachShaders() {
     if(vertexShader.shaderObject != 0) {
         glAttachShader(programObject, vertexShader.shaderObject);
     }
@@ -145,6 +141,15 @@ void ShaderProgram::link() {
     if(computeShader.shaderObject != 0) {
         glAttachShader(programObject, computeShader.shaderObject);
     }
+}
+
+//------------------------------------------------------------------------------------
+/*
+* Links all attached shaders within the ShaderProgram.
+* Note: This method must be called once before calling ShaderProgram::enable().
+*/
+void ShaderProgram::link() {
+    attachShaders();
 
     glLinkProgram(programObject);
     checkLinkStatus();
@@ -177,20 +182,22 @@ GLuint ShaderProgram::createShader (
 //------------------------------------------------------------------------------------
 void ShaderProgram::compileShader (
 		GLuint shaderObject,
-		const string & shaderSourceCode
+		const string & shaderSourceCode,
+        const string & filePath
 ) {
     const char * sourceCodeStr = shaderSourceCode.c_str();
     glShaderSource(shaderObject, 1, (const GLchar **)&sourceCodeStr, NULL);
 
     glCompileShader(shaderObject);
-    checkCompilationStatus(shaderObject);
+    checkCompilationStatus(shaderObject, filePath);
 
     CHECK_GL_ERRORS;
 }
 
 //------------------------------------------------------------------------------------
 void ShaderProgram::checkCompilationStatus (
-		GLuint shaderObject
+		GLuint shaderObject,
+        const string & filePath
 ) {
     GLint compileSuccess;
 
@@ -204,7 +211,9 @@ void ShaderProgram::checkCompilationStatus (
         GLchar errorMessage[errorMessageLength + 1]; // Add 1 for null terminator
         glGetShaderInfoLog(shaderObject, errorMessageLength, NULL, errorMessage);
 
-        string message = "Error Compiling Shader: ";
+        string message = "Error Compiling Shader ";
+        message += filePath;
+        message += ":";
         message += errorMessage;
 
         throw ShaderException(message);

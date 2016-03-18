@@ -45,7 +45,9 @@ void Navigator::init()
     terrain_renderer.init(m_exec_dir + "/Assets/");
     terrain_generator.init(m_exec_dir + "/Assets/");
 
-	initGrid();
+    terrain_generator.initBuffer(terrain_renderer.posAttrib, terrain_renderer.colorAttrib,
+            terrain_renderer.normalAttrib);
+    terrain_generator.generateTerrainBlock();
 
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
@@ -65,50 +67,6 @@ void Navigator::makeView()
         rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis),
         vec3(0.0f, 0.0f, 0.0f),
         vec3(0.0f, 1.0f, 0.0f));
-}
-
-void Navigator::initGrid()
-{
-	size_t sz = 3 * BLOCK_DIMENSION * BLOCK_DIMENSION;
-
-	float *verts = new float[ sz ];
-	size_t ct = 0;
-    for (int y = 0; y < BLOCK_DIMENSION; y++) {
-        for (int x = 0; x < BLOCK_DIMENSION; x++) {
-            // TODO: For optimization, try swapping x and y and see if that
-            // makes any difference
-            int idx = x + y * BLOCK_DIMENSION;
-            verts[idx * 3] = x;
-            verts[idx * 3 + 1] = 0;
-            verts[idx * 3 + 2] = y;
-        }
-    }
-
-	// Create the vertex array to record buffer assignments.
-	glGenVertexArrays( 1, &m_grid_vao );
-	glBindVertexArray( m_grid_vao );
-
-	// Create the cube vertex buffer
-	glGenBuffers( 1, &m_grid_vbo );
-	glBindBuffer( GL_ARRAY_BUFFER, m_grid_vbo );
-	glBufferData( GL_ARRAY_BUFFER, sz*sizeof(float),
-		verts, GL_STATIC_DRAW );
-
-	// Specify the means of extracting the position values properly.
-	GLint posAttrib = terrain_renderer.renderer_shader.getAttribLocation( "position" );
-	glEnableVertexAttribArray( posAttrib );
-	glVertexAttribPointer( posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr );
-
-	// Reset state to prevent rogue code from messing with *my*
-	// stuff!
-	glBindVertexArray( 0 );
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-
-	// OpenGL has the buffer now, there's no need for us to keep a copy.
-	delete [] verts;
-
-	CHECK_GL_ERRORS;
 }
 
 //----------------------------------------------------------------------------------------
@@ -153,7 +111,10 @@ void Navigator::guiLogic()
             ImGui::EndMenuBar();
         }
 
-        ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 40.0f);
+        if (ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 40.0f)) {
+            // Need to regenerate terrain.
+            terrain_generator.generateTerrainBlock();
+        }
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive
@@ -185,8 +146,6 @@ void Navigator::draw()
     float offset = -BLOCK_DIMENSION / 2.0f;
 	W = glm::translate(W, vec3(offset, offset, offset));
 
-    terrain_generator.generateTerrainBlock();
-
     if (wireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     }
@@ -201,10 +160,9 @@ void Navigator::draw()
 		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
 		glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
 
-		// Just draw the grid for now.
-		glBindVertexArray( m_grid_vao );
-		glDrawArraysInstanced( GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION );
+		glBindVertexArray(terrain_generator.getVertices());
 
+        glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedbackObject);
 
 		// Draw the cubes
 		// Highlight the active square.

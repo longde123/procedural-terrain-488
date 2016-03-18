@@ -1,50 +1,53 @@
-#include <algorithm>
-
 #include "grid.hpp"
 
-Grid::Grid( size_t d )
-	: m_dim( d )
-{
-	m_heights = new int[ d * d ];
-	m_cols = new int[ d * d ];
+#include <algorithm>
 
-	reset();
+#include "cs488-framework/GlErrorCheck.hpp"
+
+Grid::Grid(size_t d)
+: size(d)
+{
 }
 
-void Grid::reset()
+void Grid::init(ShaderProgram& shaderProgram)
 {
-	size_t sz = m_dim*m_dim;
-	std::fill( m_heights, m_heights + sz, 0 );
-	std::fill( m_cols, m_cols + sz, 0 );
-}
+	size_t sz = 3 * size * size;
 
-Grid::~Grid()
-{
-	delete [] m_heights;
-	delete [] m_cols;
-}
+	float *verts = new float[ sz ];
+	size_t ct = 0;
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            // TODO: For optimization, try swapping x and y and see if that
+            // makes any difference
+            int idx = x + y * size;
+            verts[idx * 3] = x;
+            verts[idx * 3 + 1] = 0;
+            verts[idx * 3 + 2] = y;
+        }
+    }
 
-size_t Grid::getDim() const
-{
-	return m_dim;
-}
+	// Create the vertex array to record buffer assignments.
+	glGenVertexArrays(1, &grid_vao);
+	glBindVertexArray(grid_vao);
 
-int Grid::getHeight( int x, int y ) const
-{
-	return m_heights[ y * m_dim + x ];
-}
+	// Create the cube vertex buffer
+	glGenBuffers(1, &grid_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, grid_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sz*sizeof(float),
+		verts, GL_STATIC_DRAW );
 
-int Grid::getColour( int x, int y ) const
-{
-	return m_cols[ y * m_dim + x ];
-}
+	// Specify the means of extracting the position values properly.
+	GLint posAttrib = shaderProgram.getAttribLocation( "position" );
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-void Grid::setHeight( int x, int y, int h )
-{
-	m_heights[ y * m_dim + x ] = h;
-}
+	// Reset state to prevent rogue code from messing with *my* stuff!
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-void Grid::setColour( int x, int y, int c )
-{
-	m_cols[ y * m_dim + x ] = c;
+	// OpenGL has the buffer now, there's no need for us to keep a copy.
+	delete [] verts;
+
+	CHECK_GL_ERRORS;
 }

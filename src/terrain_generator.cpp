@@ -4,27 +4,34 @@
 #include <assert.h>
 #include <vector>
 
+#include <glm/glm.hpp>
+
+using namespace glm;
 using namespace std;
 
 #define LOCAL_DIM_X 32
 #define LOCAL_DIM_Y 32
 #define LOCAL_DIM_Z 1
 
+#define DENSITY_BLOCK_DIMENSION (BLOCK_DIMENSION + 1)
+
 TerrainGenerator::TerrainGenerator()
 : period(4.0f)
+, grid(DENSITY_BLOCK_DIMENSION)
 {
-    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_X == 0);
-    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_Y == 0);
-    assert((BLOCK_DIMENSION + 1) % LOCAL_DIM_Z == 0);
+    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_X == 0);
+    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
+    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_Z == 0);
 }
 
 void TerrainGenerator::init(string dir)
 {
-    terrain_shader.generateProgramObject();
-    terrain_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
-    terrain_shader.link();
 
-	period_uni = terrain_shader.getUniformLocation("period");
+    density_shader.generateProgramObject();
+    density_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
+    density_shader.link();
+
+	period_uni = density_shader.getUniformLocation("period");
 
     // Generate texture object in which to store the terrain block.
     glGenTextures(1, &block);
@@ -43,7 +50,7 @@ void TerrainGenerator::init(string dir)
     glTexImage3D(GL_TEXTURE_3D,
                  0,                         // level of detail
                  GL_R32F,                   // internal format
-                 BLOCK_DIMENSION + 1, BLOCK_DIMENSION + 1, BLOCK_DIMENSION + 1,
+                 DENSITY_BLOCK_DIMENSION, DENSITY_BLOCK_DIMENSION, DENSITY_BLOCK_DIMENSION,
                  0,                         // 0 is required
                  GL_RED, GL_FLOAT, NULL     // input format, not applicable
                 );
@@ -57,18 +64,65 @@ void TerrainGenerator::init(string dir)
                        0,               // layer
                        GL_READ_WRITE,   // access
                        GL_R32F);
+
+    marching_cubes_shader.generateProgramObject();
+	marching_cubes_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
+	marching_cubes_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
+	marching_cubes_shader.link();
+
+    grid.init(marching_cubes_shader);
+}
+
+void TerrainGenerator::initBuffer(GLint posAttrib, GLint colorAttrib, GLint normalAttrib)
+{
+    // TODO: verify size
+    size_t data_size = DENSITY_BLOCK_DIMENSION * DENSITY_BLOCK_DIMENSION *
+                       DENSITY_BLOCK_DIMENSION * (sizeof(vec3) * 3) * 15;
+
+	glGenVertexArrays(1, &out_vao);
+    glGenBuffers(1, &out_vbo);
+	glBindVertexArray(out_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, out_vbo);
+    {
+        // TODO: Investigate performance of different usage flags.
+        glBufferData(GL_ARRAY_BUFFER, data_size, nullptr, GL_DYNAMIC_COPY);
+
+        // Setup location of attributes
+        glEnableVertexAttribArray(posAttrib);
+        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE,
+                3 * sizeof(vec3), 0);
+        glEnableVertexAttribArray(colorAttrib);
+        glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE,
+                3 * sizeof(vec3), (void*)(sizeof(vec3)));
+        glEnableVertexAttribArray(normalAttrib);
+        glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_FALSE,
+                3 * sizeof(vec3), (void*)(sizeof(vec3) * 2));
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+    glGenTransformFeedbacks(1, &feedbackObject);
+    {
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedbackObject);
+
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, out_vbo);
+
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+    }
+
+	CHECK_GL_ERRORS;
 }
 
 void TerrainGenerator::generateTerrainBlock()
 {
     // Generate the density values for the terrain block.
-    terrain_shader.enable();
+    density_shader.enable();
     {
         glUniform1f(period_uni, period);
 
-        glDispatchCompute((BLOCK_DIMENSION + 1) / LOCAL_DIM_X,
-                          (BLOCK_DIMENSION + 1) / LOCAL_DIM_Y,
-                          (BLOCK_DIMENSION + 1) / LOCAL_DIM_Z);
+        glDispatchCompute(DENSITY_BLOCK_DIMENSION / LOCAL_DIM_X,
+                          DENSITY_BLOCK_DIMENSION / LOCAL_DIM_Y,
+                          DENSITY_BLOCK_DIMENSION / LOCAL_DIM_Z);
 
         // Block until kernel/shader finishes execution.
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -77,14 +131,60 @@ void TerrainGenerator::generateTerrainBlock()
         /*
         vector<float> data(BLOCK_DIMENSION * BLOCK_DIMENSION * BLOCK_DIMENSION);
         glGetTexImage(GL_TEXTURE_3D, 0, GL_RED, GL_FLOAT, &data[0]);
+        for (int i = 0; i < 10; i++) {
+            printf("%f\n", data[i]);
+        }
         for (int i = 0; i < BLOCK_DIMENSION * BLOCK_DIMENSION * BLOCK_DIMENSION; i++) {
             if (!(data[i] >= -1.0 && data[i] <= 1.0)) {
                 printf("%f\n", data[i]);
                 break;
             }
-        }*/
+        }
+        */
     }
-    terrain_shader.disable();
+    density_shader.disable();
+
+	CHECK_GL_ERRORS;
+
+    // Generate the triangle mesh for the terrain.
+    marching_cubes_shader.enable();
+    {
+        GLint block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
+        glUniform1i(block_size_uni, DENSITY_BLOCK_DIMENSION);
+
+        // The terrain generator just saves vertices in world space.
+        glEnable(GL_RASTERIZER_DISCARD);
+
+        // Just draw the grid for now.
+        glBindVertexArray(grid.getVertices());
+
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedbackObject);
+        glBeginTransformFeedback(GL_TRIANGLES);
+        {
+            glDrawArraysInstanced(GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION);
+        }
+        glEndTransformFeedback();
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+
+        /*
+        // Get some data on the CPU side to see if it looks right.
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, marching_cubes_shader.getBuffer());
+            int n = 30;
+            vector<float> data(n);
+            glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * n, &data[0]);
+            CHECK_GL_ERRORS;
+            for (int i = 0; i < n; i++) {
+                printf("%f\n", data[i]);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+        */
+
+        glBindVertexArray(0);
+        glDisable(GL_RASTERIZER_DISCARD);
+    }
+    marching_cubes_shader.disable();
 
 	CHECK_GL_ERRORS;
 }
