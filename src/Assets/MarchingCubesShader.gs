@@ -322,7 +322,7 @@ float density(vec3 coord)
 
 vec3 normalAtVertex(vec3 vertex)
 {
-    float d = 1.0 / block_size;
+    float d = 1.0;
     vec3 gradient = vec3(
         density(vertex + vec3(d, 0, 0)) - density(vertex - vec3(d, 0, 0)),
         density(vertex + vec3(0, d, 0)) - density(vertex - vec3(0, d, 0)),

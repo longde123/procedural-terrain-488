@@ -92,6 +92,9 @@ void main() {
 
     float density = height_gradient + noise * 0.5;
 
+    // For debugging : this is the density function for a sphere.
+    //density = length(coords - ivec3(32, 32, 32)) - 16 + period * 0.0001;
+
     //imageStore(density_map, coords, mod(vec4(frequency), 1.0));
     //imageStore(density_map, coords, vec4(perlinNoise(coords, frequency)));
     imageStore(density_map, coords, vec4(density));
