@@ -7,6 +7,7 @@ using namespace glm;
 using namespace std;
 
 TerrainRenderer::TerrainRenderer()
+: texture("Textures/Stone1.JPG", GL_TEXTURE1)
 {
 }
 
@@ -29,5 +30,12 @@ void TerrainRenderer::init(string dir)
     color_attrib = renderer_shader.getAttribLocation("color");
     normal_attrib = renderer_shader.getAttribLocation("normal");
 
+    texture.init();
+
 	CHECK_GL_ERRORS;
+}
+
+void TerrainRenderer::prepareRender()
+{
+    texture.rebind();
 }

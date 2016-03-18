@@ -3,12 +3,14 @@
 #include <string>
 
 #include "cs488-framework/ShaderProgram.hpp"
+#include "texture.hpp"
 
 class TerrainRenderer {
 public:
     TerrainRenderer();
 
     void init(std::string dir);
+    void prepareRender();
 
     ShaderProgram renderer_shader;
 
@@ -21,4 +23,7 @@ public:
     GLint pos_attrib;
     GLint color_attrib;
     GLint normal_attrib;
+
+private:
+    Texture texture;
 };

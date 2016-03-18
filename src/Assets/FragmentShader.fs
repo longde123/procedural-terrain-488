@@ -11,6 +11,7 @@ in vertexData
 out vec4 fragColor;
 
 layout(binding = 0) uniform sampler3D density_map;
+layout(binding = 1) uniform sampler2D rock_texture;
 
 uniform bool triplanar_colors;
 
@@ -42,7 +43,7 @@ void main() {
     vec3 blend_weights = abs(normalize(vertex_in.original_normal));
     // We don't want the blending to happen gradually, only blend in the neighborhood
     // of 45 degree angles.
-    blend_weights = blend_weights - 0.4;
+    blend_weights = blend_weights - 0.45;
     blend_weights = max(blend_weights, 0.0);
     // Make sure weights sum to one.
     blend_weights = blend_weights / (blend_weights.x + blend_weights.y + blend_weights.z);
@@ -50,7 +51,10 @@ void main() {
     if (triplanar_colors) {
         fragColor = vec4(blend_weights, 1.0);
     } else {
-        // TODO: texture blending
-        fragColor = vec4(vertex_in.color * (ambient + diffuse + specular), 1.0);
+        vec4 texture_color =
+            texture(rock_texture, vertex_in.position.yz / 32) * blend_weights.x +
+            texture(rock_texture, vertex_in.position.xz / 32) * blend_weights.y +
+            texture(rock_texture, vertex_in.position.xy / 32) * blend_weights.z;
+        fragColor = texture_color * vec4((ambient + diffuse + specular), 1.0);
     }
 }

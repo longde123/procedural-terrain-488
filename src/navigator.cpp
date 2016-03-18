@@ -164,6 +164,7 @@ void Navigator::draw()
 		glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
 
         glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
+        terrain_renderer.prepareRender();
 
 		glBindVertexArray(terrain_generator.getVertices());
 
