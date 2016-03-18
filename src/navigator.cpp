@@ -25,6 +25,7 @@ Navigator::Navigator()
     mouse_down_with_control = false;
 
     wireframe = false;
+    triplanar_colors = false;
 }
 
 //----------------------------------------------------------------------------------------
@@ -106,6 +107,7 @@ void Navigator::guiLogic()
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Options")) {
                 if (ImGui::MenuItem("Wireframe", NULL, &wireframe)) {}
+                if (ImGui::MenuItem("Triplanar Colors", NULL, &triplanar_colors)) {}
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
@@ -159,6 +161,8 @@ void Navigator::draw()
 		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
 		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
 		glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
+
+        glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
 
 		glBindVertexArray(terrain_generator.getVertices());
 

@@ -23,6 +23,8 @@ void TerrainRenderer::init(string dir)
 	M_uni = renderer_shader.getUniformLocation( "M" );
 	NormalMatrix_uni = renderer_shader.getUniformLocation( "NormalMatrix" );
 
+    triplanar_colors_uni = renderer_shader.getUniformLocation("triplanar_colors");
+
     posAttrib = renderer_shader.getAttribLocation("position");
     colorAttrib = renderer_shader.getAttribLocation("color");
     normalAttrib = renderer_shader.getAttribLocation("normal");

@@ -16,6 +16,7 @@ public:
 	GLint V_uni;    // Uniform location for View matrix.
 	GLint M_uni;    // Uniform location for Model matrix.
 	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
+    GLint triplanar_colors_uni;
 
     GLint posAttrib;
     GLint colorAttrib;

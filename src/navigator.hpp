@@ -46,6 +46,7 @@ private:
 
     // Display options
     bool wireframe;
+    bool triplanar_colors;
 
     float rotation;
     float rotation_vertical;

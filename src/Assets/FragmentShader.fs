@@ -12,6 +12,8 @@ out vec4 fragColor;
 
 layout(binding = 0) uniform sampler3D density_map;
 
+uniform bool triplanar_colors;
+
 void main() {
     // Need to normalize since interpolation probably changed the lengths.
     vec3 normal = normalize(vertex_in.normal);
@@ -45,13 +47,10 @@ void main() {
     // Make sure weights sum to one.
     blend_weights = blend_weights / (blend_weights.x + blend_weights.y + blend_weights.z);
 
-    vec3 color;
-    if (true) {
-        color = blend_weights;
+    if (triplanar_colors) {
+        fragColor = vec4(blend_weights, 1.0);
     } else {
         // TODO: texture blending
+        fragColor = vec4(vertex_in.color * (ambient + diffuse + specular), 1.0);
     }
-
-    fragColor = vec4(color, 1);
-    //fragColor = vec4(vertex_in.color * (ambient + diffuse + specular), 1);
 }
