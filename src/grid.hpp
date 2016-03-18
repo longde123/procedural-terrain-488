@@ -1,21 +1,20 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "cs488-framework/OpenGLImport.hpp"
 #include "cs488-framework/ShaderProgram.hpp"
 
-class Grid
+#include "geometry.hpp"
+
+class Grid : public Geometry
 {
 public:
 	Grid( size_t dim );
 
-    void init(ShaderProgram& shaderProgram);
-
-    GLuint getVertices() { return grid_vao; }
+    // Initialize a grid of size dim x dim on the x-z plane.
+    void init(ShaderProgram& shaderProgram, glm::mat4 transform = glm::mat4());
 
 private:
-	// Fields related to grid geometry.
-	GLuint grid_vao; // Vertex Array Object
-	GLuint grid_vbo; // Vertex Buffer Object
-
     size_t size;
 };
