@@ -25,9 +25,9 @@ void TerrainRenderer::init(string dir)
 
     triplanar_colors_uni = renderer_shader.getUniformLocation("triplanar_colors");
 
-    posAttrib = renderer_shader.getAttribLocation("position");
-    colorAttrib = renderer_shader.getAttribLocation("color");
-    normalAttrib = renderer_shader.getAttribLocation("normal");
+    pos_attrib = renderer_shader.getAttribLocation("position");
+    color_attrib = renderer_shader.getAttribLocation("color");
+    normal_attrib = renderer_shader.getAttribLocation("normal");
 
 	CHECK_GL_ERRORS;
 }

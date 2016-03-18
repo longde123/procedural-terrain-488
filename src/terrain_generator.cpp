@@ -73,7 +73,7 @@ void TerrainGenerator::init(string dir)
     grid.init(marching_cubes_shader);
 }
 
-void TerrainGenerator::initBuffer(GLint posAttrib, GLint colorAttrib, GLint normalAttrib)
+void TerrainGenerator::initBuffer(GLint pos_attrib, GLint color_attrib, GLint normal_attrib)
 {
     // TODO: verify size
     size_t data_size = DENSITY_BLOCK_DIMENSION * DENSITY_BLOCK_DIMENSION *
@@ -88,22 +88,22 @@ void TerrainGenerator::initBuffer(GLint posAttrib, GLint colorAttrib, GLint norm
         glBufferData(GL_ARRAY_BUFFER, data_size, nullptr, GL_DYNAMIC_COPY);
 
         // Setup location of attributes
-        glEnableVertexAttribArray(posAttrib);
-        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE,
+        glEnableVertexAttribArray(pos_attrib);
+        glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE,
                 3 * sizeof(vec3), 0);
-        glEnableVertexAttribArray(colorAttrib);
-        glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE,
+        glEnableVertexAttribArray(color_attrib);
+        glVertexAttribPointer(color_attrib, 3, GL_FLOAT, GL_FALSE,
                 3 * sizeof(vec3), (void*)(sizeof(vec3)));
-        glEnableVertexAttribArray(normalAttrib);
-        glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_FALSE,
+        glEnableVertexAttribArray(normal_attrib);
+        glVertexAttribPointer(normal_attrib, 3, GL_FLOAT, GL_FALSE,
                 3 * sizeof(vec3), (void*)(sizeof(vec3) * 2));
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-    glGenTransformFeedbacks(1, &feedbackObject);
+    glGenTransformFeedbacks(1, &feedback_object);
     {
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedbackObject);
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
 
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, out_vbo);
 
@@ -158,7 +158,7 @@ void TerrainGenerator::generateTerrainBlock()
         // Just draw the grid for now.
         glBindVertexArray(grid.getVertices());
 
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedbackObject);
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
         glBeginTransformFeedback(GL_TRIANGLES);
         {
             glDrawArraysInstanced(GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION);

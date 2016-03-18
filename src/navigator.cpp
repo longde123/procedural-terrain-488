@@ -46,8 +46,9 @@ void Navigator::init()
     terrain_renderer.init(m_exec_dir + "/Assets/");
     terrain_generator.init(m_exec_dir + "/Assets/");
 
-    terrain_generator.initBuffer(terrain_renderer.posAttrib, terrain_renderer.colorAttrib,
-            terrain_renderer.normalAttrib);
+    terrain_generator.initBuffer(terrain_renderer.pos_attrib,
+            terrain_renderer.color_attrib,
+            terrain_renderer.normal_attrib);
     terrain_generator.generateTerrainBlock();
 
 	// Set up initial view and projection matrices (need to do this here,
@@ -166,7 +167,7 @@ void Navigator::draw()
 
 		glBindVertexArray(terrain_generator.getVertices());
 
-        glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedbackObject);
+        glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
 
 		// Draw the cubes
 		// Highlight the active square.

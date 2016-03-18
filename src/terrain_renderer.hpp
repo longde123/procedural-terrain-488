@@ -18,7 +18,7 @@ public:
 	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
     GLint triplanar_colors_uni;
 
-    GLint posAttrib;
-    GLint colorAttrib;
-    GLint normalAttrib;
+    GLint pos_attrib;
+    GLint color_attrib;
+    GLint normal_attrib;
 };

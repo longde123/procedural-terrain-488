@@ -4,7 +4,7 @@
 
 #include "cs488-framework/ShaderProgram.hpp"
 #include "grid.hpp"
-#include "TransformProgram.hpp"
+#include "transform_program.hpp"
 
 #define BLOCK_DIMENSION 63
 
@@ -13,7 +13,7 @@ public:
     TerrainGenerator();
 
     void init(std::string dir);
-    void initBuffer(GLint posAttrib, GLint colorAttrib, GLint normalAttrib);
+    void initBuffer(GLint pos_attrib, GLint color_attrib, GLint normal_attrib);
 
     void generateTerrainBlock();
 
@@ -22,7 +22,7 @@ public:
     // A 3D cubic block of terrain.
     GLuint block;
 
-    GLuint feedbackObject;
+    GLuint feedback_object;
 
     float period;
 private:

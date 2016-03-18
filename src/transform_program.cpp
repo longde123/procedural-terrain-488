@@ -1,4 +1,4 @@
-#include "TransformProgram.hpp"
+#include "transform_program.hpp"
 
 #include <assert.h>
 #include <vector>
