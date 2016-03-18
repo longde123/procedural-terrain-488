@@ -1,6 +1,6 @@
 #!lua
 
-includeDirList = { 
+includeDirList = {
     "shared",
     "shared/gl3w",
     "shared/imgui",
@@ -23,6 +23,22 @@ if not os.isfile("lib/libglfw3.a") then
     os.execute("cp shared/glfw-3.1.1/build/src/libglfw3.a lib/")
 end
 
+if not os.isfile("lib/libSOIL.a") then
+    os.chdir("shared/soil/projects/makefile")
+    os.execute("mkdir -p obj")
+    os.execute("make")
+    os.chdir("../../../..")
+    os.execute("cp shared/soil/lib/libSOIL.a lib/")
+end
+
+--[[
+if not os.isfile("lib/libjpeg.a") then
+    os.chdir("shared/jpeg-9b")
+    os.execute("./configure --disable-shared")
+    os.execute("make")
+    os.execute("cp shared/jpeg-9b/.libs/libjpeg.a lib/")
+end
+]]--
 
 solution "BuildStaticLibs"
     configurations { "Debug", "Release" }
@@ -50,7 +66,7 @@ solution "BuildStaticLibs"
             "shared/imgui/examples/opengl3_example",
             "shared/imgui/examples/libs/gl3w/",
         }
-        files { 
+        files {
             "shared/imgui/*.cpp",
             "shared/gl3w/GL/gl3w.c"
         }
