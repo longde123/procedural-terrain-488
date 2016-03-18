@@ -330,6 +330,14 @@ vec3 normalAtVertex(vec3 vertex)
     return -normalize(gradient);
 }
 
+void createVertex(vec3 vertex)
+{
+    color = vec3(density(vertex)) / 4.0 + 0.25;
+    position = vertex;
+    normal = normalAtVertex(vertex);
+    EmitVertex();
+}
+
 void main() {
     vec3 coords = vec3(gl_in[0].gl_Position);
 
@@ -397,18 +405,9 @@ void main() {
             v2 += coords;
             v3 += coords;
 
-            color = vec3(density(v1)) / 4.0 + 0.25;
-            position = v1;
-            normal = normalAtVertex(v1);
-            EmitVertex();
-            color = vec3(density(v2)) / 4.0 + 0.25;
-            position = v2;
-            normal = normalAtVertex(v2);
-            EmitVertex();
-            color = vec3(density(v3)) / 4.0 + 0.25;
-            position = v3;
-            normal = normalAtVertex(v3);
-            EmitVertex();
+            createVertex(v1);
+            createVertex(v2);
+            createVertex(v3);
 
             EndPrimitive();
         }

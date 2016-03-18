@@ -53,6 +53,7 @@ void Texture::init()
 
 void Texture::rebind()
 {
+    assert(width > 0 && height > 0);
     glActiveTexture(binding);
     glBindTexture(GL_TEXTURE_2D, texture);
 }

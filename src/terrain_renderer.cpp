@@ -8,6 +8,7 @@ using namespace std;
 
 TerrainRenderer::TerrainRenderer()
 : texture("Textures/Stone1.JPG", GL_TEXTURE1)
+, normal_map("Textures/Textures_N/Stone1_N.jpg", GL_TEXTURE2)
 {
 }
 
@@ -31,6 +32,7 @@ void TerrainRenderer::init(string dir)
     normal_attrib = renderer_shader.getAttribLocation("normal");
 
     texture.init();
+    normal_map.init();
 
 	CHECK_GL_ERRORS;
 }
@@ -38,4 +40,5 @@ void TerrainRenderer::init(string dir)
 void TerrainRenderer::prepareRender()
 {
     texture.rebind();
+    normal_map.rebind();
 }

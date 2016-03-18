@@ -12,12 +12,39 @@ out vec4 fragColor;
 
 layout(binding = 0) uniform sampler3D density_map;
 layout(binding = 1) uniform sampler2D rock_texture;
+layout(binding = 2) uniform sampler2D normal_map;
 
 uniform bool triplanar_colors;
+
+vec3 calculateBlendWeights()
+{
+    // Doesn't matter whether the normal is pointing along or opposite to the axes.
+    vec3 blend_weights = abs(normalize(vertex_in.original_normal));
+    // We don't want the blending to happen gradually, only blend in the neighborhood
+    // of 45 degree angles.
+    blend_weights = blend_weights - 0.45;
+    blend_weights = max(blend_weights, 0.0);
+    // Make sure weights sum to one.
+    blend_weights = blend_weights / (blend_weights.x + blend_weights.y + blend_weights.z);
+
+    return blend_weights;
+}
+
+vec3 calculateNormalMap(vec3 texture_normal)
+{
+    // http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
+
+    // Need the normal to be in the range [-1, 1];
+    texture_normal = normalize(texture_normal * 2 - 1.0);
+
+    return texture_normal;
+}
 
 void main() {
     // Need to normalize since interpolation probably changed the lengths.
     vec3 normal = normalize(vertex_in.normal);
+
+    vec3 blend_weights = calculateBlendWeights();
 
     // TODO: Pass these in as parameters.
     vec3 light_position = vec3(20, 20, 0);
@@ -38,15 +65,6 @@ void main() {
 
     vec3 specular = light_specular * pow(max(dot(R, E), 0.0), shininess);
     specular = clamp(specular, 0.0, 1.0);
-
-    // Doesn't matter whether the normal is pointing along or opposite to the axes.
-    vec3 blend_weights = abs(normalize(vertex_in.original_normal));
-    // We don't want the blending to happen gradually, only blend in the neighborhood
-    // of 45 degree angles.
-    blend_weights = blend_weights - 0.45;
-    blend_weights = max(blend_weights, 0.0);
-    // Make sure weights sum to one.
-    blend_weights = blend_weights / (blend_weights.x + blend_weights.y + blend_weights.z);
 
     if (triplanar_colors) {
         fragColor = vec4(blend_weights, 1.0);

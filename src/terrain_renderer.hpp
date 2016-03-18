@@ -26,4 +26,5 @@ public:
 
 private:
     Texture texture;
+    Texture normal_map;
 };
