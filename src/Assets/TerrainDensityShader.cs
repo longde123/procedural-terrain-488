@@ -19,10 +19,17 @@ vec3 perlinVectors[12] = {
     vec3(0,1,1),vec3(0,-1,1),vec3(0,1,-1),vec3(0,-1,-1)
 };
 
+unsigned int hash(ivec3 lowerCorner) {
+    unsigned int x = lowerCorner.x * 256 * 256 + lowerCorner.y * 256 + lowerCorner.z;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x);
+    return x;
+}
+
 vec3 gradientAtCoordinate(ivec3 gridCoords)
 {
-    int hash = gridCoords.x * 191 + gridCoords.y * 389 + gridCoords.z * 431;
-    return perlinVectors[hash % 12];
+    return perlinVectors[hash(gridCoords) % 12];
 }
 
 float influenceAtCoordinate(ivec3 lowerCorner, ivec3 offset, vec3 innerCoords)
@@ -40,11 +47,14 @@ float ease(float t)
     return 6 * t5 - 15 * t4 + 10 * t3;
 }
 
-float perlinNoise(ivec3 coords, float frequency)
+float perlinNoise(vec3 coords, float frequency)
 {
     vec3 scaledCoords = vec3(coords) * frequency;
     vec3 innerCoords = vec3(mod(scaledCoords, 1.0));
-    ivec3 lowerCorner = ivec3(scaledCoords - innerCoords);
+
+    // Need to use floor first to truncate consistently towards negative
+    // infinity. Otherwise, there will be symmetry around 0.
+    ivec3 lowerCorner = ivec3(floor(scaledCoords));
 
     // For swizzling.
     ivec2 offset = ivec2(0, 1);
@@ -63,7 +73,7 @@ float perlinNoise(ivec3 coords, float frequency)
                       influenceAtCoordinate(lowerCorner, offset.yxy, innerCoords),
                       influenceAtCoordinate(lowerCorner, offset.yyy, innerCoords));
     vec4 zInterp = mix(face1, face2, zInterpolant);
-    vec2 yInterp = mix(zInterp.xy, zInterp.zw, yInterpolant);
+    vec2 yInterp = mix(zInterp.xz, zInterp.yw, yInterpolant);
     float xInterp = mix(yInterp.x, yInterp.y, xInterpolant);
     return xInterp;
 }
