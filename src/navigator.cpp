@@ -48,8 +48,8 @@ void Navigator::init()
     terrain_generator.init(m_exec_dir + "/Assets/");
 
     terrain_generator.initBuffer(terrain_renderer.pos_attrib,
-            terrain_renderer.color_attrib,
-            terrain_renderer.normal_attrib);
+            terrain_renderer.normal_attrib,
+            terrain_renderer.ambient_occlusion_attrib);
     terrain_generator.generateTerrainBlock();
 
 	// Set up initial view and projection matrices (need to do this here,

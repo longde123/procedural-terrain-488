@@ -17,9 +17,8 @@ void TransformProgram::link()
 {
     attachShaders();
 
-    static const GLchar* varyings[] = { "position", "color", "normal" };
-    glTransformFeedbackVaryings(programObject, 3,
-            varyings, GL_INTERLEAVED_ATTRIBS);
+    static const GLchar* varyings[] = { "position", "normal", "ambient_occlusion" };
+    glTransformFeedbackVaryings(programObject, 3, varyings, GL_INTERLEAVED_ATTRIBS);
 
     glLinkProgram(programObject);
     checkLinkStatus();

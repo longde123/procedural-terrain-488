@@ -21,8 +21,8 @@ public:
     GLint triplanar_colors_uni;
 
     GLint pos_attrib;
-    GLint color_attrib;
     GLint normal_attrib;
+    GLint ambient_occlusion_attrib;
 
 private:
     Texture texture;

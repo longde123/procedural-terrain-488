@@ -3,8 +3,8 @@
 in vertexData
 {
     vec3 position;
-    vec3 color;
     vec3 normal;
+    float ambient_occlusion;
     vec3 original_normal;
 } vertex_in;
 

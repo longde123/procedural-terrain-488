@@ -12,7 +12,7 @@ public:
     TerrainGenerator();
 
     void init(std::string dir);
-    void initBuffer(GLint pos_attrib, GLint color_attrib, GLint normal_attrib);
+    void initBuffer(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
     void generateTerrainBlock();
 

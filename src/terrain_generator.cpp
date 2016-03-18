@@ -71,11 +71,11 @@ void TerrainGenerator::init(string dir)
     grid.init(marching_cubes_shader);
 }
 
-void TerrainGenerator::initBuffer(GLint pos_attrib, GLint color_attrib, GLint normal_attrib)
+void TerrainGenerator::initBuffer(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
 {
-    // TODO: verify size
+    size_t unit_size = sizeof(vec3) * 2 + sizeof(float);
     size_t data_size = DENSITY_BLOCK_DIMENSION * DENSITY_BLOCK_DIMENSION *
-                       DENSITY_BLOCK_DIMENSION * (sizeof(vec3) * 3) * 15;
+                       DENSITY_BLOCK_DIMENSION * unit_size * 15;
 
 	glGenVertexArrays(1, &out_vao);
     glGenBuffers(1, &out_vbo);
@@ -88,13 +88,13 @@ void TerrainGenerator::initBuffer(GLint pos_attrib, GLint color_attrib, GLint no
         // Setup location of attributes
         glEnableVertexAttribArray(pos_attrib);
         glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE,
-                3 * sizeof(vec3), 0);
-        glEnableVertexAttribArray(color_attrib);
-        glVertexAttribPointer(color_attrib, 3, GL_FLOAT, GL_FALSE,
-                3 * sizeof(vec3), (void*)(sizeof(vec3)));
+                unit_size, 0);
         glEnableVertexAttribArray(normal_attrib);
         glVertexAttribPointer(normal_attrib, 3, GL_FLOAT, GL_FALSE,
-                3 * sizeof(vec3), (void*)(sizeof(vec3) * 2));
+                unit_size, (void*)(sizeof(vec3)));
+        glEnableVertexAttribArray(ambient_occlusion_attrib);
+        glVertexAttribPointer(ambient_occlusion_attrib, 3, GL_FLOAT, GL_FALSE,
+                unit_size, (void*)(sizeof(vec3) * 2));
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

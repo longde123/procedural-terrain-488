@@ -28,8 +28,8 @@ void TerrainRenderer::init(string dir)
     triplanar_colors_uni = renderer_shader.getUniformLocation("triplanar_colors");
 
     pos_attrib = renderer_shader.getAttribLocation("position");
-    color_attrib = renderer_shader.getAttribLocation("color");
     normal_attrib = renderer_shader.getAttribLocation("normal");
+    ambient_occlusion_attrib = renderer_shader.getAttribLocation("ambient_occlusion");
 
     texture.init();
     normal_map.init();
