@@ -8,7 +8,7 @@
 #include "cs488-framework/OpenGLImport.hpp"
 #include "cs488-framework/ShaderProgram.hpp"
 
-#include "grid.hpp"
+#include "density_slicer.hpp"
 #include "terrain_generator.hpp"
 #include "terrain_renderer.hpp"
 
@@ -37,6 +37,7 @@ private:
 	// Fields related to the shader and uniforms.
 	ShaderProgram m_shader;
 
+    DensitySlicer density_slicer;
     TerrainRenderer terrain_renderer;
     TerrainGenerator terrain_generator;
 

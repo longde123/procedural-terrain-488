@@ -12,8 +12,6 @@
 using namespace glm;
 using namespace std;
 
-static const float PI = 3.14159265f;
-
 //----------------------------------------------------------------------------------------
 // Constructor
 Navigator::Navigator()
@@ -43,6 +41,7 @@ void Navigator::init()
 	glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
 	// Build the shaders
+    density_slicer.init(m_exec_dir + "/Assets/");
     terrain_renderer.init(m_exec_dir + "/Assets/");
     terrain_generator.init(m_exec_dir + "/Assets/");
 
@@ -153,11 +152,13 @@ void Navigator::draw()
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     }
 
+    glEnable( GL_DEPTH_TEST );
+
+    density_slicer.draw(proj, view, W, terrain_generator.period);
+
+    mat3 normalMatrix = mat3(transpose(inverse(view * W)));
+
 	terrain_renderer.renderer_shader.enable();
-		glEnable( GL_DEPTH_TEST );
-
-        mat3 normalMatrix = mat3(transpose(inverse(view * W)));
-
 		glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
 		glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
 		glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );

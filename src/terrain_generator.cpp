@@ -13,8 +13,6 @@ using namespace std;
 #define LOCAL_DIM_Y 32
 #define LOCAL_DIM_Z 1
 
-#define DENSITY_BLOCK_DIMENSION (BLOCK_DIMENSION + 1)
-
 TerrainGenerator::TerrainGenerator()
 : period(4.0f)
 , grid(DENSITY_BLOCK_DIMENSION)

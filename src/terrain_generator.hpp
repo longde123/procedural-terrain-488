@@ -3,10 +3,9 @@
 #include <string>
 
 #include "cs488-framework/ShaderProgram.hpp"
+#include "constants.hpp"
 #include "grid.hpp"
 #include "transform_program.hpp"
-
-#define BLOCK_DIMENSION 63
 
 class TerrainGenerator {
 public:
