@@ -24,11 +24,16 @@ public:
     GLuint feedback_object;
 
     float period;
+    bool use_short_range_ambient_occlusion;
+    bool use_long_range_ambient_occlusion;
 private:
     ShaderProgram density_shader;
     TransformProgram marching_cubes_shader;
 
     GLint period_uni;
+    GLint period_uni_marching;
+    GLint short_range_ambient_uni;
+    GLint long_range_ambient_uni;
 
     // Vertices corresponding to grid points used for the geometry shader.
     Grid grid;

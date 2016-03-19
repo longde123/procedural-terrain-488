@@ -66,7 +66,7 @@ float perlinNoise(vec3 coords, float frequency)
     return xInterp;
 }
 
-float terrainDensity(vec3 coords, float block_size, float period)
+float terrainDensity(vec3 coords, float block_size, float period, int octaves)
 {
     // Air is negative, ground is positive.
     // Generate a gradient from [1 to -1]
@@ -74,17 +74,11 @@ float terrainDensity(vec3 coords, float block_size, float period)
 
     float noise = 0.0;
     float frequency = 1.0 / period;
-    noise += perlinNoise(coords, frequency);
-    frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 2;
-    frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 3;
-    frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 4;
-    frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 5;
-    frequency *= 1.95;
-    noise += perlinNoise(coords, frequency) / 6;
+
+    for (int i = 1; i <= octaves; i++) {
+        noise += perlinNoise(coords, frequency) / i;
+        frequency *= 1.95;
+    }
 
     float density = height_gradient + noise * 0.5;
 

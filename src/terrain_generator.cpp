@@ -16,6 +16,8 @@ using namespace std;
 TerrainGenerator::TerrainGenerator()
 : period(4.0f)
 , grid(DENSITY_BLOCK_DIMENSION)
+, use_short_range_ambient_occlusion(true)
+, use_long_range_ambient_occlusion(false)
 {
     assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_X == 0);
     assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
@@ -67,6 +69,10 @@ void TerrainGenerator::init(string dir)
 	marching_cubes_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
 	marching_cubes_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
 	marching_cubes_shader.link();
+
+	period_uni_marching = marching_cubes_shader.getUniformLocation("period");
+	short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
+	long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
 
     grid.init(marching_cubes_shader);
 }
@@ -148,7 +154,11 @@ void TerrainGenerator::generateTerrainBlock()
     marching_cubes_shader.enable();
     {
         GLint block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
+
+        glUniform1f(period_uni_marching, period);
         glUniform1i(block_size_uni, DENSITY_BLOCK_DIMENSION);
+        glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
+        glUniform1f(long_range_ambient_uni, use_long_range_ambient_occlusion);
 
         // The terrain generator just saves vertices in world space.
         glEnable(GL_RASTERIZER_DISCARD);

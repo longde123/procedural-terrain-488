@@ -128,6 +128,14 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
         ImGui::Checkbox("Ambient Occlusion", &use_ambient);
+        if (ImGui::Checkbox("Short Range Ambient Occlusion",
+                    &terrain_generator.use_short_range_ambient_occlusion)) {
+            terrain_generator.generateTerrainBlock();
+        }
+        if (ImGui::Checkbox("Long Range Ambient Occlusion",
+                    &terrain_generator.use_long_range_ambient_occlusion)) {
+            terrain_generator.generateTerrainBlock();
+        }
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive

@@ -6,6 +6,9 @@ layout(triangle_strip, max_vertices = 15) out;
 layout(binding = 0) uniform sampler3D density_map;
 
 uniform int block_size;
+uniform bool short_range_ambient;
+uniform bool long_range_ambient;
+uniform float period;
 
 out vec3 position;
 out vec3 normal;
@@ -351,6 +354,8 @@ vec3 random_rays[32] = {
     vec3( 0.344460,  0.753223, -0.560359)
 };
 
+#include "noise.h"
+
 float density(vec3 coord)
 {
     return texture(density_map, coord / block_size).x;
@@ -368,21 +373,38 @@ vec3 normalAtVertex(vec3 vertex)
 
 float ambientOcclusion(vec3 vertex)
 {
+    // TODO: Need to make sure ambient occlusion looks the same for all block sizes.
     float visibility = 0.0;
     for (int i = 0; i < 32; i++) {
         vec3 ray = random_rays[i];
         float ray_visibility = 1.0;
 
         // Short-range samples
-        for (int j = 0; j < 8; j++) {
-            float d = density(vertex + j * ray);
-            ray_visibility *= clamp(d * 8, 0.0, 1.0);
+        // Don't use multiplication! Adding is faster.
+        // Start some (large) epsilon away.
+        if (short_range_ambient) {
+            vec3 short_ray = vertex + ray * 0.1;
+            vec3 delta = ray / 4;
+            for (int j = 0; j < 16; j++) {
+                short_ray += delta;
+                float d = density(short_ray);
+                ray_visibility *= clamp(d * 8, 0.0, 1.0);
+            }
+        }
+
+        // Long-range samples
+        if (long_range_ambient) {
+            for (int j = 0; j < 4; j++) {
+                float distance = pow((j + 2) / 5.0, 1.8) * 40;
+                float d = terrainDensity(vertex + distance * ray, block_size, period, 3);
+                ray_visibility *= clamp(d * 0.5, 0.0, 1.0);
+            }
         }
 
         visibility += ray_visibility;
     }
 
-    return (1.0 - visibility / 16.0);
+    return (1.0 - visibility / 32.0);
 }
 
 void createVertex(vec3 vertex)

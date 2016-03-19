@@ -14,7 +14,7 @@ out vec4 fragColor;
 void main() {
     vec3 coords = vertex_in.position;
 
-    float density = terrainDensity(coords, 64.0, period);
+    float density = terrainDensity(coords, 64.0, period, 8);
 
     fragColor = vec4(vec3(0, 0, max(density, 0)) + vec3(max(-density, 0)), 1.0);
 }
