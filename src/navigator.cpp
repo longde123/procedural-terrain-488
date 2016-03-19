@@ -2,6 +2,7 @@
 #include "cs488-framework/GlErrorCheck.hpp"
 
 #include <iostream>
+#include <stdlib.h>
 
 #include <imgui/imgui.h>
 #include <glm/glm.hpp>
@@ -43,10 +44,13 @@ void Navigator::init()
 	// Set the background colour.
 	glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
+    // Call the script that will include shader code into other shaders.
+    system((m_exec_dir + "/Assets/include.py").c_str());
+
 	// Build the shaders
-    density_slicer.init(m_exec_dir + "/Assets/");
-    terrain_renderer.init(m_exec_dir + "/Assets/");
-    terrain_generator.init(m_exec_dir + "/Assets/");
+    density_slicer.init(m_exec_dir + "/Assets/out/");
+    terrain_renderer.init(m_exec_dir + "/Assets/out/");
+    terrain_generator.init(m_exec_dir + "/Assets/out/");
 
     terrain_generator.initBuffer(terrain_renderer.pos_attrib,
             terrain_renderer.normal_attrib,
