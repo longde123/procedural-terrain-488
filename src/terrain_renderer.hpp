@@ -26,6 +26,10 @@ public:
     GLint ambient_occlusion_attrib;
 
 private:
-    Texture texture;
-    Texture normal_map;
+    Texture x_texture;
+    Texture y_texture;
+    Texture z_texture;
+    Texture x_normal_map;
+    Texture y_normal_map;
+    Texture z_normal_map;
 };

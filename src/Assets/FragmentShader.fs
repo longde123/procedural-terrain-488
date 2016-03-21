@@ -11,8 +11,12 @@ in vertexData
 out vec4 fragColor;
 
 layout(binding = 0) uniform sampler3D density_map;
-layout(binding = 1) uniform sampler2D rock_texture;
-layout(binding = 2) uniform sampler2D normal_map;
+layout(binding = 1) uniform sampler2D x_texture;
+layout(binding = 2) uniform sampler2D y_texture;
+layout(binding = 3) uniform sampler2D z_texture;
+layout(binding = 4) uniform sampler2D x_normal_map;
+layout(binding = 5) uniform sampler2D y_normal_map;
+layout(binding = 6) uniform sampler2D z_normal_map;
 
 uniform bool triplanar_colors;
 uniform bool use_ambient;
@@ -76,9 +80,9 @@ void main() {
         fragColor = vec4(blend_weights * ambient_occlusion, 1.0);
     } else {
         vec4 texture_color =
-            texture(rock_texture, vertex_in.position.yz / 32) * blend_weights.x +
-            texture(rock_texture, vertex_in.position.xz / 32) * blend_weights.y +
-            texture(rock_texture, vertex_in.position.xy / 32) * blend_weights.z;
+            texture(x_texture, vertex_in.position.yz / 32) * blend_weights.x +
+            texture(y_texture, vertex_in.position.xz / 32) * blend_weights.y +
+            texture(x_texture, vertex_in.position.xy / 32) * blend_weights.z;
         fragColor = texture_color * vec4((ambient + diffuse + specular) * ambient_occlusion, 1.0);
     }
 }

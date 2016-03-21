@@ -7,8 +7,12 @@ using namespace glm;
 using namespace std;
 
 TerrainRenderer::TerrainRenderer()
-: texture("Textures/Stone1.JPG", GL_TEXTURE1)
-, normal_map("Textures/Textures_N/Stone1_N.jpg", GL_TEXTURE2)
+: x_texture("Textures/Stone1.JPG", GL_TEXTURE1)
+, y_texture("Textures/Grass2.JPG", GL_TEXTURE2)
+, z_texture("Textures/Stone1.JPG", GL_TEXTURE3)
+, x_normal_map("Textures/Textures_N/Stone1_N.jpg", GL_TEXTURE4)
+, y_normal_map("Textures/Textures_N/Grass2_N.jpg", GL_TEXTURE5)
+, z_normal_map("Textures/Textures_N/Stone1_N.jpg", GL_TEXTURE6)
 {
 }
 
@@ -32,14 +36,22 @@ void TerrainRenderer::init(string dir)
     normal_attrib = renderer_shader.getAttribLocation("normal");
     ambient_occlusion_attrib = renderer_shader.getAttribLocation("ambient_occlusion");
 
-    texture.init();
-    normal_map.init();
+    x_texture.init();
+    y_texture.init();
+    z_texture.init();
+    x_normal_map.init();
+    y_normal_map.init();
+    z_normal_map.init();
 
 	CHECK_GL_ERRORS;
 }
 
 void TerrainRenderer::prepareRender()
 {
-    texture.rebind();
-    normal_map.rebind();
+    x_texture.rebind();
+    y_texture.rebind();
+    z_texture.rebind();
+    x_normal_map.rebind();
+    y_normal_map.rebind();
+    z_normal_map.rebind();
 }
