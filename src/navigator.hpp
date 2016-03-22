@@ -9,7 +9,7 @@
 #include "cs488-framework/ShaderProgram.hpp"
 
 #include "density_slicer.hpp"
-#include "terrain_generator.hpp"
+#include "terrain_generator_slow.hpp"
 #include "terrain_renderer.hpp"
 #include "water.hpp"
 
@@ -40,7 +40,7 @@ private:
 
     DensitySlicer density_slicer;
     TerrainRenderer terrain_renderer;
-    TerrainGenerator terrain_generator;
+    TerrainGeneratorSlow terrain_generator;
     Water water;
 
 	// Matrices controlling the camera and projection.

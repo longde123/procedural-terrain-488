@@ -10,11 +10,12 @@
 class TerrainGenerator {
 public:
     TerrainGenerator();
+    virtual ~TerrainGenerator() {}
 
     void init(std::string dir);
     void initBuffer(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
-    void generateTerrainBlock();
+    virtual void generateTerrainBlock() = 0;
 
     GLuint getVertices() { return out_vao; }
 
@@ -26,17 +27,13 @@ public:
     float period;
     bool use_short_range_ambient_occlusion;
     bool use_long_range_ambient_occlusion;
-private:
+
+protected:
+    void generateDensity();
+
     ShaderProgram density_shader;
-    TransformProgram marching_cubes_shader;
 
     GLint period_uni;
-    GLint period_uni_marching;
-    GLint short_range_ambient_uni;
-    GLint long_range_ambient_uni;
-
-    // Vertices corresponding to grid points used for the geometry shader.
-    Grid grid;
 
     GLuint out_vao;
     GLuint out_vbo;
