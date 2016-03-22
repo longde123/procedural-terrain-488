@@ -15,13 +15,13 @@ using namespace std;
 
 TerrainGenerator::TerrainGenerator()
 : period(20.0f)
-, grid(DENSITY_BLOCK_DIMENSION)
+, grid(BLOCK_SIZE)
 , use_short_range_ambient_occlusion(true)
 , use_long_range_ambient_occlusion(false)
 {
-    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_X == 0);
-    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_Y == 0);
-    assert(DENSITY_BLOCK_DIMENSION % LOCAL_DIM_Z == 0);
+    assert(BLOCK_RESOLUTION % LOCAL_DIM_X == 0);
+    assert(BLOCK_RESOLUTION % LOCAL_DIM_Y == 0);
+    assert(BLOCK_RESOLUTION % LOCAL_DIM_Z == 0);
 }
 
 void TerrainGenerator::init(string dir)
@@ -50,7 +50,7 @@ void TerrainGenerator::init(string dir)
     glTexImage3D(GL_TEXTURE_3D,
                  0,                         // level of detail
                  GL_R32F,                   // internal format
-                 DENSITY_BLOCK_DIMENSION, DENSITY_BLOCK_DIMENSION, DENSITY_BLOCK_DIMENSION,
+                 BLOCK_RESOLUTION, BLOCK_RESOLUTION, BLOCK_RESOLUTION,
                  0,                         // 0 is required
                  GL_RED, GL_FLOAT, NULL     // input format, not applicable
                 );
@@ -80,8 +80,8 @@ void TerrainGenerator::init(string dir)
 void TerrainGenerator::initBuffer(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
 {
     size_t unit_size = sizeof(vec3) * 2 + sizeof(float);
-    size_t data_size = DENSITY_BLOCK_DIMENSION * DENSITY_BLOCK_DIMENSION *
-                       DENSITY_BLOCK_DIMENSION * unit_size * 15;
+    size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
+                       BLOCK_SIZE * unit_size * 15;
 
 	glGenVertexArrays(1, &out_vao);
     glGenBuffers(1, &out_vbo);
@@ -124,9 +124,9 @@ void TerrainGenerator::generateTerrainBlock()
     {
         glUniform1f(period_uni, period);
 
-        glDispatchCompute(DENSITY_BLOCK_DIMENSION / LOCAL_DIM_X,
-                          DENSITY_BLOCK_DIMENSION / LOCAL_DIM_Y,
-                          DENSITY_BLOCK_DIMENSION / LOCAL_DIM_Z);
+        glDispatchCompute(BLOCK_RESOLUTION / LOCAL_DIM_X,
+                          BLOCK_RESOLUTION / LOCAL_DIM_Y,
+                          BLOCK_RESOLUTION / LOCAL_DIM_Z);
 
         // Block until kernel/shader finishes execution.
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -156,7 +156,7 @@ void TerrainGenerator::generateTerrainBlock()
         GLint block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
 
         glUniform1f(period_uni_marching, period);
-        glUniform1i(block_size_uni, DENSITY_BLOCK_DIMENSION);
+        glUniform1i(block_size_uni, BLOCK_SIZE);
         glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
         glUniform1f(long_range_ambient_uni, use_long_range_ambient_occlusion);
 
@@ -169,7 +169,7 @@ void TerrainGenerator::generateTerrainBlock()
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
         glBeginTransformFeedback(GL_TRIANGLES);
         {
-            glDrawArraysInstanced(GL_POINTS, 0, BLOCK_DIMENSION * BLOCK_DIMENSION, BLOCK_DIMENSION);
+            glDrawArraysInstanced(GL_POINTS, 0, BLOCK_SIZE * BLOCK_SIZE, BLOCK_SIZE);
         }
         glEndTransformFeedback();
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);

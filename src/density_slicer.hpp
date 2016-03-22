@@ -24,5 +24,6 @@ private:
     Plane xy_grid;
     Plane yz_grid;
     Plane xz_grid;
+    GLint block_size_uni;
     GLint period_uni;
 };

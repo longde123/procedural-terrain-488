@@ -103,9 +103,9 @@ void main() {
 
         vec3 light1, light2, light3;
 
-        vec2 x_uv = vec2(-vertex_in.position.z, -vertex_in.position.y) / 32;
-        vec2 y_uv = vec2(vertex_in.position.x, vertex_in.position.z) / 32;
-        vec2 z_uv = vec2(vertex_in.position.x, -vertex_in.position.y) / 32;
+        vec2 x_uv = vec2(-vertex_in.position.z, -vertex_in.position.y);
+        vec2 y_uv = vec2(vertex_in.position.x, vertex_in.position.z);
+        vec2 z_uv = vec2(vertex_in.position.x, -vertex_in.position.y);
 
         if (use_normal_map) {
             {

@@ -66,6 +66,7 @@ float perlinNoise(vec3 coords, float frequency)
     return xInterp;
 }
 
+// coords should be in the range [coords, block_size] not [0, 1]
 float terrainDensity(vec3 coords, float block_size, float period, int octaves)
 {
     // Air is negative, ground is positive.

@@ -68,12 +68,12 @@ void Navigator::init()
 	proj = glm::perspective(
 		glm::radians( 45.0f ),
 		float( m_framebufferWidth ) / float( m_framebufferHeight ),
-		1.0f, 1000.0f );
+		0.01f, 1000.0f );
 }
 
 void Navigator::makeView()
 {
-    float distance = BLOCK_DIMENSION * 2.0 * M_SQRT1_2 * distance_factor;
+    float distance = 2.0 * M_SQRT1_2 * distance_factor;
     vec3 x_axis(1.0f, 0.0f, 0.0f);
     vec3 y_axis(0.0f, 1.0f, 0.0f);
     eye_position = rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis);
@@ -174,7 +174,7 @@ void Navigator::draw()
 {
 	// Create a global transformation for the model (centre it).
 	mat4 W;
-    float offset = -BLOCK_DIMENSION / 2.0f;
+    float offset = -0.5f;
 	W = glm::translate(W, vec3(offset, offset, offset));
     mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
                      glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
@@ -231,7 +231,7 @@ void Navigator::draw()
             // Highlight the active square.
         terrain_renderer.renderer_shader.disable();
 
-        water.draw(proj, view, glm::translate(vec3(0, water_height + BLOCK_DIMENSION / 2.0f, 0)) * W);
+        water.draw(proj, view, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
     }
 
 	// Restore defaults

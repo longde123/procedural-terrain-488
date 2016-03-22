@@ -358,6 +358,9 @@ vec3 random_rays[32] = {
 
 float density(vec3 coord)
 {
+    // Should be block_size, not block_resolution even though we're sampling
+    // from a texture that's block_resolution x block_resolution.
+    // The reason is that if resolution = 2, then we want (0, 1) / 1 = (0, 1)
     return texture(density_map, coord / block_size).x;
 }
 
@@ -410,7 +413,10 @@ float ambientOcclusion(vec3 vertex)
 void createVertex(vec3 vertex)
 {
     ambient_occlusion = ambientOcclusion(vertex);
-    position = vertex;
+
+    // Map vertices to range [0, 1]
+    position = vertex / block_size;
+
     normal = normalAtVertex(vertex);
     EmitVertex();
 }
@@ -420,8 +426,6 @@ void main() {
 
     // Use swizzling, avoid typing vector constructors for each corner.
     vec2 offset = vec2(0, 1);
-
-    //ivec2 dimensions = imageSize(density_map);
 
     // More efficient to do vector operations.
     vec4 density0123;
@@ -461,7 +465,7 @@ void main() {
             ivec3 edge_index = edge_connect_list[case_index][i];
 
             // Want to place the vertex where the density is approximately zero.
-            // block_sizeote that one side of the edge should always have a positive value
+            // note that one side of the edge should always have a positive value
             // and the other, a negative value.
             // So d1 * (1 - t) + d2 * t = 0 => t = d1 / (d1 - d2)
             // e.g. d1 = 0.1, d2 = -0.3 => t = 0.25
