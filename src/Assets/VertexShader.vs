@@ -14,7 +14,6 @@ out vertexData
     vec3 position;
     vec3 normal;
     float ambient_occlusion;
-    vec3 original_normal;
 } vertex_out;
 
 void main() {
@@ -24,6 +23,6 @@ void main() {
     // Don't normalize yet, we need to do it after fragment shader
     // interpolation anyway.
     vertex_out.normal = NormalMatrix * normal;
-    vertex_out.original_normal = normal;
+
 	gl_Position = P * V * M * vec4(position, 1.0);
 }

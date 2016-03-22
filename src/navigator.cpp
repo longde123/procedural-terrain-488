@@ -28,6 +28,9 @@ Navigator::Navigator()
     show_slicer = false;
     show_terrain = true;
     use_ambient = true;
+    use_normal_map = true;
+    debug_flag = false;
+    light_x = 0.0f;
 }
 
 //----------------------------------------------------------------------------------------
@@ -68,13 +71,11 @@ void Navigator::init()
 
 void Navigator::makeView()
 {
+    float distance = BLOCK_DIMENSION * 2.0 * M_SQRT1_2 * distance_factor;
     vec3 x_axis(1.0f, 0.0f, 0.0f);
     vec3 y_axis(0.0f, 1.0f, 0.0f);
-    float distance = BLOCK_DIMENSION * 2.0 * M_SQRT1_2 * distance_factor;
-    view = lookAt(
-        rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis),
-        vec3(0.0f, 0.0f, 0.0f),
-        vec3(0.0f, 1.0f, 0.0f));
+    eye_position = rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis);
+    view = lookAt(eye_position, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 }
 
 //----------------------------------------------------------------------------------------
@@ -125,9 +126,14 @@ void Navigator::guiLogic()
             terrain_generator.generateTerrainBlock();
         }
 
+        if (ImGui::SliderFloat("Light X", &light_x, 0.0f, 70.0f)) {
+        }
+
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
         ImGui::Checkbox("Ambient Occlusion", &use_ambient);
+        ImGui::Checkbox("Normal Maps", &use_normal_map);
+        ImGui::Checkbox("Debug Flags", &debug_flag);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
                     &terrain_generator.use_short_range_ambient_occlusion)) {
             terrain_generator.generateTerrainBlock();
@@ -177,7 +183,7 @@ void Navigator::draw()
         density_slicer.draw(proj, view, W, terrain_generator.period);
     }
 
-    mat3 normalMatrix = mat3(transpose(inverse(view * W)));
+    mat3 normalMatrix = mat3(transpose(inverse(W)));
 
     if (show_terrain) {
         terrain_renderer.renderer_shader.enable();
@@ -188,6 +194,12 @@ void Navigator::draw()
 
             glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
             glUniform1i(terrain_renderer.use_ambient_uni, use_ambient);
+            glUniform1i(terrain_renderer.use_normal_map_uni, use_normal_map);
+            glUniform1i(terrain_renderer.debug_flag_uni, debug_flag);
+
+            glUniform3f(terrain_renderer.eye_position_uni, eye_position.x, eye_position.y, eye_position.z);
+            glUniform3f(terrain_renderer.light_position_uni, 30.0f, 50.0f, light_x);
+
             terrain_renderer.prepareRender();
 
             glBindVertexArray(terrain_generator.getVertices());
@@ -318,6 +330,16 @@ bool Navigator::keyInputEvent(int key, int action, int mods) {
 	if( action == GLFW_PRESS ) {
         if (key == GLFW_KEY_Q) {
             glfwSetWindowShouldClose(m_window, GL_TRUE);
+
+            eventHandled = true;
+        }
+        if (key == GLFW_KEY_D) {
+            debug_flag = !debug_flag;
+
+            eventHandled = true;
+        }
+        if (key == GLFW_KEY_N) {
+            use_normal_map = !use_normal_map;
 
             eventHandled = true;
         }

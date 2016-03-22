@@ -42,6 +42,7 @@ private:
     TerrainGenerator terrain_generator;
 
 	// Matrices controlling the camera and projection.
+    glm::vec3 eye_position;
 	glm::mat4 proj;
 	glm::mat4 view;
 
@@ -51,6 +52,9 @@ private:
     bool show_slicer;
     bool show_terrain;
     bool use_ambient;
+    bool use_normal_map;
+    bool debug_flag;
+    float light_x;
 
     float rotation;
     float rotation_vertical;

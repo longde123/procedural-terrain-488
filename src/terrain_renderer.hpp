@@ -20,6 +20,10 @@ public:
 	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
     GLint triplanar_colors_uni;
     GLint use_ambient_uni;
+    GLint use_normal_map_uni;
+    GLint debug_flag_uni;
+    GLint eye_position_uni;
+    GLint light_position_uni;
 
     GLint pos_attrib;
     GLint normal_attrib;

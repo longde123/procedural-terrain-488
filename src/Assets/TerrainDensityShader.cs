@@ -16,7 +16,7 @@ void main() {
     ivec3 coords = ivec3(gl_GlobalInvocationID.xyz);
     ivec3 block_dimensions = ivec3(gl_NumWorkGroups * gl_WorkGroupSize);
 
-    float density = terrainDensity(vec3(coords), block_dimensions.y, period, 8);
+    float density = terrainDensity(vec3(coords), block_dimensions.y, period, 3);
 
     //imageStore(density_map, coords, mod(vec4(frequency), 1.0));
     //imageStore(density_map, coords, vec4(perlinNoise(coords, frequency)));
