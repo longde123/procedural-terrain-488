@@ -29,6 +29,10 @@ void TerrainRenderer::init(string dir)
 	M_uni = renderer_shader.getUniformLocation( "M" );
 	NormalMatrix_uni = renderer_shader.getUniformLocation( "NormalMatrix" );
 
+    water_clip_uni = renderer_shader.getUniformLocation("water_clip");
+    water_reflection_clip_uni = renderer_shader.getUniformLocation("water_reflection_clip");
+    clip_height_uni = renderer_shader.getUniformLocation("clip_height");
+
     triplanar_colors_uni = renderer_shader.getUniformLocation("triplanar_colors");
     use_ambient_uni = renderer_shader.getUniformLocation("use_ambient");
     use_normal_map_uni = renderer_shader.getUniformLocation("use_normal_map");

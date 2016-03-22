@@ -11,6 +11,7 @@
 #include "density_slicer.hpp"
 #include "terrain_generator.hpp"
 #include "terrain_renderer.hpp"
+#include "water.hpp"
 
 class Navigator : public CS488Window {
 public:
@@ -40,6 +41,7 @@ private:
     DensitySlicer density_slicer;
     TerrainRenderer terrain_renderer;
     TerrainGenerator terrain_generator;
+    Water water;
 
 	// Matrices controlling the camera and projection.
     glm::vec3 eye_position;
@@ -55,6 +57,7 @@ private:
     bool use_normal_map;
     bool debug_flag;
     float light_x;
+    float water_height;
 
     float rotation;
     float rotation_vertical;

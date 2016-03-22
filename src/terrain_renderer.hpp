@@ -18,6 +18,11 @@ public:
 	GLint V_uni;    // Uniform location for View matrix.
 	GLint M_uni;    // Uniform location for Model matrix.
 	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
+
+    GLint water_clip_uni;
+    GLint water_reflection_clip_uni;
+    GLint clip_height_uni;
+
     GLint triplanar_colors_uni;
     GLint use_ambient_uni;
     GLint use_normal_map_uni;

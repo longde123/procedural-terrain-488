@@ -31,6 +31,7 @@ Navigator::Navigator()
     use_normal_map = true;
     debug_flag = false;
     light_x = 0.0f;
+    water_height = 0.0f;
 }
 
 //----------------------------------------------------------------------------------------
@@ -54,6 +55,7 @@ void Navigator::init()
     density_slicer.init(m_exec_dir + "/Assets/out/");
     terrain_renderer.init(m_exec_dir + "/Assets/out/");
     terrain_generator.init(m_exec_dir + "/Assets/out/");
+    water.init(m_exec_dir + "/Assets/out/");
 
     terrain_generator.initBuffer(terrain_renderer.pos_attrib,
             terrain_renderer.normal_attrib,
@@ -128,6 +130,8 @@ void Navigator::guiLogic()
 
         if (ImGui::SliderFloat("Light X", &light_x, 0.0f, 70.0f)) {
         }
+        if (ImGui::SliderFloat("Water Height", &water_height, -20.0f, 20.0f)) {
+        }
 
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
@@ -172,6 +176,10 @@ void Navigator::draw()
 	mat4 W;
     float offset = -BLOCK_DIMENSION / 2.0f;
 	W = glm::translate(W, vec3(offset, offset, offset));
+    mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
+                     glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
+                     glm::translate(vec3(0, -water_height, 0)) *
+                     W;
 
     if (wireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -197,6 +205,8 @@ void Navigator::draw()
             glUniform1i(terrain_renderer.use_normal_map_uni, use_normal_map);
             glUniform1i(terrain_renderer.debug_flag_uni, debug_flag);
 
+            glUniform1f(terrain_renderer.clip_height_uni, water_height);
+
             glUniform3f(terrain_renderer.eye_position_uni, eye_position.x, eye_position.y, eye_position.z);
             glUniform3f(terrain_renderer.light_position_uni, 30.0f, 50.0f, light_x);
 
@@ -204,11 +214,24 @@ void Navigator::draw()
 
             glBindVertexArray(terrain_generator.getVertices());
 
+            glEnable(GL_CLIP_DISTANCE0);
+
+            glUniform1i(terrain_renderer.water_clip_uni, true);
+            glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
             glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+
+            glUniform1i(terrain_renderer.water_clip_uni, false);
+            glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
+            glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
+            glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+
+            glDisable(GL_CLIP_DISTANCE0);
 
             // Draw the cubes
             // Highlight the active square.
         terrain_renderer.renderer_shader.disable();
+
+        water.draw(proj, view, glm::translate(vec3(0, water_height + BLOCK_DIMENSION / 2.0f, 0)) * W);
     }
 
 	// Restore defaults
@@ -252,7 +275,7 @@ bool Navigator::mouseMoveEvent(double xPos, double yPos)
             if (mouse_down_with_control) {
                 double dy = yPos - previous_mouse_y;
                 rotation_vertical += -dy / 500.0f;
-                rotation_vertical = std::max(std::min(rotation_vertical, PI / 4.1f), -PI / 4.1f);
+                rotation_vertical = std::max(std::min(rotation_vertical, PI / 4.0f), -PI / 4.0f);
                 makeView();
             } else {
                 double dx = xPos - previous_mouse_x;
