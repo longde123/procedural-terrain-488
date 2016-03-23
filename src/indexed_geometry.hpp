@@ -8,6 +8,7 @@ class IndexedGeometry : public Geometry
 {
 public:
     GLuint getIndices() { return indices_buffer; }
+    int indexCount() { return indices.size(); }
 
 protected:
     GLuint indices_buffer;

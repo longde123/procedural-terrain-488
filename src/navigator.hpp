@@ -10,6 +10,7 @@
 #include "cs488-framework/ShaderProgram.hpp"
 
 #include "density_slicer.hpp"
+#include "lod_visualizer.hpp"
 #include "terrain_generator_slow.hpp"
 #include "terrain_generator_medium.hpp"
 #include "terrain_renderer.hpp"
@@ -45,6 +46,7 @@ private:
     TerrainRenderer terrain_renderer;
     TerrainGeneratorMedium terrain_generator;
     Water water;
+    LodVisualizer lod;
 
 	// Matrices controlling the camera and projection.
     glm::vec3 eye_position;
@@ -60,6 +62,7 @@ private:
     bool wireframe;
     bool triplanar_colors;
     bool first_person_mode;
+    bool show_lod;
     bool show_slicer;
     bool show_terrain;
     bool use_ambient;

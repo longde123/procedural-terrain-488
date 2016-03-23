@@ -26,6 +26,7 @@ Navigator::Navigator()
     wireframe = false;
     triplanar_colors = false;
     first_person_mode = false;
+    show_lod = false;
     show_slicer = false;
     show_terrain = true;
     use_ambient = true;
@@ -62,6 +63,7 @@ void Navigator::init()
     terrain_renderer.init(m_exec_dir + "/Assets/out/");
     terrain_generator.init(m_exec_dir + "/Assets/out/");
     water.init(m_exec_dir + "/Assets/out/");
+    lod.init(m_exec_dir + "/Assets/out/");
 
     terrain_generator.initBuffer(terrain_renderer.pos_attrib,
             terrain_renderer.normal_attrib,
@@ -186,6 +188,7 @@ void Navigator::guiLogic()
             resetView();
             makeView();
         }
+        ImGui::Checkbox("Show Level of Detail", &show_lod);
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
         ImGui::Checkbox("Ambient Occlusion", &use_ambient);
@@ -294,6 +297,10 @@ void Navigator::draw()
         if (use_water) {
             water.draw(proj, view, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
         }
+    }
+
+    if (show_lod) {
+        lod.draw(proj, view, eye_position);
     }
 
 	// Restore defaults
