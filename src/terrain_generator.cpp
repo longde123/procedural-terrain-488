@@ -87,7 +87,7 @@ void TerrainGenerator::initBuffer(GLint pos_attrib, GLint normal_attrib, GLint a
         glVertexAttribPointer(normal_attrib, 3, GL_FLOAT, GL_FALSE,
                 unit_size, (void*)(sizeof(vec3)));
         glEnableVertexAttribArray(ambient_occlusion_attrib);
-        glVertexAttribPointer(ambient_occlusion_attrib, 3, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(ambient_occlusion_attrib, 1, GL_FLOAT, GL_FALSE,
                 unit_size, (void*)(sizeof(vec3) * 2));
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
