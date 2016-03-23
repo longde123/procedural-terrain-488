@@ -29,6 +29,7 @@ Navigator::Navigator()
     show_terrain = true;
     use_ambient = true;
     use_normal_map = true;
+    use_water = true;
     debug_flag = false;
     light_x = 0.0f;
     water_height = 0.0f;
@@ -137,6 +138,7 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Show Terrain", &show_terrain);
         ImGui::Checkbox("Ambient Occlusion", &use_ambient);
         ImGui::Checkbox("Normal Maps", &use_normal_map);
+        ImGui::Checkbox("Use Water", &use_water);
         ImGui::Checkbox("Debug Flags", &debug_flag);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
                     &terrain_generator.use_short_range_ambient_occlusion)) {
@@ -216,14 +218,20 @@ void Navigator::draw()
 
             glEnable(GL_CLIP_DISTANCE0);
 
-            glUniform1i(terrain_renderer.water_clip_uni, true);
-            glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-            glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+            if (use_water) {
+                glUniform1i(terrain_renderer.water_clip_uni, true);
+                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
+                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
 
-            glUniform1i(terrain_renderer.water_clip_uni, false);
-            glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
-            glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
-            glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+                glUniform1i(terrain_renderer.water_clip_uni, false);
+                glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
+                glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
+                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+            } else {
+                glUniform1i(terrain_renderer.water_clip_uni, false);
+                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
+                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
+            }
 
             glDisable(GL_CLIP_DISTANCE0);
 
@@ -231,7 +239,9 @@ void Navigator::draw()
             // Highlight the active square.
         terrain_renderer.renderer_shader.disable();
 
-        water.draw(proj, view, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
+        if (use_water) {
+            water.draw(proj, view, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
+        }
     }
 
 	// Restore defaults

@@ -10,6 +10,7 @@
 
 #include "density_slicer.hpp"
 #include "terrain_generator_slow.hpp"
+#include "terrain_generator_medium.hpp"
 #include "terrain_renderer.hpp"
 #include "water.hpp"
 
@@ -40,7 +41,7 @@ private:
 
     DensitySlicer density_slicer;
     TerrainRenderer terrain_renderer;
-    TerrainGeneratorSlow terrain_generator;
+    TerrainGeneratorMedium terrain_generator;
     Water water;
 
 	// Matrices controlling the camera and projection.
@@ -55,6 +56,7 @@ private:
     bool show_terrain;
     bool use_ambient;
     bool use_normal_map;
+    bool use_water;
     bool debug_flag;
     float light_x;
     float water_height;

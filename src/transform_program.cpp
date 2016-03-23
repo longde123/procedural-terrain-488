@@ -6,10 +6,12 @@
 #include <glm/glm.hpp>
 
 #include "cs488-framework/GlErrorCheck.hpp"
+
 using namespace glm;
 using namespace std;
 
-TransformProgram::TransformProgram()
+TransformProgram::TransformProgram(const GLchar** varyings, int count)
+: varyings(varyings), count(count)
 {
 }
 
@@ -17,8 +19,7 @@ void TransformProgram::link()
 {
     attachShaders();
 
-    static const GLchar* varyings[] = { "position", "normal", "ambient_occlusion" };
-    glTransformFeedbackVaryings(programObject, 3, varyings, GL_INTERLEAVED_ATTRIBS);
+    glTransformFeedbackVaryings(programObject, count, varyings, GL_INTERLEAVED_ATTRIBS);
 
     glLinkProgram(programObject);
     checkLinkStatus();

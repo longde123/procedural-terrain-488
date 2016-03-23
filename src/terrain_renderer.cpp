@@ -42,6 +42,7 @@ void TerrainRenderer::init(string dir)
 
     pos_attrib = renderer_shader.getAttribLocation("position");
     normal_attrib = renderer_shader.getAttribLocation("normal");
+
     ambient_occlusion_attrib = renderer_shader.getAttribLocation("ambient_occlusion");
 
     x_texture.init();

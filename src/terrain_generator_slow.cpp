@@ -7,8 +7,11 @@
 using namespace glm;
 using namespace std;
 
+static const GLchar* varyings[] = { "position", "normal", "ambient_occlusion" };
+
 TerrainGeneratorSlow::TerrainGeneratorSlow()
 : TerrainGenerator()
+, marching_cubes_shader(varyings, 3)
 , grid(BLOCK_SIZE)
 {
 }
@@ -46,7 +49,6 @@ void TerrainGeneratorSlow::generateTerrainBlock()
         // The terrain generator just saves vertices in world space.
         glEnable(GL_RASTERIZER_DISCARD);
 
-        // Just draw the grid for now.
         glBindVertexArray(grid.getVertices());
 
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
@@ -56,21 +58,6 @@ void TerrainGeneratorSlow::generateTerrainBlock()
         }
         glEndTransformFeedback();
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-
-        /*
-        // Get some data on the CPU side to see if it looks right.
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, marching_cubes_shader.getBuffer());
-            int n = 30;
-            vector<float> data(n);
-            glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * n, &data[0]);
-            CHECK_GL_ERRORS;
-            for (int i = 0; i < n; i++) {
-                printf("%f\n", data[i]);
-            }
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
-        */
 
         glBindVertexArray(0);
         glDisable(GL_RASTERIZER_DISCARD);
