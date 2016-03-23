@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+#include <unordered_set>
 #include <vector>
 
 #include "cs488-framework/CS488Window.hpp"
@@ -34,6 +35,7 @@ protected:
 	virtual bool keyInputEvent(int key, int action, int mods) override;
 
 private:
+    void resetView();
     void makeView();
 
 	// Fields related to the shader and uniforms.
@@ -46,12 +48,18 @@ private:
 
 	// Matrices controlling the camera and projection.
     glm::vec3 eye_position;
+    glm::vec3 eye_direction;
+    glm::vec3 eye_up;
 	glm::mat4 proj;
 	glm::mat4 view;
+
+    // First person stuff
+    std::unordered_set<int> pressed_keys;
 
     // Display options
     bool wireframe;
     bool triplanar_colors;
+    bool first_person_mode;
     bool show_slicer;
     bool show_terrain;
     bool use_ambient;

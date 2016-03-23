@@ -25,6 +25,7 @@ Navigator::Navigator()
 
     wireframe = false;
     triplanar_colors = false;
+    first_person_mode = false;
     show_slicer = false;
     show_terrain = true;
     use_ambient = true;
@@ -49,6 +50,10 @@ void Navigator::init()
 	// Set the background colour.
 	glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
+    GLint result;
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &result);
+    printf("Max 3D texture size: %d\n", result);
+
     // Call the script that will include shader code into other shaders.
     system((m_exec_dir + "/Assets/include.py").c_str());
 
@@ -63,22 +68,34 @@ void Navigator::init()
             terrain_renderer.ambient_occlusion_attrib);
     terrain_generator.generateTerrainBlock();
 
-	// Set up initial view and projection matrices (need to do this here,
-	// since it depends on the GLFW window being set up correctly).
-    makeView();
 	proj = glm::perspective(
 		glm::radians( 45.0f ),
 		float( m_framebufferWidth ) / float( m_framebufferHeight ),
 		0.01f, 1000.0f );
+
+    resetView();
+
+	// Set up initial view and projection matrices (need to do this here,
+	// since it depends on the GLFW window being set up correctly).
+    makeView();
 }
 
-void Navigator::makeView()
+void Navigator::resetView()
 {
     float distance = 2.0 * M_SQRT1_2 * distance_factor;
     vec3 x_axis(1.0f, 0.0f, 0.0f);
     vec3 y_axis(0.0f, 1.0f, 0.0f);
     eye_position = rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis);
-    view = lookAt(eye_position, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    eye_direction = -normalize(eye_position);
+
+    eye_up = vec3(0.0f, 1.0f, 0.0f);
+    vec3 eye_right = cross(eye_direction, eye_up);
+    eye_up = cross(eye_right, eye_direction);
+}
+
+void Navigator::makeView()
+{
+    view = lookAt(eye_position, eye_position + eye_direction, eye_up);
 }
 
 //----------------------------------------------------------------------------------------
@@ -87,7 +104,38 @@ void Navigator::makeView()
  */
 void Navigator::appLogic()
 {
-	// Place per frame, application logic here ...
+    // First person camera controls.
+    if (first_person_mode) {
+        vec3 eye_right = cross(eye_direction, eye_up);
+        float factor = 0.02f;
+
+        // Left
+        if (pressed_keys.find(GLFW_KEY_A) != pressed_keys.end()) {
+            eye_position -= eye_right * factor;
+        }
+        // Right
+        if (pressed_keys.find(GLFW_KEY_D) != pressed_keys.end()) {
+            eye_position += eye_right * factor;
+        }
+        // Back
+        if (pressed_keys.find(GLFW_KEY_S) != pressed_keys.end()) {
+            eye_position -= eye_direction * factor;
+        }
+        // Forward
+        if (pressed_keys.find(GLFW_KEY_W) != pressed_keys.end()) {
+            eye_position += eye_direction * factor;
+        }
+        // Up
+        if (pressed_keys.find(GLFW_KEY_Q) != pressed_keys.end()) {
+            eye_position += eye_up * factor;
+        }
+        // Down
+        if (pressed_keys.find(GLFW_KEY_E) != pressed_keys.end()) {
+            eye_position -= eye_up * factor;
+        }
+
+        makeView();
+    }
 }
 
 //----------------------------------------------------------------------------------------
@@ -134,6 +182,10 @@ void Navigator::guiLogic()
         if (ImGui::SliderFloat("Water Height", &water_height, -20.0f, 20.0f)) {
         }
 
+        if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
+            resetView();
+            makeView();
+        }
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
         ImGui::Checkbox("Ambient Occlusion", &use_ambient);
@@ -282,15 +334,35 @@ bool Navigator::mouseMoveEvent(double xPos, double yPos)
 
     if (!ImGui::IsMouseHoveringAnyWindow()) {
         if (mouse_down) {
-            if (mouse_down_with_control) {
-                double dy = yPos - previous_mouse_y;
-                rotation_vertical += -dy / 500.0f;
-                rotation_vertical = std::max(std::min(rotation_vertical, PI / 4.0f), -PI / 4.0f);
+            float dy = yPos - previous_mouse_y;
+            float dx = xPos - previous_mouse_x;
+
+            if (first_person_mode) {
+                vec3 eye_right = cross(eye_direction, eye_up);
+                eye_direction = rotate(eye_direction, dy / 500.0f, eye_right);
+                eye_up = rotate(eye_up, dy / 500.0f, eye_right);
+
+                eye_direction = rotate(eye_direction, dx / 500.0f, vec3(0.0, 1.0, 0.0));
+                eye_up = rotate(eye_up, dx / 500.0f, vec3(0.0, 1.0, 0.0));
+
+                eye_direction = normalize(eye_direction);
+                eye_up = normalize(eye_up);
+
+                // TODO: Might want to prevent looking too far up or down.
+                // http://gamedev.stackexchange.com/questions/19507/how-should-i-implement-a-first-person-camera
+
                 makeView();
             } else {
-                double dx = xPos - previous_mouse_x;
-                rotation += -dx / 500.0f;
-                makeView();
+                if (mouse_down_with_control) {
+                    rotation_vertical += -dy / 500.0f;
+                    rotation_vertical = std::max(std::min(rotation_vertical, PI / 4.0f), -PI / 4.0f);
+                    resetView();
+                    makeView();
+                } else {
+                    rotation += -dx / 500.0f;
+                    resetView();
+                    makeView();
+                }
             }
         }
     }
@@ -332,10 +404,11 @@ bool Navigator::mouseScrollEvent(double xOffSet, double yOffSet) {
 	bool eventHandled(false);
 
 	// Zoom in or out.
-    distance_factor -= yOffSet / 20.0f;
+    distance_factor *= exp(-yOffSet / 10.0f);
     // Put reasonable bounds.
     distance_factor = std::max(0.1f, std::min(100.0f, distance_factor));
 
+    resetView();
     makeView();
 
 	return eventHandled;
@@ -360,13 +433,13 @@ bool Navigator::windowResizeEvent(int width, int height) {
 bool Navigator::keyInputEvent(int key, int action, int mods) {
 	bool eventHandled(false);
 
-	if( action == GLFW_PRESS ) {
-        if (key == GLFW_KEY_Q) {
+	if (action == GLFW_PRESS) {
+        if (key == GLFW_KEY_ESCAPE) {
             glfwSetWindowShouldClose(m_window, GL_TRUE);
 
             eventHandled = true;
         }
-        if (key == GLFW_KEY_D) {
+        if (key == GLFW_KEY_F) {
             debug_flag = !debug_flag;
 
             eventHandled = true;
@@ -376,6 +449,12 @@ bool Navigator::keyInputEvent(int key, int action, int mods) {
 
             eventHandled = true;
         }
+
+        pressed_keys.insert(key);
+	}
+
+	if (action == GLFW_RELEASE) {
+        pressed_keys.erase(key);
 	}
 
 	return eventHandled;
