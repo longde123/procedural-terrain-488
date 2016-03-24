@@ -181,7 +181,7 @@ void Navigator::guiLogic()
 
         if (ImGui::SliderFloat("Light X", &light_x, 0.0f, 70.0f)) {
         }
-        if (ImGui::SliderFloat("Water Height", &water_height, -20.0f, 20.0f)) {
+        if (ImGui::SliderFloat("Water Height", &water_height, -0.5f, 0.5f)) {
         }
 
         if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
