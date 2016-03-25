@@ -39,6 +39,7 @@ void TerrainRenderer::init(string dir)
     debug_flag_uni = renderer_shader.getUniformLocation("debug_flag");
     eye_position_uni = renderer_shader.getUniformLocation("eye_position");
     light_position_uni = renderer_shader.getUniformLocation("light_position");
+    alpha_uni = renderer_shader.getUniformLocation("alpha");
 
     pos_attrib = renderer_shader.getAttribLocation("position");
     normal_attrib = renderer_shader.getAttribLocation("normal");

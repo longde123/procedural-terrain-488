@@ -125,7 +125,7 @@ void Navigator::appLogic()
         makeView();
     }
 
-    block_manager.generateNextBlock();
+    block_manager.update();
 }
 
 //----------------------------------------------------------------------------------------

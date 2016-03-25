@@ -12,11 +12,15 @@ public:
 
     void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
+    void update();
+    void reset();
+    void finish() { generated = true; }
+    bool isReady() { return generated; }
+    float getAlpha() { return transparency; }
+
     glm::ivec3 index;
 
     int size;
-
-    bool generated;
 
     // TODO: Make a buffer pool to recycle these.
     GLuint out_vao;
@@ -24,4 +28,8 @@ public:
 
     // Careful, these cannot be reused for multiple buffers!
     GLuint feedback_object;
+
+private:
+    bool generated;
+    float transparency;
 };

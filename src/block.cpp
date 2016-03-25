@@ -9,6 +9,7 @@ Block::Block(ivec3 index, int size)
 : index(index)
 , size(size)
 , generated(false)
+, transparency(0.0f)
 {
 }
 
@@ -51,4 +52,15 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
     }
 
 	CHECK_GL_ERRORS;
+}
+
+void Block::update()
+{
+    transparency = std::min(1.0f, transparency + 0.01f);
+}
+
+void Block::reset()
+{
+    generated = false;
+    transparency = 0.0f;
 }

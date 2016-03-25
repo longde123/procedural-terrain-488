@@ -29,6 +29,7 @@ public:
     GLint debug_flag_uni;
     GLint eye_position_uni;
     GLint light_position_uni;
+    GLint alpha_uni;
 
     GLint pos_attrib;
     GLint normal_attrib;

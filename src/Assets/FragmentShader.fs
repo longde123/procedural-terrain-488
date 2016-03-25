@@ -24,6 +24,8 @@ uniform bool debug_flag;
 uniform vec3 eye_position;
 uniform vec3 light_position;
 
+uniform float alpha;
+
 vec3 calculateBlendWeights()
 {
     // Doesn't matter whether the normal is pointing along or opposite to the axes.
@@ -144,6 +146,7 @@ void main() {
         vec3 color_z = texture(z_texture, z_uv).xyz * light3;
         fragColor = vec4((color_x * blend_weights.x +
                           color_y * blend_weights.y +
-                          color_z * blend_weights.z) * ambient_occlusion, 1.0);
+                          color_z * blend_weights.z) * ambient_occlusion,
+                         alpha);
     }
 }
