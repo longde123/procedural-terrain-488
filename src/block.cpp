@@ -8,6 +8,7 @@ using namespace std;
 Block::Block(ivec3 index, int size)
 : index(index)
 , size(size)
+, generated(false)
 {
 }
 

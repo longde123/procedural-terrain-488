@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+#include <memory>
 #include <vector>
 
 #include "block.hpp"
@@ -16,10 +18,11 @@ public:
     BlockManager();
 
     void init(std::string dir);
-    void regenerateBlocks();
+    void generateNextBlock();
+    void regenerateAllBlocks();
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
-    std::vector<Block> blocks;
+    std::vector<std::shared_ptr<Block>> blocks;
 
     bool triplanar_colors;
     bool use_ambient;
@@ -35,4 +38,7 @@ public:
 private:
     Lod lod;
     Water water;
+
+    // List of blocks to generate.
+    std::queue<std::shared_ptr<Block>> block_queue;
 };

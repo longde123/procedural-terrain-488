@@ -16,6 +16,8 @@ public:
 
     int size;
 
+    bool generated;
+
     // TODO: Make a buffer pool to recycle these.
     GLuint out_vao;
     GLuint out_vbo;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "cs488-framework/ShaderProgram.hpp"
@@ -22,7 +23,7 @@ public:
     bool use_long_range_ambient_occlusion;
 
 protected:
-    void generateDensity(Block block);
+    void generateDensity(Block& block);
 
 private:
     ShaderProgram density_shader;

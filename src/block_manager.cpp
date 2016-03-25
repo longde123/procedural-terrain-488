@@ -12,13 +12,13 @@ using namespace std;
 BlockManager::BlockManager()
 : lod(16)
 {
-    blocks.push_back(Block(ivec3(0, 0, 0), 1));
-    blocks.push_back(Block(ivec3(1, 0, 0), 1));
-    blocks.push_back(Block(ivec3(0, 0, 1), 1));
-    blocks.push_back(Block(ivec3(1, 0, 1), 4));
-    blocks.push_back(Block(ivec3(-1, 0, 0), 1));
-    blocks.push_back(Block(ivec3(0, 0, -1), 1));
-    blocks.push_back(Block(ivec3(-2, 0, -2), 2));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, 0), 1)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(1, 0, 0), 1)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, 1), 1)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(1, 0, 1), 4)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(-1, 0, 0), 1)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, -1), 1)));
+    blocks.push_back(shared_ptr<Block>(new Block(ivec3(-2, 0, -2), 2)));
 
     triplanar_colors = false;
     use_ambient = true;
@@ -35,18 +35,34 @@ void BlockManager::init(string dir)
     terrain_generator.init(dir);
     water.init(dir);
 
-    for (Block& block : blocks) {
-        block.init(terrain_renderer.pos_attrib,
+    for (shared_ptr<Block>& block : blocks) {
+        block->init(terrain_renderer.pos_attrib,
             terrain_renderer.normal_attrib,
             terrain_renderer.ambient_occlusion_attrib);
-        terrain_generator.generateTerrainBlock(block);
+        block_queue.push(block);
     }
 }
 
-void BlockManager::regenerateBlocks()
+void BlockManager::regenerateAllBlocks()
 {
-    for (Block& block : blocks) {
-        terrain_generator.generateTerrainBlock(block);
+    // Get rid of existing stuff, we're interrupting.
+    while (!block_queue.empty()) {
+       block_queue.pop();
+    }
+
+    for (shared_ptr<Block>& block : blocks) {
+        block->generated = false;
+        block_queue.push(block);
+    }
+}
+
+void BlockManager::generateNextBlock()
+{
+    if (!block_queue.empty()) {
+        shared_ptr<Block> block = block_queue.front();
+        block_queue.pop();
+        terrain_generator.generateTerrainBlock(*block);
+        block->generated = true;
     }
 }
 
@@ -70,36 +86,43 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         glEnable(GL_CLIP_DISTANCE0);
 
-        for (Block& block : blocks) {
-            mat4 block_transform = translate(vec3(block.index)) * W * scale(vec3(block.size));
+        for (auto& block : blocks) {
+            // Skip blocks that are still in the queue.
+            if (!block->generated) {
+                continue;
+            }
+
+            mat4 block_transform = translate(vec3(block->index)) * W * scale(vec3(block->size));
             mat3 normalMatrix = mat3(transpose(inverse(block_transform)));
             glUniformMatrix4fv(terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(block_transform));
             glUniformMatrix3fv(terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr(normalMatrix));
 
-            glBindVertexArray(block.out_vao);
+            glBindVertexArray(block->out_vao);
 
             if (use_water) {
                 glUniform1i(terrain_renderer.water_clip_uni, true);
                 glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
 
-                mat4 W_reflect = translate(vec3(block.index)) *
+                mat4 W_reflect = translate(vec3(block->index)) *
                                  glm::translate(vec3(0, water_height, 0)) *
                                  glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
                                  glm::translate(vec3(0, -water_height, 0)) *
-                                 W * scale(vec3(block.size));
+                                 W * scale(vec3(block->size));
 
                 glUniform1i(terrain_renderer.water_clip_uni, false);
                 glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
                 glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
-                glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
             } else {
                 glUniform1i(terrain_renderer.water_clip_uni, false);
                 glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
             }
 
             glBindVertexArray(0);
+
+            CHECK_GL_ERRORS;
         }
 
         glDisable(GL_CLIP_DISTANCE0);
@@ -109,8 +132,13 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
     terrain_renderer.renderer_shader.disable();
 
     if (use_water) {
-        for (Block& block : blocks) {
-            mat4 block_transform = translate(vec3(block.index)) * W * scale(vec3(block.size));
+        for (auto& block : blocks) {
+            // Skip blocks that are still in the queue.
+            if (!block->generated) {
+                continue;
+            }
+
+            mat4 block_transform = translate(vec3(block->index)) * W * scale(vec3(block->size));
             water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform);
         }
     }

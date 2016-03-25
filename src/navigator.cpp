@@ -124,6 +124,8 @@ void Navigator::appLogic()
 
         makeView();
     }
+
+    block_manager.generateNextBlock();
 }
 
 //----------------------------------------------------------------------------------------
@@ -162,7 +164,7 @@ void Navigator::guiLogic()
 
         if (ImGui::SliderFloat("Period", &block_manager.terrain_generator.period, 4.0f, 40.0f)) {
             // Need to regenerate terrain.
-            block_manager.regenerateBlocks();
+            block_manager.regenerateAllBlocks();
         }
 
         if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {
@@ -183,11 +185,11 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
                     &block_manager.terrain_generator.use_short_range_ambient_occlusion)) {
-            block_manager.regenerateBlocks();
+            block_manager.regenerateAllBlocks();
         }
         if (ImGui::Checkbox("Long Range Ambient Occlusion",
                     &block_manager.terrain_generator.use_long_range_ambient_occlusion)) {
-            block_manager.regenerateBlocks();
+            block_manager.regenerateAllBlocks();
         }
 
 /*

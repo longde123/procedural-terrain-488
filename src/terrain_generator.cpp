@@ -68,7 +68,7 @@ void TerrainGenerator::init(string dir)
 	CHECK_GL_ERRORS;
 }
 
-void TerrainGenerator::generateDensity(Block block)
+void TerrainGenerator::generateDensity(Block& block)
 {
     // Generate the density values for the terrain block.
     density_shader.enable();
