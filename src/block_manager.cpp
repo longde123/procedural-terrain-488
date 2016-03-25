@@ -15,7 +15,7 @@ BlockManager::BlockManager()
     blocks.push_back(Block(ivec3(0, 0, 0), 1));
     blocks.push_back(Block(ivec3(1, 0, 0), 1));
     blocks.push_back(Block(ivec3(0, 0, 1), 1));
-    blocks.push_back(Block(ivec3(1, 0, 1), 2));
+    blocks.push_back(Block(ivec3(1, 0, 1), 4));
     blocks.push_back(Block(ivec3(-1, 0, 0), 1));
     blocks.push_back(Block(ivec3(0, 0, -1), 1));
     blocks.push_back(Block(ivec3(-2, 0, -2), 2));

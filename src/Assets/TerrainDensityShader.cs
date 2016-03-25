@@ -21,7 +21,7 @@ void main() {
     ivec3 block_dimensions = ivec3(gl_NumWorkGroups * gl_WorkGroupSize);
 
     float density = terrainDensity(
-            vec3(coords + block_index.xyz * (block_dimensions - 1)) * block_index.w,
+            vec3(coords * block_index.w) + block_index.xyz * (block_dimensions - 1),
             block_dimensions.y, period, 3);
 
     //imageStore(density_map, coords, mod(vec4(frequency), 1.0));

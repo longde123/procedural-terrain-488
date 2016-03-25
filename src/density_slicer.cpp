@@ -25,6 +25,7 @@ void DensitySlicer::init(string dir)
 	P_uni = density_shader.getUniformLocation("P");
 	V_uni = density_shader.getUniformLocation("V");
 	M_uni = density_shader.getUniformLocation("M");
+	block_index_uni = density_shader.getUniformLocation("block_index");
 	block_size_uni = density_shader.getUniformLocation("block_size");
 	period_uni = density_shader.getUniformLocation("period");
 
@@ -43,6 +44,7 @@ void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float period)
     glUniformMatrix4fv(P_uni, 1, GL_FALSE, value_ptr(P));
     glUniformMatrix4fv(V_uni, 1, GL_FALSE, value_ptr(V));
     glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(M));
+    glUniform4i(block_index_uni, 0, 0, 0, 1);
     glUniform1f(block_size_uni, BLOCK_SIZE);
     glUniform1f(period_uni, period);
 
