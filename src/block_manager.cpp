@@ -24,7 +24,7 @@ BlockManager::BlockManager()
     use_ambient = true;
     use_normal_map = true;
     debug_flag = false;
-    use_water = false;
+    use_water = true;
     water_height = 0.0f;
     light_x = 0.0f;
 }
@@ -52,11 +52,6 @@ void BlockManager::regenerateBlocks()
 
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
-    mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
-                     glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
-                     glm::translate(vec3(0, -water_height, 0)) *
-                     W;
-
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
         glUniformMatrix4fv(terrain_renderer.V_uni, 1, GL_FALSE, value_ptr(V));
@@ -88,6 +83,12 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
                 glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
                 glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
 
+                mat4 W_reflect = translate(vec3(block.index)) *
+                                 glm::translate(vec3(0, water_height, 0)) *
+                                 glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
+                                 glm::translate(vec3(0, -water_height, 0)) *
+                                 W * scale(vec3(block.size));
+
                 glUniform1i(terrain_renderer.water_clip_uni, false);
                 glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
                 glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
@@ -108,7 +109,10 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
     terrain_renderer.renderer_shader.disable();
 
     if (use_water) {
-        water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
+        for (Block& block : blocks) {
+            mat4 block_transform = translate(vec3(block.index)) * W * scale(vec3(block.size));
+            water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform);
+        }
     }
 
     CHECK_GL_ERRORS;
