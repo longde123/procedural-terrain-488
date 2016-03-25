@@ -70,6 +70,43 @@ void BlockManager::update()
     }
 }
 
+void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
+{
+    mat4 block_transform = translate(vec3(block.index)) * W * scale(vec3(block.size));
+    mat3 normalMatrix = mat3(transpose(inverse(block_transform)));
+    glUniformMatrix4fv(terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(block_transform));
+    glUniformMatrix3fv(terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr(normalMatrix));
+
+    glUniform1f(terrain_renderer.alpha_uni, block.getAlpha());
+
+    glBindVertexArray(block.out_vao);
+
+    if (use_water) {
+        glUniform1i(terrain_renderer.water_clip_uni, true);
+        glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
+        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+
+        mat4 W_reflect = translate(vec3(block.index)) *
+                         glm::translate(vec3(0, water_height, 0)) *
+                         glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
+                         glm::translate(vec3(0, -water_height, 0)) *
+                         W * scale(vec3(block.size));
+
+        glUniform1i(terrain_renderer.water_clip_uni, false);
+        glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
+        glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
+        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+    } else {
+        glUniform1i(terrain_renderer.water_clip_uni, false);
+        glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
+        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+    }
+
+    glBindVertexArray(0);
+
+    CHECK_GL_ERRORS;
+}
+
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
     terrain_renderer.renderer_shader.enable();
@@ -92,43 +129,9 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         for (auto& block : blocks) {
             // Skip blocks that are still in the queue.
-            if (!block->isReady()) {
-                continue;
+            if (block->isReady()) {
+                renderBlock(P, V, W, *block);
             }
-
-            mat4 block_transform = translate(vec3(block->index)) * W * scale(vec3(block->size));
-            mat3 normalMatrix = mat3(transpose(inverse(block_transform)));
-            glUniformMatrix4fv(terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(block_transform));
-            glUniformMatrix3fv(terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr(normalMatrix));
-
-            glUniform1f(terrain_renderer.alpha_uni, block->getAlpha());
-
-            glBindVertexArray(block->out_vao);
-
-            if (use_water) {
-                glUniform1i(terrain_renderer.water_clip_uni, true);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
-
-                mat4 W_reflect = translate(vec3(block->index)) *
-                                 glm::translate(vec3(0, water_height, 0)) *
-                                 glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
-                                 glm::translate(vec3(0, -water_height, 0)) *
-                                 W * scale(vec3(block->size));
-
-                glUniform1i(terrain_renderer.water_clip_uni, false);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
-                glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
-                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
-            } else {
-                glUniform1i(terrain_renderer.water_clip_uni, false);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, block->feedback_object);
-            }
-
-            glBindVertexArray(0);
-
-            CHECK_GL_ERRORS;
         }
 
         glDisable(GL_CLIP_DISTANCE0);

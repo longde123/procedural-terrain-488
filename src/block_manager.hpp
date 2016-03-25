@@ -20,6 +20,7 @@ public:
     void init(std::string dir);
     void update();
     void regenerateAllBlocks();
+    void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block);
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
     std::vector<std::shared_ptr<Block>> blocks;
