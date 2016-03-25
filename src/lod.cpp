@@ -73,6 +73,7 @@ void Lod::generateForPosition(vec3 current_pos)
         }
     }
 
+    /*
     for (int x = -range; x <= range; x += 4) {
         for (int y = -range; y <= range; y += 4) {
             ivec3 block = ivec3(x, 0, y) + (ivec3(current_pos.x, 0, current_pos.z) / 4) * 4;
@@ -91,4 +92,5 @@ void Lod::generateForPosition(vec3 current_pos)
             }
         }
     }
+    */
 }

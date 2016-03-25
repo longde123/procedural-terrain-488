@@ -10,16 +10,8 @@ using namespace glm;
 using namespace std;
 
 BlockManager::BlockManager()
-: lod(16)
+: lod(2)
 {
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, 0), 1)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(1, 0, 0), 1)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, 1), 1)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(1, 0, 1), 4)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(-1, 0, 0), 1)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(0, 0, -1), 1)));
-    blocks.push_back(shared_ptr<Block>(new Block(ivec3(-2, 0, -2), 2)));
-
     triplanar_colors = false;
     use_ambient = true;
     use_normal_map = true;
@@ -34,13 +26,6 @@ void BlockManager::init(string dir)
     terrain_renderer.init(dir);
     terrain_generator.init(dir);
     water.init(dir);
-
-    for (shared_ptr<Block>& block : blocks) {
-        block->init(terrain_renderer.pos_attrib,
-            terrain_renderer.normal_attrib,
-            terrain_renderer.ambient_occlusion_attrib);
-        block_queue.push(block);
-    }
 }
 
 void BlockManager::regenerateAllBlocks()
@@ -50,14 +35,35 @@ void BlockManager::regenerateAllBlocks()
        block_queue.pop();
     }
 
-    for (shared_ptr<Block>& block : blocks) {
+    for (auto& kv : blocks) {
+        auto& block = kv.second;
         block->reset();
         block_queue.push(block);
     }
 }
 
-void BlockManager::update()
+void BlockManager::update(vec3 eye_position)
 {
+    lod.generateForPosition(eye_position);
+
+    for (ivec4& index : lod.blocks_of_size_1) {
+        if (blocks.count(index) == 0) {
+            newBlock(ivec3(index), index.w);
+        }
+    }
+
+    for (ivec4& index : lod.blocks_of_size_2) {
+        if (blocks.count(index) == 0) {
+            newBlock(ivec3(index), index.w);
+        }
+    }
+
+    for (ivec4& index : lod.blocks_of_size_4) {
+        if (blocks.count(index) == 0) {
+            newBlock(ivec3(index), index.w);
+        }
+    }
+
     if (!block_queue.empty()) {
         shared_ptr<Block> block = block_queue.front();
         block_queue.pop();
@@ -65,9 +71,19 @@ void BlockManager::update()
         block->finish();
     }
 
-    for (auto& block : blocks) {
+    for (auto& kv : blocks) {
+        auto& block = kv.second;
         block->update();
     }
+}
+
+void BlockManager::newBlock(ivec3 index, int size)
+{
+    auto block = shared_ptr<Block>(new Block(index, size));
+    block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
+                terrain_renderer.ambient_occlusion_attrib);
+    blocks[ivec4(index, size)] = block;
+    block_queue.push(block);
 }
 
 void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
@@ -127,7 +143,8 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         glEnable(GL_CLIP_DISTANCE0);
 
-        for (auto& block : blocks) {
+        for (auto& kv : blocks) {
+            auto& block = kv.second;
             // Skip blocks that are still in the queue.
             if (block->isReady()) {
                 renderBlock(P, V, W, *block);
@@ -141,7 +158,8 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
     terrain_renderer.renderer_shader.disable();
 
     if (use_water) {
-        for (auto& block : blocks) {
+        for (auto& kv : blocks) {
+            auto& block = kv.second;
             // Skip blocks that are still in the queue.
             if (!block->isReady()) {
                 continue;

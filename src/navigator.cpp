@@ -125,7 +125,7 @@ void Navigator::appLogic()
         makeView();
     }
 
-    block_manager.update();
+    block_manager.update(eye_position);
 }
 
 //----------------------------------------------------------------------------------------

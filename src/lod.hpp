@@ -12,9 +12,9 @@ public:
     void generateForPosition(glm::vec3 current_pos);
 
     // Contains xyz coordinates and w is the alpha of the block.
-    std::vector<glm::vec4> blocks_of_size_1;
-    std::vector<glm::vec4> blocks_of_size_2;
-    std::vector<glm::vec4> blocks_of_size_4;
+    std::vector<glm::ivec4> blocks_of_size_1;
+    std::vector<glm::ivec4> blocks_of_size_2;
+    std::vector<glm::ivec4> blocks_of_size_4;
 private:
     void genSubblocks(std::vector<glm::ivec3>& subblocks, int n);
 

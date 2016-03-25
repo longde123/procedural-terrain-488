@@ -44,21 +44,21 @@ void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
 
     lod.generateForPosition(current_pos);
 
-    for (vec4& block : lod.blocks_of_size_1) {
+    for (ivec4& block : lod.blocks_of_size_1) {
         mat4 transform = translate(vec3(block) + vec3(0.05)) * scale(vec3(0.9));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 0.0f, 0.0f, 1.0f, 0.5 * block.w);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     }
 
-    for (vec4& block : lod.blocks_of_size_2) {
+    for (ivec4& block : lod.blocks_of_size_2) {
         mat4 transform = translate(vec3(block) + vec3(0.025)) * scale(vec3(1.95));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 0.0f, 1.0f, 0.0f, 0.5f * block.w);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     }
 
-    for (vec4& block : lod.blocks_of_size_4) {
+    for (ivec4& block : lod.blocks_of_size_4) {
         mat4 transform = translate(vec3(block)) * scale(vec3(4.0));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 1.0f, 0.0f, 0.0f, 0.5f * block.w);

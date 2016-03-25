@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "block.hpp"
@@ -13,17 +14,34 @@
 
 #include "water.hpp"
 
+struct KeyHash {
+    std::size_t operator()(const glm::ivec4& v) const
+    {
+        long x = v.x;
+        long y = v.y;
+        long z = v.z;
+        long w = v.w;
+        return std::hash<long>()(x + (y << 8) + (z << 16) + (w << 24));
+    }
+};
+
+struct KeyEqual {
+    bool operator()(const glm::ivec4& lhs, const glm::ivec4& rhs) const
+    {
+        return lhs == rhs;
+    }
+};
+
 class BlockManager {
 public:
     BlockManager();
 
     void init(std::string dir);
-    void update();
+    void update(glm::vec3 eye_position);
     void regenerateAllBlocks();
-    void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block);
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
-    std::vector<std::shared_ptr<Block>> blocks;
+    std::unordered_map<glm::ivec4, std::shared_ptr<Block>, KeyHash, KeyEqual> blocks;
 
     bool triplanar_colors;
     bool use_ambient;
@@ -37,6 +55,9 @@ public:
     //TerrainGeneratorSlow terrain_generator;
     TerrainGeneratorMedium terrain_generator;
 private:
+    void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block);
+    void newBlock(glm::ivec3 index, int size);
+
     Lod lod;
     Water water;
 
