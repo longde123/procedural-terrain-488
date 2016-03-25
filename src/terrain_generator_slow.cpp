@@ -25,6 +25,7 @@ void TerrainGeneratorSlow::init(string dir)
 	marching_cubes_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
 	marching_cubes_shader.link();
 
+    block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
 	period_uni_marching = marching_cubes_shader.getUniformLocation("period");
 	short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
@@ -32,15 +33,13 @@ void TerrainGeneratorSlow::init(string dir)
     grid.init(marching_cubes_shader);
 }
 
-void TerrainGeneratorSlow::generateTerrainBlock()
+void TerrainGeneratorSlow::generateTerrainBlock(Block& block)
 {
-    generateDensity();
+    generateDensity(block);
 
     // Generate the triangle mesh for the terrain.
     marching_cubes_shader.enable();
     {
-        GLint block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
-
         glUniform1f(period_uni_marching, period);
         glUniform1i(block_size_uni, BLOCK_SIZE);
         glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
@@ -51,15 +50,22 @@ void TerrainGeneratorSlow::generateTerrainBlock()
 
         glBindVertexArray(grid.getVertices());
 
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, block.feedback_object);
+
+        glBindBuffer(GL_ARRAY_BUFFER, block.out_vbo);
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, block.out_vbo);
+
         glBeginTransformFeedback(GL_TRIANGLES);
         {
             glDrawArraysInstanced(GL_POINTS, 0, BLOCK_SIZE * BLOCK_SIZE, BLOCK_SIZE);
         }
         glEndTransformFeedback();
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);
+        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
         glBindVertexArray(0);
+
         glDisable(GL_RASTERIZER_DISCARD);
     }
     marching_cubes_shader.disable();

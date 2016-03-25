@@ -9,7 +9,7 @@ public:
 
     void init(std::string dir);
 
-    virtual void generateTerrainBlock();
+    virtual void generateTerrainBlock(Block& block);
 
 private:
     void initPackedStorage();
@@ -19,7 +19,8 @@ private:
 
     GLuint voxel_edges_feedback;
 
-    GLint block_size_uni;
+    GLint block_size_uni_1;
+    GLint block_size_uni_2;
     GLint period_uni_marching;
     GLint short_range_ambient_uni;
     GLint long_range_ambient_uni;

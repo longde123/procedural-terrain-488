@@ -1,3 +1,11 @@
+layout(binding = 0) uniform sampler3D density_map;
+
+uniform int block_size;
+
+// first 3 components are the world coordinate
+// 4th is the texture coordinate, should be 1, 2 or 4
+uniform ivec4 block_index;
+
 // The marching cubes algorithm consists of 256 cases of triangle configurations (each
 // corner can be on or off).
 

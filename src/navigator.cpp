@@ -24,17 +24,10 @@ Navigator::Navigator()
     mouse_down_with_control = false;
 
     wireframe = false;
-    triplanar_colors = false;
     first_person_mode = false;
     show_lod = false;
     show_slicer = false;
     show_terrain = true;
-    use_ambient = true;
-    use_normal_map = true;
-    use_water = true;
-    debug_flag = false;
-    light_x = 0.0f;
-    water_height = 0.0f;
 }
 
 //----------------------------------------------------------------------------------------
@@ -59,16 +52,9 @@ void Navigator::init()
     system((m_exec_dir + "/Assets/include.py").c_str());
 
 	// Build the shaders
+    block_manager.init(m_exec_dir + "/Assets/out/");
     density_slicer.init(m_exec_dir + "/Assets/out/");
-    terrain_renderer.init(m_exec_dir + "/Assets/out/");
-    terrain_generator.init(m_exec_dir + "/Assets/out/");
-    water.init(m_exec_dir + "/Assets/out/");
     lod.init(m_exec_dir + "/Assets/out/");
-
-    terrain_generator.initBuffer(terrain_renderer.pos_attrib,
-            terrain_renderer.normal_attrib,
-            terrain_renderer.ambient_occlusion_attrib);
-    terrain_generator.generateTerrainBlock();
 
 	proj = glm::perspective(
 		glm::radians( 45.0f ),
@@ -168,20 +154,20 @@ void Navigator::guiLogic()
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Options")) {
                 if (ImGui::MenuItem("Wireframe", NULL, &wireframe)) {}
-                if (ImGui::MenuItem("Triplanar Colors", NULL, &triplanar_colors)) {}
+                if (ImGui::MenuItem("Triplanar Colors", NULL, &block_manager.triplanar_colors)) {}
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
 
-        if (ImGui::SliderFloat("Period", &terrain_generator.period, 4.0f, 40.0f)) {
+        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator.period, 4.0f, 40.0f)) {
             // Need to regenerate terrain.
-            terrain_generator.generateTerrainBlock();
+            block_manager.regenerateBlocks();
         }
 
-        if (ImGui::SliderFloat("Light X", &light_x, 0.0f, 70.0f)) {
+        if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {
         }
-        if (ImGui::SliderFloat("Water Height", &water_height, -0.5f, 0.5f)) {
+        if (ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 0.5f)) {
         }
 
         if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
@@ -191,17 +177,17 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Show Level of Detail", &show_lod);
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
-        ImGui::Checkbox("Ambient Occlusion", &use_ambient);
-        ImGui::Checkbox("Normal Maps", &use_normal_map);
-        ImGui::Checkbox("Use Water", &use_water);
-        ImGui::Checkbox("Debug Flags", &debug_flag);
+        ImGui::Checkbox("Ambient Occlusion", &block_manager.use_ambient);
+        ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
+        ImGui::Checkbox("Use Water", &block_manager.use_water);
+        ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
-                    &terrain_generator.use_short_range_ambient_occlusion)) {
-            terrain_generator.generateTerrainBlock();
+                    &block_manager.terrain_generator.use_short_range_ambient_occlusion)) {
+            block_manager.regenerateBlocks();
         }
         if (ImGui::Checkbox("Long Range Ambient Occlusion",
-                    &terrain_generator.use_long_range_ambient_occlusion)) {
-            terrain_generator.generateTerrainBlock();
+                    &block_manager.terrain_generator.use_long_range_ambient_occlusion)) {
+            block_manager.regenerateBlocks();
         }
 
 /*
@@ -233,10 +219,6 @@ void Navigator::draw()
 	mat4 W;
     float offset = -0.5f;
 	W = glm::translate(W, vec3(offset, offset, offset));
-    mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
-                     glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
-                     glm::translate(vec3(0, -water_height, 0)) *
-                     W;
 
     if (wireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -245,58 +227,11 @@ void Navigator::draw()
     glEnable( GL_DEPTH_TEST );
 
     if (show_slicer) {
-        density_slicer.draw(proj, view, W, terrain_generator.period);
+        density_slicer.draw(proj, view, W, block_manager.terrain_generator.period);
     }
 
-    mat3 normalMatrix = mat3(transpose(inverse(W)));
-
     if (show_terrain) {
-        terrain_renderer.renderer_shader.enable();
-            glUniformMatrix4fv( terrain_renderer.P_uni, 1, GL_FALSE, value_ptr( proj ) );
-            glUniformMatrix4fv( terrain_renderer.V_uni, 1, GL_FALSE, value_ptr( view ) );
-            glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr( W ) );
-            glUniformMatrix3fv( terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr( normalMatrix ) );
-
-            glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
-            glUniform1i(terrain_renderer.use_ambient_uni, use_ambient);
-            glUniform1i(terrain_renderer.use_normal_map_uni, use_normal_map);
-            glUniform1i(terrain_renderer.debug_flag_uni, debug_flag);
-
-            glUniform1f(terrain_renderer.clip_height_uni, water_height);
-
-            glUniform3f(terrain_renderer.eye_position_uni, eye_position.x, eye_position.y, eye_position.z);
-            glUniform3f(terrain_renderer.light_position_uni, 30.0f, 50.0f, light_x);
-
-            terrain_renderer.prepareRender();
-
-            glBindVertexArray(terrain_generator.getVertices());
-
-            glEnable(GL_CLIP_DISTANCE0);
-
-            if (use_water) {
-                glUniform1i(terrain_renderer.water_clip_uni, true);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
-
-                glUniform1i(terrain_renderer.water_clip_uni, false);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
-                glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
-                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
-            } else {
-                glUniform1i(terrain_renderer.water_clip_uni, false);
-                glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-                glDrawTransformFeedback(GL_TRIANGLES, terrain_generator.feedback_object);
-            }
-
-            glDisable(GL_CLIP_DISTANCE0);
-
-            // Draw the cubes
-            // Highlight the active square.
-        terrain_renderer.renderer_shader.disable();
-
-        if (use_water) {
-            water.draw(proj, view, glm::translate(vec3(0, water_height + 0.5f, 0)) * W);
-        }
+        block_manager.renderBlocks(proj, view, W, eye_position);
     }
 
     if (show_lod) {
@@ -447,12 +382,12 @@ bool Navigator::keyInputEvent(int key, int action, int mods) {
             eventHandled = true;
         }
         if (key == GLFW_KEY_F) {
-            debug_flag = !debug_flag;
+            block_manager.debug_flag = !block_manager.debug_flag;
 
             eventHandled = true;
         }
         if (key == GLFW_KEY_N) {
-            use_normal_map = !use_normal_map;
+            block_manager.use_normal_map = !block_manager.use_normal_map;
 
             eventHandled = true;
         }

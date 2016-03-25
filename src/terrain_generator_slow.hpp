@@ -9,11 +9,12 @@ public:
 
     void init(std::string dir);
 
-    virtual void generateTerrainBlock();
+    virtual void generateTerrainBlock(Block& block);
 
 private:
     TransformProgram marching_cubes_shader;
 
+    GLint block_size_uni;
     GLint period_uni_marching;
     GLint short_range_ambient_uni;
     GLint long_range_ambient_uni;

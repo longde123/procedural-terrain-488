@@ -31,11 +31,12 @@ void TerrainGenerator::init(string dir)
     density_shader.link();
 
 	period_uni = density_shader.getUniformLocation("period");
+	block_index_uni = density_shader.getUniformLocation("block_index");
 
     // Generate texture object in which to store the terrain block.
-    glGenTextures(1, &block);
+    glGenTextures(1, &block_texture);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, block);
+    glBindTexture(GL_TEXTURE_3D, block_texture);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -57,60 +58,25 @@ void TerrainGenerator::init(string dir)
     // Some people run into the issue that 3D textures need to
     // have layered be GL_TRUE
     glBindImageTexture(0,               // unit
-                       block,
+                       block_texture,
                        0,               // level
                        GL_TRUE,         // layered
                        0,               // layer
                        GL_READ_WRITE,   // access
                        GL_R32F);
-}
-
-void TerrainGenerator::initBuffer(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
-{
-    size_t unit_size = sizeof(vec3) * 2 + sizeof(float);
-    size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
-                       BLOCK_SIZE * unit_size * 15;
-
-	glGenVertexArrays(1, &out_vao);
-    glGenBuffers(1, &out_vbo);
-	glBindVertexArray(out_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, out_vbo);
-    {
-        // TODO: Investigate performance of different usage flags.
-        glBufferData(GL_ARRAY_BUFFER, data_size, nullptr, GL_DYNAMIC_COPY);
-
-        // Setup location of attributes
-        glEnableVertexAttribArray(pos_attrib);
-        glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE,
-                unit_size, 0);
-        glEnableVertexAttribArray(normal_attrib);
-        glVertexAttribPointer(normal_attrib, 3, GL_FLOAT, GL_FALSE,
-                unit_size, (void*)(sizeof(vec3)));
-        glEnableVertexAttribArray(ambient_occlusion_attrib);
-        glVertexAttribPointer(ambient_occlusion_attrib, 1, GL_FLOAT, GL_FALSE,
-                unit_size, (void*)(sizeof(vec3) * 2));
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-    glGenTransformFeedbacks(1, &feedback_object);
-    {
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback_object);
-
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, out_vbo);
-
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-    }
 
 	CHECK_GL_ERRORS;
 }
 
-void TerrainGenerator::generateDensity()
+void TerrainGenerator::generateDensity(Block block)
 {
     // Generate the density values for the terrain block.
     density_shader.enable();
     {
         glUniform1f(period_uni, period);
+        glUniform4i(block_index_uni,
+                    block.index.x, block.index.y,
+                    block.index.z, block.size);
 
         glDispatchCompute(BLOCK_RESOLUTION / LOCAL_DIM_X,
                           BLOCK_RESOLUTION / LOCAL_DIM_Y,

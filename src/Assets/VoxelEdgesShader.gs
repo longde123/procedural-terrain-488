@@ -3,10 +3,6 @@
 layout(points) in;
 layout(points, max_vertices = 5) out;
 
-layout(binding = 0) uniform sampler3D density_map;
-
-uniform int block_size;
-
 out uint z6_y6_x6_edge1_edge2_edge3;
 
 #include "marching_cubes_common.h"

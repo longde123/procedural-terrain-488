@@ -5,9 +5,6 @@ layout(triangle_strip, max_vertices = 3) out;
 
 in uint z6_y6_x6_edge1_edge2_edge3[];
 
-layout(binding = 0) uniform sampler3D density_map;
-
-uniform int block_size;
 uniform bool short_range_ambient;
 uniform bool long_range_ambient;
 uniform float period;

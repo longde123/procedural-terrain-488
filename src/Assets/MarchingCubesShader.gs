@@ -3,10 +3,6 @@
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
-layout(binding = 0) uniform sampler3D density_map;
-
-uniform int block_size;
-
 uniform bool short_range_ambient;
 uniform bool long_range_ambient;
 uniform float period;

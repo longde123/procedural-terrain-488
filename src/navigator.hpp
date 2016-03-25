@@ -9,12 +9,9 @@
 #include "cs488-framework/OpenGLImport.hpp"
 #include "cs488-framework/ShaderProgram.hpp"
 
+#include "block_manager.hpp"
 #include "density_slicer.hpp"
 #include "lod_visualizer.hpp"
-#include "terrain_generator_slow.hpp"
-#include "terrain_generator_medium.hpp"
-#include "terrain_renderer.hpp"
-#include "water.hpp"
 
 class Navigator : public CS488Window {
 public:
@@ -42,10 +39,8 @@ private:
 	// Fields related to the shader and uniforms.
 	ShaderProgram m_shader;
 
+    BlockManager block_manager;
     DensitySlicer density_slicer;
-    TerrainRenderer terrain_renderer;
-    TerrainGeneratorMedium terrain_generator;
-    Water water;
     LodVisualizer lod;
 
 	// Matrices controlling the camera and projection.
@@ -60,17 +55,10 @@ private:
 
     // Display options
     bool wireframe;
-    bool triplanar_colors;
     bool first_person_mode;
     bool show_lod;
     bool show_slicer;
     bool show_terrain;
-    bool use_ambient;
-    bool use_normal_map;
-    bool use_water;
-    bool debug_flag;
-    float light_x;
-    float water_height;
 
     float rotation;
     float rotation_vertical;
