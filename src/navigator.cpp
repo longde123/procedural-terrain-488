@@ -28,6 +28,7 @@ Navigator::Navigator()
     show_lod = false;
     show_slicer = false;
     show_terrain = true;
+    generate_blocks = true;
 }
 
 //----------------------------------------------------------------------------------------
@@ -125,7 +126,7 @@ void Navigator::appLogic()
         makeView();
     }
 
-    block_manager.update(eye_position);
+    block_manager.update(eye_position, generate_blocks);
 }
 
 //----------------------------------------------------------------------------------------
@@ -179,6 +180,7 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Show Level of Detail", &show_lod);
         ImGui::Checkbox("Show Slicer", &show_slicer);
         ImGui::Checkbox("Show Terrain", &show_terrain);
+        ImGui::Checkbox("Generate Blocks", &generate_blocks);
         ImGui::Checkbox("Ambient Occlusion", &block_manager.use_ambient);
         ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
@@ -390,6 +392,11 @@ bool Navigator::keyInputEvent(int key, int action, int mods) {
         }
         if (key == GLFW_KEY_N) {
             block_manager.use_normal_map = !block_manager.use_normal_map;
+
+            eventHandled = true;
+        }
+        if (key == GLFW_KEY_G) {
+            generate_blocks = !generate_blocks;
 
             eventHandled = true;
         }

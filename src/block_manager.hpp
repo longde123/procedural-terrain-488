@@ -37,7 +37,7 @@ public:
     BlockManager();
 
     void init(std::string dir);
-    void update(glm::vec3 eye_position);
+    void update(glm::vec3 eye_position, bool generate_blocks);
     void regenerateAllBlocks();
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 

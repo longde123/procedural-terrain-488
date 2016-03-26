@@ -2,6 +2,8 @@
 
 #include "cs488-framework/GlErrorCheck.hpp"
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -15,6 +17,9 @@ Block::Block(ivec3 index, int size)
 
 void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
 {
+    Timer timer;
+    timer.start();
+
     // TODO: reevaluate amount of space needed, maybe dynamically
     size_t unit_size = sizeof(vec3) * 2 + sizeof(float);
     size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
@@ -52,6 +57,11 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
     }
 
 	CHECK_GL_ERRORS;
+
+    glFinish();
+    timer.stop();
+
+    printf("Init took %.4f\n", timer.elapsedSeconds());
 }
 
 void Block::update()

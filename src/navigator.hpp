@@ -59,6 +59,7 @@ private:
     bool show_lod;
     bool show_slicer;
     bool show_terrain;
+    bool generate_blocks;
 
     float rotation;
     float rotation_vertical;

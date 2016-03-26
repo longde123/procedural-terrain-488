@@ -42,7 +42,7 @@ void BlockManager::regenerateAllBlocks()
     }
 }
 
-void BlockManager::update(vec3 eye_position)
+void BlockManager::update(vec3 eye_position, bool generate_blocks)
 {
     lod.generateForPosition(eye_position);
 

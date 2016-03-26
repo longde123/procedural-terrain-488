@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -90,9 +92,20 @@ void TerrainGeneratorMedium::initPackedStorage()
 
 void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
 {
+    Timer timer;
+    double density_time, voxel_time, unpack_time;
+
+    timer.start();
+
     generateDensity(block);
 
+    glFinish();
+    timer.stop();
+    density_time = timer.elapsedSeconds();
+
     glEnable(GL_RASTERIZER_DISCARD);
+
+    timer.start();
 
     voxel_edges_shader.enable();
     {
@@ -113,7 +126,13 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
     }
     voxel_edges_shader.disable();
 
+    glFinish();
+    timer.stop();
+    voxel_time = timer.elapsedSeconds();
+
 	CHECK_GL_ERRORS;
+
+    timer.start();
 
     triangle_unpack_shader.enable();
     {
@@ -142,7 +161,15 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
     }
     triangle_unpack_shader.disable();
 
+    glFinish();
+    timer.stop();
+    unpack_time = timer.elapsedSeconds();
+
     glDisable(GL_RASTERIZER_DISCARD);
 
 	CHECK_GL_ERRORS;
+
+    printf("Generated block <%d, %d, %d | %d> in <%.4f, %.4f, %.4f>\n",
+           block.index.x, block.index.y, block.index.z, block.size,
+           density_time, voxel_time, unpack_time);
 }
