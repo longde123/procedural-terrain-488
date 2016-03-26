@@ -42,26 +42,32 @@ void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
 
     int index_count = cube.indexCount();
 
-    lod.generateForPosition(current_pos);
+    lod.generateForPosition(P, V, current_pos);
 
-    for (ivec4& block : lod.blocks_of_size_1) {
-        mat4 transform = translate(vec3(block) + vec3(0.05)) * scale(vec3(0.9));
+    printf("Visible: %ld\r",
+           lod.blocks_of_size_1.size() + lod.blocks_of_size_2.size() + lod.blocks_of_size_4.size());
+
+    for (auto& block : lod.blocks_of_size_1) {
+        ivec3 index = block.first;
+        mat4 transform = translate(vec3(index) + vec3(0.05)) * scale(vec3(0.9));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
-        glUniform4f(color_uni, 0.0f, 0.0f, 1.0f, 0.5 * block.w);
+        glUniform4f(color_uni, 0.0f, 0.0f, 1.0f, 0.5 * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     }
 
-    for (ivec4& block : lod.blocks_of_size_2) {
-        mat4 transform = translate(vec3(block) + vec3(0.025)) * scale(vec3(1.95));
+    for (auto& block : lod.blocks_of_size_2) {
+        ivec3 index = block.first;
+        mat4 transform = translate(vec3(index) + vec3(0.025)) * scale(vec3(1.95));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
-        glUniform4f(color_uni, 0.0f, 1.0f, 0.0f, 0.5f * block.w);
+        glUniform4f(color_uni, 0.0f, 1.0f, 0.0f, 0.5f * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     }
 
-    for (ivec4& block : lod.blocks_of_size_4) {
-        mat4 transform = translate(vec3(block)) * scale(vec3(4.0));
+    for (auto& block : lod.blocks_of_size_4) {
+        ivec3 index = block.first;
+        mat4 transform = translate(vec3(index)) * scale(vec3(4.0));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
-        glUniform4f(color_uni, 1.0f, 0.0f, 0.0f, 0.5f * block.w);
+        glUniform4f(color_uni, 1.0f, 0.0f, 0.0f, 0.5f * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     }
 

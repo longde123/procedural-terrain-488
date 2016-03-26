@@ -44,26 +44,6 @@ void BlockManager::regenerateAllBlocks()
 
 void BlockManager::update(vec3 eye_position, bool generate_blocks)
 {
-    lod.generateForPosition(eye_position);
-
-    for (ivec4& index : lod.blocks_of_size_1) {
-        if (blocks.count(index) == 0) {
-            newBlock(ivec3(index), index.w);
-        }
-    }
-
-    for (ivec4& index : lod.blocks_of_size_2) {
-        if (blocks.count(index) == 0) {
-            newBlock(ivec3(index), index.w);
-        }
-    }
-
-    for (ivec4& index : lod.blocks_of_size_4) {
-        if (blocks.count(index) == 0) {
-            newBlock(ivec3(index), index.w);
-        }
-    }
-
     if (!block_queue.empty()) {
         shared_ptr<Block> block = block_queue.front();
         block_queue.pop();
@@ -88,6 +68,8 @@ void BlockManager::newBlock(ivec3 index, int size)
 
 void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
 {
+    assert(block.isReady());
+
     mat4 block_transform = translate(vec3(block.index)) * W * scale(vec3(block.size));
     mat3 normalMatrix = mat3(transpose(inverse(block_transform)));
     glUniformMatrix4fv(terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(block_transform));
@@ -125,6 +107,8 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
 
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
+    lod.generateForPosition(P, V, eye_position);
+
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
         glUniformMatrix4fv(terrain_renderer.V_uni, 1, GL_FALSE, value_ptr(V));
@@ -142,6 +126,34 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         terrain_renderer.prepareRender();
 
         glEnable(GL_CLIP_DISTANCE0);
+
+        for (auto& block : lod.blocks_of_size_1) {
+            ivec4 index = vec4(block.first, 1);
+            if (blocks.count(index) == 0) {
+                newBlock(block.first, 1);
+            } else if (blocks[index]->isReady()) {
+                renderBlock(P, V, W, *blocks[index]);
+            }
+        }
+
+        for (auto& block : lod.blocks_of_size_2) {
+            ivec4 index = vec4(block.first, 2);
+            if (blocks.count(index) == 0) {
+                newBlock(block.first, 2);
+            } else if (blocks[index]->isReady()) {
+                renderBlock(P, V, W, *blocks[index]);
+            }
+        }
+
+        for (auto& block : lod.blocks_of_size_4) {
+            ivec4 index = vec4(block.first, 4);
+            if (blocks.count(index) == 0) {
+                newBlock(block.first, 4);
+            } else if (blocks[index]->isReady()) {
+                renderBlock(P, V, W, *blocks[index]);
+            }
+        }
+
 
         for (auto& kv : blocks) {
             auto& block = kv.second;

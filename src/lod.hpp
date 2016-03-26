@@ -9,14 +9,15 @@ class Lod {
 public:
     Lod(int range);
 
-    void generateForPosition(glm::vec3 current_pos);
+    void generateForPosition(glm::mat4 P, glm::mat4 V, glm::vec3 current_pos);
 
-    // Contains xyz coordinates and w is the alpha of the block.
-    std::vector<glm::ivec4> blocks_of_size_1;
-    std::vector<glm::ivec4> blocks_of_size_2;
-    std::vector<glm::ivec4> blocks_of_size_4;
+    // Contains xyz coordinates and alpha of the block.
+    std::vector<std::pair<glm::ivec3, float>> blocks_of_size_1;
+    std::vector<std::pair<glm::ivec3, float>> blocks_of_size_2;
+    std::vector<std::pair<glm::ivec3, float>> blocks_of_size_4;
 private:
     void genSubblocks(std::vector<glm::ivec3>& subblocks, int n);
+    bool blockIsInView(glm::mat4& P, glm::mat4& V, glm::ivec3 block, int size);
 
     int range;
 
