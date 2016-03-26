@@ -4,12 +4,12 @@ using namespace glm;
 using namespace std;
 
 // Range of distance for blocks of size 1 where they fade out.
-const int BLOCK_1_FADEOUT_START = 5;
-const int BLOCK_1_FADEOUT_END = 6;
+const int BLOCK_1_FADEOUT_START = 4;
+const int BLOCK_1_FADEOUT_END = 5;
 
 // Range of distance for blocks of size 2 where they fade out.
-const int BLOCK_2_FADEOUT_START = 12;
-const int BLOCK_2_FADEOUT_END = 14;
+const int BLOCK_2_FADEOUT_START = 8;
+const int BLOCK_2_FADEOUT_END = 10;
 
 Lod::Lod(int range)
 : range(range)

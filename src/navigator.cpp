@@ -185,6 +185,9 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
         ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
+        ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
+        ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
+        ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
                     &block_manager.terrain_generator.use_short_range_ambient_occlusion)) {
             block_manager.regenerateAllBlocks();

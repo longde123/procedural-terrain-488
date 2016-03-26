@@ -48,6 +48,9 @@ public:
     bool use_normal_map;
     bool debug_flag;
     bool use_water;
+    bool small_blocks;
+    bool medium_blocks;
+    bool large_blocks;
     float water_height;
     float light_x;
 
@@ -55,7 +58,7 @@ public:
     //TerrainGeneratorSlow terrain_generator;
     TerrainGeneratorMedium terrain_generator;
 private:
-    void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block);
+    void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block, float fadeAlpha);
     void newBlock(glm::ivec3 index, int size);
 
     Lod lod;

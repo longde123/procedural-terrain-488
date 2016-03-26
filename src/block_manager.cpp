@@ -10,7 +10,7 @@ using namespace glm;
 using namespace std;
 
 BlockManager::BlockManager()
-: lod(2)
+: lod(4)
 {
     triplanar_colors = false;
     use_ambient = true;
@@ -18,6 +18,9 @@ BlockManager::BlockManager()
     debug_flag = false;
     use_water = true;
     water_height = 0.0f;
+    small_blocks = true;
+    medium_blocks = true;
+    large_blocks = true;
     light_x = 0.0f;
 }
 
@@ -66,7 +69,7 @@ void BlockManager::newBlock(ivec3 index, int size)
     block_queue.push(block);
 }
 
-void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
+void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeAlpha)
 {
     assert(block.isReady());
 
@@ -75,7 +78,7 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block)
     glUniformMatrix4fv(terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(block_transform));
     glUniformMatrix3fv(terrain_renderer.NormalMatrix_uni, 1, GL_FALSE, value_ptr(normalMatrix));
 
-    glUniform1f(terrain_renderer.alpha_uni, block.getAlpha());
+    glUniform1f(terrain_renderer.alpha_uni, std::min(block.getAlpha(), fadeAlpha));
 
     glBindVertexArray(block.out_vao);
 
@@ -127,39 +130,36 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         glEnable(GL_CLIP_DISTANCE0);
 
-        for (auto& block : lod.blocks_of_size_1) {
-            ivec4 index = vec4(block.first, 1);
-            if (blocks.count(index) == 0) {
-                newBlock(block.first, 1);
-            } else if (blocks[index]->isReady()) {
-                renderBlock(P, V, W, *blocks[index]);
+        if (large_blocks) {
+            for (auto& block : lod.blocks_of_size_4) {
+                ivec4 index = vec4(block.first, 4);
+                if (blocks.count(index) == 0) {
+                    newBlock(block.first, 4);
+                } else if (blocks[index]->isReady()) {
+                    renderBlock(P, V, W, *blocks[index], block.second);
+                }
             }
         }
 
-        for (auto& block : lod.blocks_of_size_2) {
-            ivec4 index = vec4(block.first, 2);
-            if (blocks.count(index) == 0) {
-                newBlock(block.first, 2);
-            } else if (blocks[index]->isReady()) {
-                renderBlock(P, V, W, *blocks[index]);
+        if (medium_blocks) {
+            for (auto& block : lod.blocks_of_size_2) {
+                ivec4 index = vec4(block.first, 2);
+                if (blocks.count(index) == 0) {
+                    newBlock(block.first, 2);
+                } else if (blocks[index]->isReady()) {
+                    renderBlock(P, V, W, *blocks[index], block.second);
+                }
             }
         }
 
-        for (auto& block : lod.blocks_of_size_4) {
-            ivec4 index = vec4(block.first, 4);
-            if (blocks.count(index) == 0) {
-                newBlock(block.first, 4);
-            } else if (blocks[index]->isReady()) {
-                renderBlock(P, V, W, *blocks[index]);
-            }
-        }
-
-
-        for (auto& kv : blocks) {
-            auto& block = kv.second;
-            // Skip blocks that are still in the queue.
-            if (block->isReady()) {
-                renderBlock(P, V, W, *block);
+        if (small_blocks) {
+            for (auto& block : lod.blocks_of_size_1) {
+                ivec4 index = vec4(block.first, 1);
+                if (blocks.count(index) == 0) {
+                    newBlock(block.first, 1);
+                } else if (blocks[index]->isReady()) {
+                    renderBlock(P, V, W, *blocks[index], block.second);
+                }
             }
         }
 

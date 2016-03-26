@@ -24,6 +24,11 @@ void main() {
             vec3(coords * block_index.w) + block_index.xyz * (block_dimensions - 1),
             block_dimensions.y, period, 3);
 
+    // Erosion, we want the lower-detail blocks the be slightly shaved off so that
+    // we can render the higher-detail blocks with transparency on top of them with
+    // z-layer conflicts.
+    density -= (block_index.w - 1) * 0.02;
+
     //imageStore(density_map, coords, mod(vec4(frequency), 1.0));
     //imageStore(density_map, coords, vec4(perlinNoise(coords, frequency)));
     imageStore(density_map, coords, vec4(density));
