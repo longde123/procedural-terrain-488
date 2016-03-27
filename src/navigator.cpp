@@ -150,9 +150,6 @@ void Navigator::guiLogic()
     windowFlags |= ImGuiWindowFlags_MenuBar;
 
 	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,100), opacity, windowFlags)) {
-		if (ImGui::Button("Quit Application")) {
-			glfwSetWindowShouldClose(m_window, GL_TRUE);
-		}
 
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Options")) {
@@ -201,7 +198,13 @@ void Navigator::guiLogic()
         if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
         if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
 
+		if (ImGui::Button("Profile Block Generation")) {
+            block_manager.profileBlockGeneration();
+		}
 
+		if (ImGui::Button("Quit Application")) {
+			glfwSetWindowShouldClose(m_window, GL_TRUE);
+		}
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive

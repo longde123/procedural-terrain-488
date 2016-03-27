@@ -6,6 +6,8 @@
 
 #include "cs488-framework/GlErrorCheck.hpp"
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -34,6 +36,32 @@ void BlockManager::init(string dir)
     terrain_generator_slow.init(dir);
     terrain_generator_medium.init(dir);
     water.init(dir);
+}
+
+void BlockManager::profileBlockGeneration()
+{
+    // Make sure OpenGL has executed everything, they don't interfere
+    // with our profiling.
+    glFinish();
+
+    Timer timer;
+    timer.start();
+
+    auto block = shared_ptr<Block>(new Block(ivec3(0), 1));
+    block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
+                terrain_renderer.ambient_occlusion_attrib);
+
+    for (int i = 0; i < 100; i++) {
+        terrain_generator->generateTerrainBlock(*block);
+    }
+
+    // Make sure OpenGL has executed everything, so that they are measured
+    // by the profiling.
+    glFinish();
+
+    timer.stop();
+
+    printf("Generating 100 blocks took %f seconds\n", timer.elapsedSeconds());
 }
 
 void BlockManager::regenerateAllBlocks()

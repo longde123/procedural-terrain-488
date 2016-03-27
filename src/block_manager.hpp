@@ -56,6 +56,8 @@ public:
     void regenerateAllBlocks();
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
+    void profileBlockGeneration();
+
     std::unordered_map<glm::ivec4, std::shared_ptr<Block>, KeyHash, KeyEqual> blocks;
 
     bool triplanar_colors;

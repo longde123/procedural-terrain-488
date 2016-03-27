@@ -60,8 +60,6 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
 
     glFinish();
     timer.stop();
-
-    printf("Init took %.4f\n", timer.elapsedSeconds());
 }
 
 void Block::update()

@@ -169,7 +169,9 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
 
 	CHECK_GL_ERRORS;
 
+    /*
     printf("Generated block <%d, %d, %d | %d> in <%.4f, %.4f, %.4f>\n",
            block.index.x, block.index.y, block.index.z, block.size,
            density_time, voxel_time, unpack_time);
+    */
 }
