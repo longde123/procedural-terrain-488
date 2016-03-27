@@ -10,7 +10,7 @@ using namespace glm;
 using namespace std;
 
 BlockManager::BlockManager()
-: lod(4)
+: lod(16)
 {
     triplanar_colors = false;
     use_ambient = true;
