@@ -18,6 +18,7 @@ BlockManager::BlockManager()
     debug_flag = false;
     use_water = true;
     water_height = 0.0f;
+    one_block_only = false;
     small_blocks = true;
     medium_blocks = true;
     large_blocks = true;
@@ -134,7 +135,7 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
 
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
-    lod.generateForPosition(P, V, eye_position);
+    lod.generateForPosition(P, V, W, eye_position);
 
     // We need to make sure not to draw water multiple times on the same grid
     // cell, because the overlapping will cause visual artifacts.
@@ -161,19 +162,25 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         if (large_blocks) {
             for (auto& block : lod.blocks_of_size_4) {
-                processBlockOfSize(P, V, W, needed_water_squares, block.first, 4, block.second);
+                if (!one_block_only) {
+                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 4, block.second);
+                }
             }
         }
 
         if (medium_blocks) {
             for (auto& block : lod.blocks_of_size_2) {
-                processBlockOfSize(P, V, W, needed_water_squares, block.first, 2, block.second);
+                if (!one_block_only) {
+                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 2, block.second);
+                }
             }
         }
 
         if (small_blocks) {
             for (auto& block : lod.blocks_of_size_1) {
-                processBlockOfSize(P, V, W, needed_water_squares, block.first, 1, block.second);
+                if (!one_block_only || block.first == ivec3(0, 0, 0)) {
+                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 1, block.second);
+                }
             }
         }
 

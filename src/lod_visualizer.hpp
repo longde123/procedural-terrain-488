@@ -14,7 +14,7 @@ public:
     LodVisualizer();
 
     void init(std::string dir);
-    void draw(glm::mat4 P, glm::mat4 V, glm::vec3 current_pos);
+    void draw(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 current_pos);
 
 private:
     ShaderProgram lod_shader;

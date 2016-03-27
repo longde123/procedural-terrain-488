@@ -31,7 +31,7 @@ void LodVisualizer::init(string dir)
 	CHECK_GL_ERRORS;
 }
 
-void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
+void LodVisualizer::draw(mat4 P, mat4 V, mat4 W, vec3 current_pos)
 {
     lod_shader.enable();
 
@@ -42,14 +42,14 @@ void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
 
     int index_count = cube.indexCount();
 
-    lod.generateForPosition(P, V, current_pos);
+    lod.generateForPosition(P, V, W, current_pos);
 
     printf("Visible: %ld\r",
            lod.blocks_of_size_1.size() + lod.blocks_of_size_2.size() + lod.blocks_of_size_4.size());
 
     for (auto& block : lod.blocks_of_size_1) {
         ivec3 index = block.first;
-        mat4 transform = translate(vec3(index) + vec3(0.05)) * scale(vec3(0.9));
+        mat4 transform = translate(vec3(index) + vec3(0.05)) * W * scale(vec3(0.9));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 0.0f, 0.0f, 1.0f, 0.5 * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
@@ -57,7 +57,7 @@ void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
 
     for (auto& block : lod.blocks_of_size_2) {
         ivec3 index = block.first;
-        mat4 transform = translate(vec3(index) + vec3(0.025)) * scale(vec3(1.95));
+        mat4 transform = translate(vec3(index) + vec3(0.025)) * W * scale(vec3(1.95));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 0.0f, 1.0f, 0.0f, 0.5f * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
@@ -65,7 +65,7 @@ void LodVisualizer::draw(mat4 P, mat4 V, vec3 current_pos)
 
     for (auto& block : lod.blocks_of_size_4) {
         ivec3 index = block.first;
-        mat4 transform = translate(vec3(index)) * scale(vec3(4.0));
+        mat4 transform = translate(vec3(index)) * W * scale(vec3(4.0));
         glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
         glUniform4f(color_uni, 1.0f, 0.0f, 0.0f, 0.5f * block.second);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);

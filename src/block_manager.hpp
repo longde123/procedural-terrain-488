@@ -58,6 +58,7 @@ public:
     bool use_normal_map;
     bool debug_flag;
     bool use_water;
+    bool one_block_only;
     bool small_blocks;
     bool medium_blocks;
     bool large_blocks;

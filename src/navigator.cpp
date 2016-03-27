@@ -185,6 +185,7 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
         ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
+        ImGui::Checkbox("One Block Only", &block_manager.one_block_only);
         ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
         ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
         ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
@@ -222,7 +223,7 @@ void Navigator::guiLogic()
  */
 void Navigator::draw()
 {
-	// Create a global transformation for the model (centre it).
+	// Create a global transformation for the model.
 	mat4 W;
     float offset = -0.5f;
 	W = glm::translate(W, vec3(offset, offset, offset));
@@ -242,7 +243,7 @@ void Navigator::draw()
     }
 
     if (show_lod) {
-        lod.draw(proj, view, eye_position);
+        lod.draw(proj, view, W, eye_position);
     }
 
 	// Restore defaults

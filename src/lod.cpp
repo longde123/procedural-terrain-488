@@ -1,5 +1,9 @@
 #include "lod.hpp"
 
+#include <cstdio>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
 using namespace glm;
 using namespace std;
 
@@ -30,7 +34,7 @@ void Lod::genSubblocks(vector<ivec3>& subblocks, int n)
     }
 }
 
-bool Lod::blockIsInView(mat4& P, mat4& V, ivec3 block, int size)
+bool Lod::blockIsInView(mat4& P, mat4& V, mat4& W, ivec3 block, int size)
 {
     // This is not a perfect test, but it should do for now.
     vector<vec3> cubePoints = {
@@ -51,30 +55,32 @@ bool Lod::blockIsInView(mat4& P, mat4& V, ivec3 block, int size)
     bool all_behind = true;
 
     for (int i = 0; i < cubePoints.size(); i++) {
-        vec4 point = P * V * vec4(cubePoints[i] + vec3(block), 1.0);
+        vec4 point = P * V * translate(vec3(block)) * W  *vec4(cubePoints[i], 1.0);
         bool inside = true;
 
-        if (point.x < -point.w) {
+        float w = point.w;
+
+        if (point.x < -w) {
             inside = false;
         } else {
             all_on_left = false;
         }
-        if (point.x > point.w) {
+        if (point.x > w) {
             inside = false;
         } else {
             all_on_right = false;
         }
-        if (point.y < -point.w) {
+        if (point.y < -w) {
             inside = false;
         } else {
             all_on_bottom = false;
         }
-        if (point.y > point.w) {
+        if (point.y > w) {
             inside = false;
         } else {
             all_on_top = false;
         }
-        if (point.z < -point.w) {
+        if (point.z < -w) {
             inside = false;
         } else {
             all_behind = false;
@@ -92,7 +98,7 @@ bool Lod::blockIsInView(mat4& P, mat4& V, ivec3 block, int size)
     }
 }
 
-void Lod::generateForPosition(mat4 P, mat4 V, vec3 current_pos)
+void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
 {
     blocks_of_size_1.clear();
     blocks_of_size_2.clear();
@@ -102,7 +108,7 @@ void Lod::generateForPosition(mat4 P, mat4 V, vec3 current_pos)
         for (int y = -range; y <= range; y += 1) {
             ivec3 block = ivec3(x, 0, y) + ivec3(current_pos.x, 0, current_pos.z);
 
-            if (!blockIsInView(P, V, block, 1)) {
+            if (!blockIsInView(P, V, W, block, 1)) {
                 continue;
             }
 
@@ -121,7 +127,7 @@ void Lod::generateForPosition(mat4 P, mat4 V, vec3 current_pos)
             ivec3 block = ivec3(x, 0, y) + (ivec3(current_pos.x, 0, current_pos.z) / 2) * 2;
             assert(block % 2 == ivec3(0));
 
-            if (!blockIsInView(P, V, block, 2)) {
+            if (!blockIsInView(P, V, W, block, 2)) {
                 continue;
             }
 
@@ -152,7 +158,7 @@ void Lod::generateForPosition(mat4 P, mat4 V, vec3 current_pos)
             ivec3 block = ivec3(x, 0, y) + (ivec3(current_pos.x, 0, current_pos.z) / 4) * 4;
             assert(block % 4 == ivec3(0));
 
-            if (!blockIsInView(P, V, block, 4)) {
+            if (!blockIsInView(P, V, W, block, 4)) {
                 continue;
             }
 
