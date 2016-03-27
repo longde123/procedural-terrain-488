@@ -163,7 +163,7 @@ void Navigator::guiLogic()
 
         if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 4.0f, 40.0f)) {
             // Need to regenerate terrain.
-            block_manager.regenerateAllBlocks();
+            block_manager.regenerateAllBlocks(false);
         }
 
         if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {

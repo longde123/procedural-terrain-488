@@ -53,7 +53,7 @@ public:
 
     void init(std::string dir);
     void update(glm::vec3 eye_position, bool generate_blocks);
-    void regenerateAllBlocks();
+    void regenerateAllBlocks(bool alpha_blend = true);
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
     void profileBlockGeneration();

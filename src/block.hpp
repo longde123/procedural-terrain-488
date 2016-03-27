@@ -8,12 +8,12 @@
 
 class Block {
 public:
-    Block(glm::ivec3 index, int size);
+    Block(glm::ivec3 index, int size, bool alpha_blend = true);
 
     void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
     void update();
-    void reset();
+    void reset(bool alpha_blend = true);
     void finish() { generated = true; }
     bool isReady() { return generated; }
     float getAlpha() { return transparency; }

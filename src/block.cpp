@@ -7,12 +7,11 @@
 using namespace glm;
 using namespace std;
 
-Block::Block(ivec3 index, int size)
+Block::Block(ivec3 index, int size, bool alpha_blend)
 : index(index)
 , size(size)
-, generated(false)
-, transparency(0.0f)
 {
+    reset(alpha_blend);
 }
 
 void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
@@ -64,11 +63,17 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
 
 void Block::update()
 {
-    transparency = std::min(1.0f, transparency + 0.01f);
+    transparency = std::min(1.0f, transparency + 0.015f);
 }
 
-void Block::reset()
+void Block::reset(bool alpha_blend)
 {
     generated = false;
-    transparency = 0.0f;
+    if (alpha_blend) {
+        // Go from transparent to opaque.
+        transparency = 0.0;
+    } else {
+        // Skip gradual transition to being fully opaque.
+        transparency = 1.0;
+    }
 }

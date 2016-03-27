@@ -64,7 +64,7 @@ void BlockManager::profileBlockGeneration()
     printf("Generating 100 blocks took %f seconds\n", timer.elapsedSeconds());
 }
 
-void BlockManager::regenerateAllBlocks()
+void BlockManager::regenerateAllBlocks(bool alpha_blend)
 {
     // Get rid of existing stuff, we're interrupting.
     while (!block_queue.empty()) {
@@ -73,7 +73,7 @@ void BlockManager::regenerateAllBlocks()
 
     for (auto& kv : blocks) {
         auto& block = kv.second;
-        block->reset();
+        block->reset(alpha_blend);
         block_queue.push(block);
     }
 }
