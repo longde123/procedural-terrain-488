@@ -23,12 +23,16 @@ BlockManager::BlockManager()
     medium_blocks = true;
     large_blocks = true;
     light_x = 0.0f;
+
+    terrain_generator = &terrain_generator_medium;
+    generator_selection = Medium;
 }
 
 void BlockManager::init(string dir)
 {
     terrain_renderer.init(dir);
-    terrain_generator.init(dir);
+    terrain_generator_slow.init(dir);
+    terrain_generator_medium.init(dir);
     water.init(dir);
 }
 
@@ -48,10 +52,19 @@ void BlockManager::regenerateAllBlocks()
 
 void BlockManager::update(vec3 eye_position, bool generate_blocks)
 {
+    switch (generator_selection) {
+        case Slow:
+            terrain_generator = &terrain_generator_slow;
+            break;
+        case Medium:
+            terrain_generator = &terrain_generator_medium;
+            break;
+    }
+
     if (!block_queue.empty()) {
         shared_ptr<Block> block = block_queue.front();
         block_queue.pop();
-        terrain_generator.generateTerrainBlock(*block);
+        terrain_generator->generateTerrainBlock(*block);
         block->finish();
     }
 

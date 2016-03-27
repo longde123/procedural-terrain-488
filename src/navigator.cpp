@@ -163,7 +163,7 @@ void Navigator::guiLogic()
             ImGui::EndMenuBar();
         }
 
-        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator.period, 4.0f, 40.0f)) {
+        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 4.0f, 40.0f)) {
             // Need to regenerate terrain.
             block_manager.regenerateAllBlocks();
         }
@@ -190,13 +190,18 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
         ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
-                    &block_manager.terrain_generator.use_short_range_ambient_occlusion)) {
+                    &block_manager.terrain_generator->use_short_range_ambient_occlusion)) {
             block_manager.regenerateAllBlocks();
         }
         if (ImGui::Checkbox("Long Range Ambient Occlusion",
-                    &block_manager.terrain_generator.use_long_range_ambient_occlusion)) {
+                    &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
             block_manager.regenerateAllBlocks();
         }
+
+        if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
+        if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
+
+
 
 /*
 		// For convenience, you can uncomment this to show ImGui's massive
@@ -235,7 +240,7 @@ void Navigator::draw()
     glEnable( GL_DEPTH_TEST );
 
     if (show_slicer) {
-        density_slicer.draw(proj, view, W, block_manager.terrain_generator.period);
+        density_slicer.draw(proj, view, W, block_manager.terrain_generator->period);
     }
 
     if (show_terrain) {

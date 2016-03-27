@@ -40,6 +40,11 @@ struct KeyEqual {
     }
 };
 
+enum TerrainGeneratorSelection {
+    Slow = 0,
+    Medium = 1,
+};
+
 typedef std::unordered_map<glm::ivec2, float, KeyHash, KeyEqual> ivec2float_map;
 
 class BlockManager {
@@ -65,9 +70,10 @@ public:
     float water_height;
     float light_x;
 
+    TerrainGeneratorSelection generator_selection;
+
     TerrainRenderer terrain_renderer;
-    //TerrainGeneratorSlow terrain_generator;
-    TerrainGeneratorMedium terrain_generator;
+    TerrainGenerator* terrain_generator;
 private:
     void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block, float fadeAlpha);
     void processBlockOfSize(glm::mat4 P, glm::mat4 V, glm::mat4 W,
@@ -77,6 +83,8 @@ private:
 
     Lod lod;
     Water water;
+    TerrainGeneratorSlow terrain_generator_slow;
+    TerrainGeneratorMedium terrain_generator_medium;
 
     // List of blocks to generate.
     std::queue<std::shared_ptr<Block>> block_queue;
