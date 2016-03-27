@@ -64,6 +64,7 @@ private:
     float rotation;
     float rotation_vertical;
     float distance_factor;
+    float camera_speed;
 
     // If the main mouse is pressed.
     bool mouse_down;

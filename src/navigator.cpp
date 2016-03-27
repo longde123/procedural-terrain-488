@@ -20,6 +20,7 @@ Navigator::Navigator()
     rotation = 0.0f;
     rotation_vertical = 0.0f;
     distance_factor = 1.0f;
+    camera_speed = 1.0f;
     mouse_down = false;
     mouse_down_with_control = false;
 
@@ -96,7 +97,7 @@ void Navigator::appLogic()
     // First person camera controls.
     if (first_person_mode) {
         vec3 eye_right = cross(eye_direction, eye_up);
-        float factor = 0.02f;
+        float factor = 0.02f * camera_speed;
 
         // Left
         if (pressed_keys.find(GLFW_KEY_A) != pressed_keys.end()) {
@@ -168,6 +169,8 @@ void Navigator::guiLogic()
         if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {
         }
         if (ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 0.5f)) {
+        }
+        if (ImGui::SliderFloat("Camera Speed", &camera_speed, 0.1f, 6.0f)) {
         }
 
         if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
