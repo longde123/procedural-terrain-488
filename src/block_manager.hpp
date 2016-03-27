@@ -15,8 +15,12 @@
 #include "water.hpp"
 
 struct KeyHash {
-    std::size_t operator()(const glm::ivec4& v) const
-    {
+    std::size_t operator()(const glm::ivec2& v) const {
+        long x = v.x;
+        long y = v.y;
+        return std::hash<long>()(x + (y << 8));
+    }
+    std::size_t operator()(const glm::ivec4& v) const {
         long x = v.x;
         long y = v.y;
         long z = v.z;
@@ -26,11 +30,17 @@ struct KeyHash {
 };
 
 struct KeyEqual {
+    bool operator()(const glm::ivec2& lhs, const glm::ivec2& rhs) const
+    {
+        return lhs == rhs;
+    }
     bool operator()(const glm::ivec4& lhs, const glm::ivec4& rhs) const
     {
         return lhs == rhs;
     }
 };
+
+typedef std::unordered_map<glm::ivec2, float, KeyHash, KeyEqual> ivec2float_map;
 
 class BlockManager {
 public:
@@ -59,6 +69,9 @@ public:
     TerrainGeneratorMedium terrain_generator;
 private:
     void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block, float fadeAlpha);
+    void processBlockOfSize(glm::mat4 P, glm::mat4 V, glm::mat4 W,
+                            ivec2float_map& water_squares,
+                            glm::ivec3 position, int size, float alpha);
     void newBlock(glm::ivec3 index, int size);
 
     Lod lod;

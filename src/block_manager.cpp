@@ -108,9 +108,38 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
     CHECK_GL_ERRORS;
 }
 
+void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
+                                      ivec2float_map& water_squares,
+                                      ivec3 position, int size, float alpha)
+{
+    ivec4 index = vec4(position, size);
+    if (blocks.count(index) == 0) {
+        newBlock(position, size);
+    } else if (blocks[index]->isReady()) {
+        renderBlock(P, V, W, *blocks[index], alpha);
+
+        // Indicate grid units that need water corresponding to this block.
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                ivec2 water_index = ivec2(index.x + x, index.z + y);
+                if (water_squares.count(water_index) > 0) {
+                    water_squares[water_index] = std::max(alpha, water_squares[water_index]);
+                } else {
+                    water_squares[water_index] = alpha;
+                }
+            }
+        }
+    }
+}
+
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
     lod.generateForPosition(P, V, eye_position);
+
+    // We need to make sure not to draw water multiple times on the same grid
+    // cell, because the overlapping will cause visual artifacts.
+    // Keep track of the highest alpha at that cell.
+    ivec2float_map needed_water_squares;
 
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
@@ -132,34 +161,19 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         if (large_blocks) {
             for (auto& block : lod.blocks_of_size_4) {
-                ivec4 index = vec4(block.first, 4);
-                if (blocks.count(index) == 0) {
-                    newBlock(block.first, 4);
-                } else if (blocks[index]->isReady()) {
-                    renderBlock(P, V, W, *blocks[index], block.second);
-                }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 4, block.second);
             }
         }
 
         if (medium_blocks) {
             for (auto& block : lod.blocks_of_size_2) {
-                ivec4 index = vec4(block.first, 2);
-                if (blocks.count(index) == 0) {
-                    newBlock(block.first, 2);
-                } else if (blocks[index]->isReady()) {
-                    renderBlock(P, V, W, *blocks[index], block.second);
-                }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 2, block.second);
             }
         }
 
         if (small_blocks) {
             for (auto& block : lod.blocks_of_size_1) {
-                ivec4 index = vec4(block.first, 1);
-                if (blocks.count(index) == 0) {
-                    newBlock(block.first, 1);
-                } else if (blocks[index]->isReady()) {
-                    renderBlock(P, V, W, *blocks[index], block.second);
-                }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 1, block.second);
             }
         }
 
@@ -170,16 +184,11 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
     terrain_renderer.renderer_shader.disable();
 
     if (use_water) {
-        for (auto& kv : blocks) {
-            auto& block = kv.second;
-            // Skip blocks that are still in the queue.
-            if (!block->isReady()) {
-                continue;
-            }
-
-            mat4 block_transform = translate(vec3(block->index)) * W * scale(vec3(block->size));
-            water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform,
-                       block->getAlpha());
+        for (auto& kv : needed_water_squares) {
+            vec3 position = vec3(kv.first.x, 0.0, kv.first.y);
+            float alpha = kv.second;
+            mat4 block_transform = translate(position) * W;
+            water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform, alpha);
         }
     }
 
