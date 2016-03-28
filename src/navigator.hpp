@@ -47,6 +47,7 @@ private:
     glm::vec3 eye_position;
     glm::vec3 eye_direction;
     glm::vec3 eye_up;
+    glm::mat4 W;
 	glm::mat4 proj;
 	glm::mat4 view;
 

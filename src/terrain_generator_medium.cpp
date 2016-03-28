@@ -161,7 +161,7 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
     }
     triangle_unpack_shader.disable();
 
-    glFinish();
+    //glFinish();
     timer.stop();
     unpack_time = timer.elapsedSeconds();
 

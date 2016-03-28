@@ -16,9 +16,6 @@ Block::Block(ivec3 index, int size, bool alpha_blend)
 
 void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
 {
-    Timer timer;
-    timer.start();
-
     // TODO: reevaluate amount of space needed, maybe dynamically
     size_t unit_size = sizeof(vec3) * 2 + sizeof(float);
     size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
@@ -56,9 +53,6 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
     }
 
 	CHECK_GL_ERRORS;
-
-    glFinish();
-    timer.stop();
 }
 
 void Block::update(float time_elapsed)

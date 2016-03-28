@@ -79,15 +79,9 @@ void BlockManager::profileBlockGeneration()
 
 void BlockManager::regenerateAllBlocks(bool alpha_blend)
 {
-    // Get rid of existing stuff, we're interrupting.
-    while (!block_queue.empty()) {
-       block_queue.pop();
-    }
-
     for (auto& kv : blocks) {
         auto& block = kv.second;
         block->reset(alpha_blend);
-        block_queue.push(block);
     }
 
     // We might want to regenerate this block continuously when we show
@@ -110,7 +104,68 @@ void BlockManager::regenerateAllBlocks(bool alpha_blend)
     }
 }
 
-void BlockManager::update(float time_elapsed, vec3 eye_position, bool generate_blocks)
+void BlockManager::generateBestBlock()
+{
+    // Generate fully visible blocks first. This lets us have at least something,
+    // even if it's lower detail. If a block is not fully visible, this means it's
+    // transitioning, so there is at least a fully visible block under it.
+    //
+    // We'd like to generate them in order of distance to the camera.
+    // For now I'm being lazy and just generating small blocks first,
+    // then medium ones, then large ones, as a proxy.
+    for (auto& block : lod.blocks_of_size_1) {
+        if (blocks.count(ivec4(block.first, 1)) == 0 && block.second == 1.0) {
+            auto new_block = newBlock(block.first, 1);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+    for (auto& block : lod.blocks_of_size_2) {
+        if (blocks.count(ivec4(block.first, 2)) == 0 && block.second == 1.0) {
+            auto new_block = newBlock(block.first, 2);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+    for (auto& block : lod.blocks_of_size_4) {
+        if (blocks.count(ivec4(block.first, 4)) == 0 && block.second == 1.0) {
+            auto new_block = newBlock(block.first, 4);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+
+    // Generate non-fully visible blocks.
+    for (auto& block : lod.blocks_of_size_1) {
+        if (blocks.count(ivec4(block.first, 1)) == 0) {
+            auto new_block = newBlock(block.first, 1);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+    for (auto& block : lod.blocks_of_size_2) {
+        if (blocks.count(ivec4(block.first, 2)) == 0) {
+            auto new_block = newBlock(block.first, 2);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+    for (auto& block : lod.blocks_of_size_4) {
+        if (blocks.count(ivec4(block.first, 4)) == 0) {
+            auto new_block = newBlock(block.first, 4);
+            terrain_generator->generateTerrainBlock(*new_block);
+            new_block->finish();
+            return;
+        }
+    }
+}
+
+void BlockManager::update(float time_elapsed, mat4 P, mat4 V, mat4 W, vec3 eye_position, bool generate_blocks)
 {
     switch (generator_selection) {
         case Slow:
@@ -121,12 +176,29 @@ void BlockManager::update(float time_elapsed, vec3 eye_position, bool generate_b
             break;
     }
 
-    if (!block_queue.empty()) {
-        shared_ptr<Block> block = block_queue.front();
-        block_queue.pop();
-        terrain_generator->generateTerrainBlock(*block);
-        block->finish();
+    lod.generateForPosition(P, V, W, eye_position);
+    blocks_in_view = lod.blocks_of_size_1.size() + lod.blocks_of_size_2.size() + lod.blocks_of_size_4.size();
+
+    // Count blocks that we don't already have.
+    blocks_in_queue = 0;
+
+    for (auto& block : lod.blocks_of_size_4) {
+        if (blocks.count(ivec4(block.first, 4)) == 0) {
+            blocks_in_queue++;
+        }
     }
+    for (auto& block : lod.blocks_of_size_2) {
+        if (blocks.count(ivec4(block.first, 2)) == 0) {
+            blocks_in_queue++;
+        }
+    }
+    for (auto& block : lod.blocks_of_size_1) {
+        if (blocks.count(ivec4(block.first, 1)) == 0) {
+            blocks_in_queue++;
+        }
+    }
+
+    generateBestBlock();
 
     for (auto& kv : blocks) {
         auto& block = kv.second;
@@ -137,13 +209,13 @@ void BlockManager::update(float time_elapsed, vec3 eye_position, bool generate_b
     }
 }
 
-void BlockManager::newBlock(ivec3 index, int size)
+shared_ptr<Block> BlockManager::newBlock(ivec3 index, int size)
 {
     auto block = shared_ptr<Block>(new Block(index, size));
     block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
                 terrain_renderer.ambient_occlusion_attrib);
     blocks[ivec4(index, size)] = block;
-    block_queue.push(block);
+    return block;
 }
 
 void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeAlpha)
@@ -190,9 +262,7 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
                                       ivec3 position, int size, float alpha)
 {
     ivec4 index = vec4(position, size);
-    if (blocks.count(index) == 0) {
-        newBlock(position, size);
-    } else if (blocks[index]->isReady()) {
+    if (blocks.count(index) > 0 && blocks[index]->isReady()) {
         // Don't draw blocks under water.
         if (!use_water || (W * vec4(position, 1.0)).y + 1.0 >= water_height) {
             renderBlock(P, V, W, *blocks[index], alpha);
@@ -214,8 +284,6 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
 
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
-    lod.generateForPosition(P, V, W, eye_position);
-
     // We need to make sure not to draw water multiple times on the same grid
     // cell, because the overlapping will cause visual artifacts.
     // Keep track of the highest alpha at that cell.

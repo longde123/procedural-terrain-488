@@ -58,13 +58,15 @@ public:
     BlockManager();
 
     void init(std::string dir);
-    void update(float time_elapsed, glm::vec3 eye_position, bool generate_blocks);
+    void update(float time_elapsed, glm::mat4 P, glm::mat4 V, glm::mat4 W,
+                glm::vec3 eye_position, bool generate_blocks);
     void regenerateAllBlocks(bool alpha_blend = true);
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
     void profileBlockGeneration();
 
-    int blocksInQueue() { return block_queue.size(); }
+    int blocksInQueue() { return blocks_in_queue; }
+    int blocksInView() { return blocks_in_view; }
 
     std::unordered_map<glm::ivec4, std::shared_ptr<Block>, KeyHash, KeyEqual> blocks;
 
@@ -89,7 +91,12 @@ private:
     void processBlockOfSize(glm::mat4 P, glm::mat4 V, glm::mat4 W,
                             ivec2float_map& water_squares,
                             glm::ivec3 position, int size, float alpha);
-    void newBlock(glm::ivec3 index, int size);
+    std::shared_ptr<Block> newBlock(glm::ivec3 index, int size);
+    void generateBestBlock();
+
+    // Keep track of this for debugging.
+    int blocks_in_view;
+    int blocks_in_queue;
 
     Lod lod;
     Water water;

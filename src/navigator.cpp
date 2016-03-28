@@ -130,7 +130,12 @@ void Navigator::appLogic()
         makeView();
     }
 
-    block_manager.update(time_elapsed, eye_position, generate_blocks);
+	// Create a global transformation for the model.
+    float offset = -0.5f;
+	W = glm::translate(mat4(), vec3(offset, offset, offset));
+
+
+    block_manager.update(time_elapsed, proj, view, W, eye_position, generate_blocks);
 }
 
 //----------------------------------------------------------------------------------------
@@ -227,6 +232,7 @@ void Navigator::guiLogic()
 
 		ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
 		ImGui::Text("Blocks to render: %d", block_manager.blocksInQueue());
+		ImGui::Text("Blocks in view: %d", block_manager.blocksInView());
     }
 	ImGui::End();
 
@@ -241,11 +247,6 @@ void Navigator::guiLogic()
  */
 void Navigator::draw()
 {
-	// Create a global transformation for the model.
-	mat4 W;
-    float offset = -0.5f;
-	W = glm::translate(W, vec3(offset, offset, offset));
-
     if (wireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     }
