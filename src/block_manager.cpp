@@ -261,7 +261,7 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
 }
 
 void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
-                                      ivec2float_map& water_squares,
+                                      ivec2_map<float>& water_squares,
                                       ivec3 position, int size, float alpha)
 {
     ivec4 index = vec4(position, size);
@@ -290,7 +290,7 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
     // We need to make sure not to draw water multiple times on the same grid
     // cell, because the overlapping will cause visual artifacts.
     // Keep track of the highest alpha at that cell.
-    ivec2float_map needed_water_squares;
+    ivec2_map<float> needed_water_squares;
 
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
