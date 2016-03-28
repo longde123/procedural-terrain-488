@@ -78,6 +78,7 @@ public:
     bool small_blocks;
     bool medium_blocks;
     bool large_blocks;
+    int blocks_per_frame;
     float water_height;
     float light_x;
 

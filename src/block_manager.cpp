@@ -28,6 +28,7 @@ BlockManager::BlockManager()
     medium_blocks = true;
     large_blocks = true;
     light_x = 0.0f;
+    blocks_per_frame = 2;
 
     terrain_generator = &terrain_generator_medium;
     block_display_type = All;
@@ -198,7 +199,9 @@ void BlockManager::update(float time_elapsed, mat4 P, mat4 V, mat4 W, vec3 eye_p
         }
     }
 
-    generateBestBlock();
+    for (int i = 0; i < blocks_per_frame; i++) {
+        generateBestBlock();
+    }
 
     for (auto& kv : blocks) {
         auto& block = kv.second;

@@ -181,6 +181,8 @@ void Navigator::guiLogic()
         if (ImGui::SliderFloat("Camera Speed", &camera_speed, 0.5f, 20.0f)) {
         }
 
+        ImGui::SliderInt("Blocks per Frame", &block_manager.blocks_per_frame, 1, 8);
+
         if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
             resetView();
             makeView();
@@ -196,6 +198,7 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
         ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
         ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
+
         if (ImGui::Checkbox("Short Range Ambient Occlusion",
                     &block_manager.terrain_generator->use_short_range_ambient_occlusion)) {
             block_manager.regenerateAllBlocks();
@@ -204,6 +207,7 @@ void Navigator::guiLogic()
                     &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
             block_manager.regenerateAllBlocks();
         }
+
 
         if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
         if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
