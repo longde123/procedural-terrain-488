@@ -110,7 +110,7 @@ void BlockManager::regenerateAllBlocks(bool alpha_blend)
     }
 }
 
-void BlockManager::update(vec3 eye_position, bool generate_blocks)
+void BlockManager::update(float time_elapsed, vec3 eye_position, bool generate_blocks)
 {
     switch (generator_selection) {
         case Slow:
@@ -130,7 +130,10 @@ void BlockManager::update(vec3 eye_position, bool generate_blocks)
 
     for (auto& kv : blocks) {
         auto& block = kv.second;
-        block->update();
+
+        if (block->isReady()) {
+            block->update(time_elapsed);
+        }
     }
 }
 

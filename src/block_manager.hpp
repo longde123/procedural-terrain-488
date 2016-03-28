@@ -58,11 +58,13 @@ public:
     BlockManager();
 
     void init(std::string dir);
-    void update(glm::vec3 eye_position, bool generate_blocks);
+    void update(float time_elapsed, glm::vec3 eye_position, bool generate_blocks);
     void regenerateAllBlocks(bool alpha_blend = true);
     void renderBlocks(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 eye_position);
 
     void profileBlockGeneration();
+
+    int blocksInQueue() { return block_queue.size(); }
 
     std::unordered_map<glm::ivec4, std::shared_ptr<Block>, KeyHash, KeyEqual> blocks;
 

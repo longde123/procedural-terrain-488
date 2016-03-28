@@ -94,6 +94,9 @@ void Navigator::makeView()
  */
 void Navigator::appLogic()
 {
+    // Animations should not be dependent on FPS.
+    float time_elapsed = ImGui::GetIO().DeltaTime;
+
     // First person camera controls.
     if (first_person_mode) {
         vec3 eye_right = cross(eye_direction, eye_up);
@@ -127,7 +130,7 @@ void Navigator::appLogic()
         makeView();
     }
 
-    block_manager.update(eye_position, generate_blocks);
+    block_manager.update(time_elapsed, eye_position, generate_blocks);
 }
 
 //----------------------------------------------------------------------------------------
@@ -223,6 +226,7 @@ void Navigator::guiLogic()
 */
 
 		ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
+		ImGui::Text("Blocks to render: %d", block_manager.blocksInQueue());
     }
 	ImGui::End();
 

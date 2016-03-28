@@ -61,9 +61,9 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
     timer.stop();
 }
 
-void Block::update()
+void Block::update(float time_elapsed)
 {
-    transparency = std::min(1.0f, transparency + 0.015f);
+    transparency = std::min(1.0f, transparency + 0.8f * time_elapsed);
 }
 
 void Block::reset(bool alpha_blend)

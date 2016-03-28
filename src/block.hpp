@@ -12,7 +12,7 @@ public:
 
     void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
-    void update();
+    void update(float time_elapsed);
     void reset(bool alpha_blend = true);
     void finish() { generated = true; }
     bool isReady() { return generated; }
