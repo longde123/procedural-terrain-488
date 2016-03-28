@@ -69,19 +69,32 @@ float perlinNoise(vec3 coords, float frequency)
 // coords should be in the range [coords, block_size] not [0, 1]
 float terrainDensity(vec3 coords, float block_size, float period, int octaves)
 {
+    float max_blocks_y = 2.0;
+
+    // Should make sure that there's a solid ground at the bottom
+    // and air at the top.
+    if (coords.y / block_size < 0.1) {
+        return 1.0;
+    }
+    if (coords.y / block_size > max_blocks_y - 0.1) {
+        return 0.0;
+    }
+
     // Air is negative, ground is positive.
-    // Generate a gradient from [1 to -1]
-    float height_gradient = 1.0 - coords.y / block_size * 2.0;
+    // Generate a gradient from [max to min]
+    float min = -1.0;
+    float max = 0.5;
+    float height_gradient = max - (max - min) * (coords.y / max_blocks_y) / block_size;
 
     float noise = 0.0;
     float frequency = 1.0 / period;
 
     for (int i = 1; i <= octaves; i++) {
-        noise += perlinNoise(coords, frequency) / i;
+        noise += perlinNoise(coords, frequency) / i / i;
         frequency *= 1.95;
     }
 
-    float density = height_gradient + noise * 0.5;
+    float density = height_gradient + noise * 1.5;
 
     // For debugging : this is the density function for a sphere.
     //density = length(coords - ivec3(32, 32, 32)) - 16 + period * 0.0001;

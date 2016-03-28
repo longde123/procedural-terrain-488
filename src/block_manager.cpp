@@ -4,12 +4,16 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#include <unordered_set>
+
 #include "cs488-framework/GlErrorCheck.hpp"
 
 #include "timer.hpp"
 
 using namespace glm;
 using namespace std;
+
+static unordered_set<ivec4, KeyHash, KeyEqual> eight_blocks;
 
 BlockManager::BlockManager()
 : lod(16)
@@ -19,15 +23,24 @@ BlockManager::BlockManager()
     use_normal_map = true;
     debug_flag = false;
     use_water = true;
-    water_height = 0.0f;
-    one_block_only = false;
+    water_height = -0.3f;
     small_blocks = true;
     medium_blocks = true;
     large_blocks = true;
     light_x = 0.0f;
 
     terrain_generator = &terrain_generator_medium;
+    block_display_type = All;
     generator_selection = Medium;
+
+    eight_blocks.insert(ivec4(0, 0, 0, 1));
+    eight_blocks.insert(ivec4(1, 0, 0, 1));
+    eight_blocks.insert(ivec4(0, 1, 0, 1));
+    eight_blocks.insert(ivec4(1, 1, 0, 1));
+    eight_blocks.insert(ivec4(0, 0, 1, 1));
+    eight_blocks.insert(ivec4(1, 0, 1, 1));
+    eight_blocks.insert(ivec4(0, 1, 1, 1));
+    eight_blocks.insert(ivec4(1, 1, 1, 1));
 }
 
 void BlockManager::init(string dir)
@@ -75,6 +88,25 @@ void BlockManager::regenerateAllBlocks(bool alpha_blend)
         auto& block = kv.second;
         block->reset(alpha_blend);
         block_queue.push(block);
+    }
+
+    // We might want to regenerate this block continuously when we show
+    // only few blocks, so generate themn ow.
+    if (block_display_type == OneBlock) {
+        if (blocks.count(ivec4(0, 0, 0, 1))) {
+            auto block = blocks[ivec4(0, 0, 0, 1)];
+            terrain_generator->generateTerrainBlock(*block);
+            block->finish();
+        }
+    } else if (block_display_type == EightBlocks) {
+        for (ivec4 index : eight_blocks) {
+            if (blocks.count(index) == 0) {
+                newBlock(ivec3(index), index.w);
+            }
+            auto block = blocks[index];
+            terrain_generator->generateTerrainBlock(*block);
+            block->finish();
+        }
     }
 }
 
@@ -129,10 +161,10 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
         glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
         glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
 
-        mat4 W_reflect = translate(vec3(block.index)) *
-                         glm::translate(vec3(0, water_height, 0)) *
+        mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
                          glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
                          glm::translate(vec3(0, -water_height, 0)) *
+                         translate(vec3(block.index)) *
                          W * scale(vec3(block.size));
 
         glUniform1i(terrain_renderer.water_clip_uni, false);
@@ -158,7 +190,10 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
     if (blocks.count(index) == 0) {
         newBlock(position, size);
     } else if (blocks[index]->isReady()) {
-        renderBlock(P, V, W, *blocks[index], alpha);
+        // Don't draw blocks under water.
+        if (!use_water || (W * vec4(position, 1.0)).y + 1.0 >= water_height) {
+            renderBlock(P, V, W, *blocks[index], alpha);
+        }
 
         // Indicate grid units that need water corresponding to this block.
         for (int x = 0; x < size; x++) {
@@ -203,25 +238,31 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         if (large_blocks) {
             for (auto& block : lod.blocks_of_size_4) {
-                if (!one_block_only) {
-                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 4, block.second);
+                if (block_display_type != All) {
+                    continue;
                 }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 4, block.second);
             }
         }
 
         if (medium_blocks) {
             for (auto& block : lod.blocks_of_size_2) {
-                if (!one_block_only) {
-                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 2, block.second);
+                if (block_display_type != All) {
+                    continue;
                 }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 2, block.second);
             }
         }
 
         if (small_blocks) {
             for (auto& block : lod.blocks_of_size_1) {
-                if (!one_block_only || block.first == ivec3(0, 0, 0)) {
-                    processBlockOfSize(P, V, W, needed_water_squares, block.first, 1, block.second);
+                if (block_display_type == OneBlock && block.first != ivec3(0, 0, 0)) {
+                    continue;
                 }
+                if (block_display_type == EightBlocks && eight_blocks.count(ivec4(block.first, 1)) == 0) {
+                    continue;
+                }
+                processBlockOfSize(P, V, W, needed_water_squares, block.first, 1, block.second);
             }
         }
 

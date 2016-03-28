@@ -20,7 +20,7 @@ Navigator::Navigator()
     rotation = 0.0f;
     rotation_vertical = 0.0f;
     distance_factor = 1.0f;
-    camera_speed = 1.0f;
+    camera_speed = 5.0f;
     mouse_down = false;
     mouse_down_with_control = false;
 
@@ -72,7 +72,7 @@ void Navigator::init()
 
 void Navigator::resetView()
 {
-    float distance = 2.0 * M_SQRT1_2 * distance_factor;
+    float distance = 5.0 * M_SQRT1_2 * distance_factor;
     vec3 x_axis(1.0f, 0.0f, 0.0f);
     vec3 y_axis(0.0f, 1.0f, 0.0f);
     eye_position = rotate(rotate(vec3(0.0f, distance, distance), rotation_vertical, x_axis), rotation, y_axis);
@@ -161,16 +161,16 @@ void Navigator::guiLogic()
             ImGui::EndMenuBar();
         }
 
-        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 4.0f, 40.0f)) {
+        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
             // Need to regenerate terrain.
             block_manager.regenerateAllBlocks(false);
         }
 
         if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {
         }
-        if (ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 0.5f)) {
+        if (ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f)) {
         }
-        if (ImGui::SliderFloat("Camera Speed", &camera_speed, 0.1f, 6.0f)) {
+        if (ImGui::SliderFloat("Camera Speed", &camera_speed, 0.5f, 20.0f)) {
         }
 
         if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
@@ -185,7 +185,6 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
         ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
-        ImGui::Checkbox("One Block Only", &block_manager.one_block_only);
         ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
         ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
         ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
@@ -200,6 +199,10 @@ void Navigator::guiLogic()
 
         if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
         if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
+
+        if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {}
+        if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {}
+        if (ImGui::RadioButton("All", (int*)&block_manager.block_display_type, 2)) {}
 
 		if (ImGui::Button("Profile Block Generation")) {
             block_manager.profileBlockGeneration();

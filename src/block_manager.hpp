@@ -45,6 +45,12 @@ enum TerrainGeneratorSelection {
     Medium = 1,
 };
 
+enum BlockDisplayType {
+    OneBlock = 0,
+    EightBlocks = 1,
+    All = 2,
+};
+
 typedef std::unordered_map<glm::ivec2, float, KeyHash, KeyEqual> ivec2float_map;
 
 class BlockManager {
@@ -65,13 +71,13 @@ public:
     bool use_normal_map;
     bool debug_flag;
     bool use_water;
-    bool one_block_only;
     bool small_blocks;
     bool medium_blocks;
     bool large_blocks;
     float water_height;
     float light_x;
 
+    BlockDisplayType block_display_type;
     TerrainGeneratorSelection generator_selection;
 
     TerrainRenderer terrain_renderer;

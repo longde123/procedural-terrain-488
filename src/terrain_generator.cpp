@@ -14,7 +14,7 @@ using namespace std;
 #define LOCAL_DIM_Z 1
 
 TerrainGenerator::TerrainGenerator()
-: period(20.0f)
+: period(50.0f)
 , use_short_range_ambient_occlusion(true)
 , use_long_range_ambient_occlusion(false)
 {

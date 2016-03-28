@@ -8,12 +8,12 @@ using namespace glm;
 using namespace std;
 
 // Range of distance for blocks of size 1 where they fade out.
-const int BLOCK_1_FADEOUT_START = 4;
-const int BLOCK_1_FADEOUT_END = 5;
+const int BLOCK_1_FADEOUT_START = 6;
+const int BLOCK_1_FADEOUT_END = 8;
 
 // Range of distance for blocks of size 2 where they fade out.
-const int BLOCK_2_FADEOUT_START = 8;
-const int BLOCK_2_FADEOUT_END = 10;
+const int BLOCK_2_FADEOUT_START = 10;
+const int BLOCK_2_FADEOUT_END = 12;
 
 Lod::Lod(int range)
 : range(range)
@@ -105,26 +105,28 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
     blocks_of_size_4.clear();
 
     for (int x = -range; x <= range; x += 1) {
-        for (int y = -range; y <= range; y += 1) {
-            ivec3 block = ivec3(x, 0, y) + ivec3(current_pos.x, 0, current_pos.z);
+        for (int y = 0; y < 2; y += 1) {
+            for (int z = -range; z <= range; z += 1) {
+                ivec3 block = ivec3(x, y, z) + ivec3(current_pos.x, 0, current_pos.z);
 
-            if (!blockIsInView(P, V, W, block, 1)) {
-                continue;
-            }
+                if (!blockIsInView(P, V, W, block, 1)) {
+                    continue;
+                }
 
-            float distance = length(vec3(block) - current_pos);
+                float distance = length(vec3(block) - current_pos);
 
-            if (distance < BLOCK_1_FADEOUT_END) {
-                float ratio = (distance - BLOCK_1_FADEOUT_START) /
-                              (BLOCK_1_FADEOUT_END - BLOCK_1_FADEOUT_START);
-                blocks_of_size_1.push_back(make_pair(block, 1.0f - clamp(ratio, 0.0f, 1.0f)));
+                if (distance < BLOCK_1_FADEOUT_END) {
+                    float ratio = (distance - BLOCK_1_FADEOUT_START) /
+                                  (BLOCK_1_FADEOUT_END - BLOCK_1_FADEOUT_START);
+                    blocks_of_size_1.push_back(make_pair(block, 1.0f - clamp(ratio, 0.0f, 1.0f)));
+                }
             }
         }
     }
 
     for (int x = -range; x <= range; x += 2) {
-        for (int y = -range; y <= range; y += 2) {
-            ivec3 block = ivec3(x, 0, y) + (ivec3(current_pos.x, 0, current_pos.z) / 2) * 2;
+        for (int z = -range; z <= range; z += 2) {
+            ivec3 block = ivec3(x, 0, z) + (ivec3(current_pos.x, 0, current_pos.z) / 2) * 2;
             assert(block % 2 == ivec3(0));
 
             if (!blockIsInView(P, V, W, block, 2)) {
@@ -154,8 +156,8 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
     }
 
     for (int x = -range; x <= range; x += 4) {
-        for (int y = -range; y <= range; y += 4) {
-            ivec3 block = ivec3(x, 0, y) + (ivec3(current_pos.x, 0, current_pos.z) / 4) * 4;
+        for (int z = -range; z <= range; z += 4) {
+            ivec3 block = ivec3(x, 0, z) + (ivec3(current_pos.x, 0, current_pos.z) / 4) * 4;
             assert(block % 4 == ivec3(0));
 
             if (!blockIsInView(P, V, W, block, 4)) {
