@@ -13,10 +13,12 @@
 using namespace glm;
 using namespace std;
 
+#define VIEW_RANGE 16
+
 static ivec4_set eight_blocks;
 
 BlockManager::BlockManager()
-: lod(16)
+: lod(VIEW_RANGE)
 {
     triplanar_colors = false;
     use_ambient = true;
@@ -29,6 +31,8 @@ BlockManager::BlockManager()
     large_blocks = true;
     light_x = 0.0f;
     blocks_per_frame = 2;
+
+    reused_block_count = 0;
 
     terrain_generator = &terrain_generator_medium;
     block_display_type = All;
@@ -78,11 +82,16 @@ void BlockManager::profileBlockGeneration()
     printf("Generating 100 blocks took %f seconds\n", timer.elapsedSeconds());
 }
 
+int BlockManager::allocatedBlocks()
+{
+    return free_blocks.size() + blocks.size();
+}
+
 void BlockManager::regenerateAllBlocks(bool alpha_blend)
 {
     for (auto& kv : blocks) {
         auto& block = kv.second;
-        block->reset(alpha_blend);
+        block->resetBlock(alpha_blend);
     }
 
     // We might want to regenerate this block continuously when we show
@@ -114,9 +123,9 @@ void BlockManager::generateBestBlock()
     // We'd like to generate them in order of distance to the camera.
     // For now I'm being lazy and just generating small blocks first,
     // then medium ones, then large ones, as a proxy.
-    for (auto& block : lod.blocks_of_size_1) {
-        if (blocks.count(ivec4(block.first, 1)) == 0 && block.second == 1.0) {
-            auto new_block = newBlock(block.first, 1);
+    for (auto& block : lod.blocks_of_size_4) {
+        if (blocks.count(ivec4(block.first, 4)) == 0 && block.second == 1.0) {
+            auto new_block = newBlock(block.first, 4);
             terrain_generator->generateTerrainBlock(*new_block);
             new_block->finish();
             return;
@@ -130,9 +139,9 @@ void BlockManager::generateBestBlock()
             return;
         }
     }
-    for (auto& block : lod.blocks_of_size_4) {
-        if (blocks.count(ivec4(block.first, 4)) == 0 && block.second == 1.0) {
-            auto new_block = newBlock(block.first, 4);
+    for (auto& block : lod.blocks_of_size_1) {
+        if (blocks.count(ivec4(block.first, 1)) == 0 && block.second == 1.0) {
+            auto new_block = newBlock(block.first, 1);
             terrain_generator->generateTerrainBlock(*new_block);
             new_block->finish();
             return;
@@ -140,9 +149,9 @@ void BlockManager::generateBestBlock()
     }
 
     // Generate non-fully visible blocks.
-    for (auto& block : lod.blocks_of_size_1) {
-        if (blocks.count(ivec4(block.first, 1)) == 0) {
-            auto new_block = newBlock(block.first, 1);
+    for (auto& block : lod.blocks_of_size_4) {
+        if (blocks.count(ivec4(block.first, 4)) == 0) {
+            auto new_block = newBlock(block.first, 4);
             terrain_generator->generateTerrainBlock(*new_block);
             new_block->finish();
             return;
@@ -156,9 +165,9 @@ void BlockManager::generateBestBlock()
             return;
         }
     }
-    for (auto& block : lod.blocks_of_size_4) {
-        if (blocks.count(ivec4(block.first, 4)) == 0) {
-            auto new_block = newBlock(block.first, 4);
+    for (auto& block : lod.blocks_of_size_1) {
+        if (blocks.count(ivec4(block.first, 1)) == 0) {
+            auto new_block = newBlock(block.first, 1);
             terrain_generator->generateTerrainBlock(*new_block);
             new_block->finish();
             return;
@@ -208,20 +217,50 @@ void BlockManager::update(float time_elapsed, mat4 P, mat4 V, mat4 W, vec3 eye_p
         generateBestBlock();
     }
 
+    vector<ivec4> to_be_removed;
     for (auto& kv : blocks) {
         auto& block = kv.second;
+
+        float distance = length(eye_position - vec3(block->index));
+        if (distance > VIEW_RANGE * 1.1) {
+            // Block is no longer visible, remove, but only if size 1 or 2.
+            if (block->size < 4) {
+                to_be_removed.push_back(kv.first);
+                block->resetBlock();
+                free_blocks.push(block);
+            } else if (distance > VIEW_RANGE * 2) {
+                // Should still remove large blocks at some point.
+                to_be_removed.push_back(kv.first);
+                block->resetBlock();
+                free_blocks.push(block);
+            }
+        }
 
         if (block->isReady()) {
             block->update(time_elapsed);
         }
     }
+
+    for (auto& index : to_be_removed) {
+        blocks.erase(index);
+    }
 }
 
 shared_ptr<Block> BlockManager::newBlock(ivec3 index, int size)
 {
-    auto block = shared_ptr<Block>(new Block(index, size));
-    block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
-                terrain_renderer.ambient_occlusion_attrib);
+    shared_ptr<Block> block;
+    if (free_blocks.empty()) {
+        block = shared_ptr<Block>(new Block(index, size));
+        block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
+                    terrain_renderer.ambient_occlusion_attrib);
+    } else {
+        reused_block_count++;
+        block = free_blocks.front();
+        free_blocks.pop();
+
+        block->index = index;
+        block->size = size;
+    }
     blocks[ivec4(index, size)] = block;
     return block;
 }

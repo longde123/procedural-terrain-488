@@ -11,7 +11,7 @@ Block::Block(ivec3 index, int size, bool alpha_blend)
 : index(index)
 , size(size)
 {
-    reset(alpha_blend);
+    resetBlock(alpha_blend);
 }
 
 void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
@@ -60,7 +60,7 @@ void Block::update(float time_elapsed)
     transparency = std::min(1.0f, transparency + 0.8f * time_elapsed);
 }
 
-void Block::reset(bool alpha_blend)
+void Block::resetBlock(bool alpha_blend)
 {
     generated = false;
     if (alpha_blend) {

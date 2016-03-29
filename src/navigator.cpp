@@ -237,6 +237,8 @@ void Navigator::guiLogic()
 		ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
 		ImGui::Text("Blocks to render: %d", block_manager.blocksInQueue());
 		ImGui::Text("Blocks in view: %d", block_manager.blocksInView());
+		ImGui::Text("Allocated blocks: %d", block_manager.allocatedBlocks());
+		ImGui::Text("Reused blocks: %d", block_manager.reusedBlockCount());
     }
 	ImGui::End();
 

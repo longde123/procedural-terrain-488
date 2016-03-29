@@ -39,6 +39,8 @@ public:
 
     int blocksInQueue() { return blocks_in_queue; }
     int blocksInView() { return blocks_in_view; }
+    int reusedBlockCount() { return reused_block_count; }
+    int allocatedBlocks();
 
     ivec4_map<std::shared_ptr<Block>> blocks;
 
@@ -70,12 +72,12 @@ private:
     // Keep track of this for debugging.
     int blocks_in_view;
     int blocks_in_queue;
+    int reused_block_count;
 
     Lod lod;
     Water water;
     TerrainGeneratorSlow terrain_generator_slow;
     TerrainGeneratorMedium terrain_generator_medium;
 
-    // List of blocks to generate.
-    std::queue<std::shared_ptr<Block>> block_queue;
+    std::queue<std::shared_ptr<Block>> free_blocks;
 };

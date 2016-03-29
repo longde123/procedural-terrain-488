@@ -13,7 +13,11 @@ public:
     void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
     void update(float time_elapsed);
-    void reset(bool alpha_blend = true);
+
+    // Don't name this function "reset", the compiler won't catch the mistake // if the block is stored in a shared_ptr and we accidently do .reset
+    // instead of ->reset.
+    void resetBlock(bool alpha_blend = true);
+
     void finish() { generated = true; }
     bool isReady() { return generated; }
     float getAlpha() { return transparency; }
