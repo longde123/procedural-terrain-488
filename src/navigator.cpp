@@ -158,63 +158,63 @@ void Navigator::guiLogic()
     // Without this, menu won't be visible.
     windowFlags |= ImGuiWindowFlags_MenuBar;
 
-	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,100), opacity, windowFlags)) {
+	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,300), opacity, windowFlags)) {
 
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("Options")) {
-                if (ImGui::MenuItem("Wireframe", NULL, &wireframe)) {}
-                if (ImGui::MenuItem("Triplanar Colors", NULL, &block_manager.triplanar_colors)) {}
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenuBar();
-        }
-
-        if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
-            // Need to regenerate terrain.
-            block_manager.regenerateAllBlocks(false);
-        }
-
-        if (ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f)) {
-        }
-        if (ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f)) {
-        }
-        if (ImGui::SliderFloat("Camera Speed", &camera_speed, 0.5f, 20.0f)) {
-        }
-
-        ImGui::SliderInt("Blocks per Frame", &block_manager.blocks_per_frame, 1, 8);
-
-        if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
-            resetView();
-            makeView();
-        }
-        ImGui::Checkbox("Show Level of Detail", &show_lod);
-        ImGui::Checkbox("Show Slicer", &show_slicer);
-        ImGui::Checkbox("Show Terrain", &show_terrain);
-        ImGui::Checkbox("Generate Blocks", &generate_blocks);
-        ImGui::Checkbox("Ambient Occlusion", &block_manager.use_ambient);
-        ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
+        ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
-        ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
-        ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
-        ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
-        ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
-
-        if (ImGui::Checkbox("Short Range Ambient Occlusion",
-                    &block_manager.terrain_generator->use_short_range_ambient_occlusion)) {
-            block_manager.regenerateAllBlocks();
-        }
-        if (ImGui::Checkbox("Long Range Ambient Occlusion",
-                    &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
-            block_manager.regenerateAllBlocks();
-        }
-
-
-        if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
-        if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
 
         if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {}
         if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {}
         if (ImGui::RadioButton("All", (int*)&block_manager.block_display_type, 2)) {}
+
+        if (ImGui::CollapsingHeader("Navigation Options")) {
+            if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
+                resetView();
+                makeView();
+            }
+            ImGui::SliderFloat("Camera Speed", &camera_speed, 0.5f, 20.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Light Options")) {
+            ImGui::Checkbox("Ambient Occlusion", &block_manager.use_ambient);
+            ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
+            ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f);
+
+            if (ImGui::Checkbox("Short Range Ambient Occlusion",
+                        &block_manager.terrain_generator->use_short_range_ambient_occlusion)) {
+                block_manager.regenerateAllBlocks();
+            }
+            if (ImGui::Checkbox("Long Range Ambient Occlusion",
+                        &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
+                block_manager.regenerateAllBlocks();
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Block Generation Options")) {
+            if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
+                // Need to regenerate terrain.
+                block_manager.regenerateAllBlocks(false);
+            }
+
+            ImGui::Checkbox("Generate Blocks", &generate_blocks);
+            ImGui::SliderInt("Blocks per Frame", &block_manager.blocks_per_frame, 1, 8);
+
+            if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
+            if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
+        }
+
+        if (ImGui::CollapsingHeader("Debug Options")) {
+            ImGui::Checkbox("Show Level of Detail", &show_lod);
+            ImGui::Checkbox("Show Slicer", &show_slicer);
+            ImGui::Checkbox("Show Terrain", &show_terrain);
+            ImGui::Checkbox("Debug Flags", &block_manager.debug_flag);
+            ImGui::Checkbox("Small Blocks", &block_manager.small_blocks);
+            ImGui::Checkbox("Medium Blocks", &block_manager.medium_blocks);
+            ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
+            ImGui::Checkbox("Wireframe", &wireframe);
+            ImGui::Checkbox("Triplanar Colors", &block_manager.triplanar_colors);
+        }
+
 
 		if (ImGui::Button("Profile Block Generation")) {
             block_manager.profileBlockGeneration();
