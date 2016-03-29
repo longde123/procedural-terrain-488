@@ -1,5 +1,4 @@
 #include "lod.hpp"
-
 #include <cstdio>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -25,10 +24,10 @@ Lod::Lod(int range)
 
 void Lod::genSubblocks(vector<ivec3>& subblocks, int n)
 {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int k = 0; k < n; k++) {
-                subblocks.push_back(ivec3(i, j, k));
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            for (int k = 0; k < 2; k++) {
+                subblocks.push_back(ivec3(i, j, k) * n / 2);
             }
         }
     }
@@ -98,7 +97,7 @@ bool Lod::blockIsInView(mat4& P, mat4& V, mat4& W, ivec3 block, int size)
     }
 }
 
-void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
+void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos, ivec4_map<float>* existing_blocks_alpha)
 {
     blocks_of_size_1.clear();
     blocks_of_size_2.clear();
@@ -118,7 +117,10 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
                 if (distance < BLOCK_1_FADEOUT_END) {
                     float ratio = (distance - BLOCK_1_FADEOUT_START) /
                                   (BLOCK_1_FADEOUT_END - BLOCK_1_FADEOUT_START);
-                    blocks_of_size_1.push_back(make_pair(block, 1.0f - clamp(ratio, 0.0f, 1.0f)));
+                    float alpha = 1.0f - clamp(ratio, 0.0f, 1.0f);
+                    if (alpha > 0.0) {
+                        blocks_of_size_1.push_back(make_pair(block, alpha));
+                    }
                 }
             }
         }
@@ -134,10 +136,27 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
             }
 
             bool fully_visible_subblocks = true;
-            for (ivec3& subblocks : block_2_subblocks) {
-                if (length(vec3(block + subblocks) - current_pos) > BLOCK_1_FADEOUT_START) {
+            for (ivec3& subblock : block_2_subblocks) {
+                ivec3 subblock_index = block + subblock;
+
+                float dist_to_subblock = length(vec3(block + subblock) - current_pos);
+                if (dist_to_subblock > BLOCK_1_FADEOUT_START && dist_to_subblock < BLOCK_1_FADEOUT_END) {
                     fully_visible_subblocks = false;
                     break;
+                }
+                if (existing_blocks_alpha) {
+                    if (existing_blocks_alpha->count(ivec4(subblock_index, 1)) > 0) {
+                        float alpha = existing_blocks_alpha->at(ivec4(subblock_index, 1));
+                        if (alpha < 1.0) {
+                            // Subblock still in the process of fading in.
+                            fully_visible_subblocks = false;
+                            break;
+                        }
+                    } else {
+                        // Subblock needed, but has not been created yet.
+                        fully_visible_subblocks = false;
+                        break;
+                    }
                 }
             }
 
@@ -146,7 +165,10 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
             if (!fully_visible_subblocks && distance < BLOCK_2_FADEOUT_END) {
                 float ratio = (distance - BLOCK_2_FADEOUT_START) /
                               (BLOCK_2_FADEOUT_END - BLOCK_2_FADEOUT_START);
-                blocks_of_size_2.push_back(make_pair(block, 1.0f - clamp(ratio, 0.0f, 1.0f)));
+                float alpha = 1.0f - clamp(ratio, 0.0f, 1.0f);
+                if (alpha > 0.0) {
+                    blocks_of_size_2.push_back(make_pair(block, alpha));
+                }
             }
         }
     }
@@ -165,10 +187,27 @@ void Lod::generateForPosition(mat4 P, mat4 V, mat4 W, vec3 current_pos)
             }
 
             bool fully_visible_subblocks = true;
-            for (ivec3& subblocks : block_4_subblocks) {
-                if (length(vec3(block + subblocks) - current_pos) > BLOCK_2_FADEOUT_START) {
+            for (ivec3& subblock : block_4_subblocks) {
+                ivec3 subblock_index = block + subblock;
+
+                // Subblock too far to be displayed.
+                if (length(vec3(subblock_index) - current_pos) > BLOCK_2_FADEOUT_START) {
                     fully_visible_subblocks = false;
                     break;
+                }
+                if (existing_blocks_alpha) {
+                    if (existing_blocks_alpha->count(ivec4(subblock_index, 2)) > 0) {
+                        float alpha = existing_blocks_alpha->at(ivec4(subblock_index, 2));
+                        if (alpha < 1.0) {
+                            // Subblock still in the process of fading in.
+                            fully_visible_subblocks = false;
+                            break;
+                        }
+                    } else {
+                        // Subblock needed, but has not been created yet.
+                        fully_visible_subblocks = false;
+                        break;
+                    }
                 }
             }
 

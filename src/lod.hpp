@@ -4,12 +4,15 @@
 
 #include <glm/glm.hpp>
 
+#include "vec_hash.hpp"
+
 // Calculate level of detail required for blocks
 class Lod {
 public:
     Lod(int range);
 
-    void generateForPosition(glm::mat4 P, glm::mat4 V, glm::mat4 W, glm::vec3 current_pos);
+    void generateForPosition(glm::mat4 P, glm::mat4 V, glm::mat4 W,
+                             glm::vec3 current_pos, ivec4_map<float>* existing_blocks_alpha = NULL);
 
     // Contains xyz coordinates and alpha of the block.
     std::vector<std::pair<glm::ivec3, float>> blocks_of_size_1;

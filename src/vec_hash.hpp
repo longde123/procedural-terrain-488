@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 
@@ -29,6 +30,8 @@ struct KeyEqual {
         return lhs == rhs;
     }
 };
+
+using ivec4_set = std::unordered_set<glm::ivec4, KeyHash, KeyEqual>;
 
 template <typename V>
 using ivec2_map = std::unordered_map<glm::ivec2, V, KeyHash, KeyEqual>;

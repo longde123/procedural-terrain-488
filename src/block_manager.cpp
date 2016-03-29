@@ -13,7 +13,7 @@
 using namespace glm;
 using namespace std;
 
-static unordered_set<ivec4, KeyHash, KeyEqual> eight_blocks;
+static ivec4_set eight_blocks;
 
 BlockManager::BlockManager()
 : lod(16)
@@ -177,7 +177,12 @@ void BlockManager::update(float time_elapsed, mat4 P, mat4 V, mat4 W, vec3 eye_p
             break;
     }
 
-    lod.generateForPosition(P, V, W, eye_position);
+    ivec4_map<float> existing_blocks_alpha;
+    for (auto& kv : blocks) {
+        existing_blocks_alpha[kv.first] = kv.second->getAlpha();
+    }
+    lod.generateForPosition(P, V, W, eye_position, &existing_blocks_alpha);
+
     blocks_in_view = lod.blocks_of_size_1.size() + lod.blocks_of_size_2.size() + lod.blocks_of_size_4.size();
 
     // Count blocks that we don't already have.
