@@ -4,6 +4,8 @@
 // 4th is the texture coordinate, should be 1, 2 or 4
 uniform ivec4 block_index;
 
+uniform int octaves;
+uniform float octaves_decay;
 uniform float period;
 
 // One work group = 1 slice
@@ -22,7 +24,7 @@ void main() {
 
     float density = terrainDensity(
             vec3(coords * block_index.w) + block_index.xyz * (block_dimensions - 1),
-            block_dimensions.y, period, 3);
+            block_dimensions.y, period, octaves, octaves_decay);
 
     // Erosion, we want the lower-detail blocks the be slightly shaved off so that
     // we can render the higher-detail blocks with transparency on top of them with

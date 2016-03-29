@@ -27,6 +27,8 @@ void TerrainGeneratorSlow::init(string dir)
 
     block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
 	period_uni_marching = marching_cubes_shader.getUniformLocation("period");
+	octaves_uni_marching = marching_cubes_shader.getUniformLocation("octaves");
+	octaves_decay_uni_marching = marching_cubes_shader.getUniformLocation("octaves_decay");
 	short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
 
@@ -41,6 +43,8 @@ void TerrainGeneratorSlow::generateTerrainBlock(Block& block)
     marching_cubes_shader.enable();
     {
         glUniform1f(period_uni_marching, period);
+        glUniform1i(octaves_uni_marching, octaves);
+        glUniform1f(octaves_decay_uni_marching, octaves_decay);
         glUniform1i(block_size_uni, BLOCK_SIZE);
         glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
         glUniform1f(long_range_ambient_uni, use_long_range_ambient_occlusion);

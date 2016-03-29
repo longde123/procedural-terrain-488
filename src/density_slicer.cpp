@@ -28,6 +28,8 @@ void DensitySlicer::init(string dir)
 	block_index_uni = density_shader.getUniformLocation("block_index");
 	block_size_uni = density_shader.getUniformLocation("block_size");
 	period_uni = density_shader.getUniformLocation("period");
+	octaves_uni = density_shader.getUniformLocation("octaves");
+	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
 
     mat4 translation = translate(mat4(), vec3(0.5f));
     xy_grid.init(density_shader, translation * rotate(mat4(), PI / 2, vec3(1.0f, 0, 0)));
@@ -37,7 +39,8 @@ void DensitySlicer::init(string dir)
 	CHECK_GL_ERRORS;
 }
 
-void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float period)
+void DensitySlicer::draw(mat4 P, mat4 V, mat4 M,
+                         float period, int octaves, float octaves_decay)
 {
     density_shader.enable();
 
@@ -47,6 +50,8 @@ void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float period)
     glUniform4i(block_index_uni, 0, 0, 0, 1);
     glUniform1f(block_size_uni, BLOCK_SIZE);
     glUniform1f(period_uni, period);
+    glUniform1i(octaves_uni, octaves);
+    glUniform1f(octaves_decay_uni, octaves_decay);
 
     glBindVertexArray(xy_grid.getVertices());
     glDrawArrays(GL_TRIANGLES, 0, 6);

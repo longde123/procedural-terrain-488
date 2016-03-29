@@ -15,6 +15,8 @@ using namespace std;
 
 TerrainGenerator::TerrainGenerator()
 : period(50.0f)
+, octaves(4)
+, octaves_decay(2.0f)
 , use_short_range_ambient_occlusion(true)
 , use_long_range_ambient_occlusion(false)
 {
@@ -31,6 +33,8 @@ void TerrainGenerator::init(string dir)
     density_shader.link();
 
 	period_uni = density_shader.getUniformLocation("period");
+	octaves_uni = density_shader.getUniformLocation("octaves");
+	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
 	block_index_uni = density_shader.getUniformLocation("block_index");
 
     // Generate texture object in which to store the terrain block.
@@ -73,6 +77,8 @@ void TerrainGenerator::generateDensity(Block& block)
     // Generate the density values for the terrain block.
     density_shader.enable();
     {
+        glUniform1i(octaves_uni, octaves);
+        glUniform1f(octaves_decay_uni, octaves_decay);
         glUniform1f(period_uni, period);
         glUniform4i(block_index_uni,
                     block.index.x, block.index.y,

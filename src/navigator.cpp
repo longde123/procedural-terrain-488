@@ -199,6 +199,14 @@ void Navigator::guiLogic()
                 // Need to regenerate terrain.
                 block_manager.regenerateAllBlocks(false);
             }
+            if (ImGui::SliderInt("Octaves", &block_manager.terrain_generator->octaves, 1, 10)) {
+                // Need to regenerate terrain.
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Octaves Decay", &block_manager.terrain_generator->octaves_decay, 1.0f, 4.0f)) {
+                // Need to regenerate terrain.
+                block_manager.regenerateAllBlocks(false);
+            }
 
             ImGui::Checkbox("Generate Blocks", &generate_blocks);
             ImGui::SliderInt("Blocks per Frame", &block_manager.blocks_per_frame, 1, 8);
@@ -264,7 +272,10 @@ void Navigator::draw()
     glEnable( GL_DEPTH_TEST );
 
     if (show_slicer) {
-        density_slicer.draw(proj, view, W, block_manager.terrain_generator->period);
+        density_slicer.draw(proj, view, W,
+                            block_manager.terrain_generator->period,
+                            block_manager.terrain_generator->octaves,
+                            block_manager.terrain_generator->octaves_decay);
     }
 
     if (show_terrain) {

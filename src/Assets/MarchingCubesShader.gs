@@ -5,7 +5,10 @@ layout(triangle_strip, max_vertices = 15) out;
 
 uniform bool short_range_ambient;
 uniform bool long_range_ambient;
+
 uniform float period;
+uniform int octaves;
+uniform float octaves_decay;
 
 out vec3 position;
 out vec3 normal;

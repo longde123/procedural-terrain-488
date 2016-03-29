@@ -33,7 +33,8 @@ float ambientOcclusion(vec3 vertex, bool short_range_ambient, bool long_range_am
         if (long_range_ambient) {
             for (int j = 0; j < 4; j++) {
                 float distance = pow((j + 2) / 5.0, 1.8) * 40;
-                float d = terrainDensity(vertex + distance * ray, block_size, period, 3);
+                float d = terrainDensity(vertex + distance * ray, block_size, period,
+                                         min(3, octaves), octaves_decay);
                 ray_visibility *= clamp(d * 0.5, 0.0, 1.0);
             }
         }

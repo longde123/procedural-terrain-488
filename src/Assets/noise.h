@@ -67,7 +67,7 @@ float perlinNoise(vec3 coords, float frequency)
 }
 
 // coords should be in the range [coords, block_size] not [0, 1]
-float terrainDensity(vec3 coords, float block_size, float period, int octaves)
+float terrainDensity(vec3 coords, float block_size, float period, int octaves, float octaves_decay)
 {
     float max_blocks_y = 2.0;
 
@@ -90,7 +90,7 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves)
     float frequency = 1.0 / period;
 
     for (int i = 1; i <= octaves; i++) {
-        noise += perlinNoise(coords, frequency) / i / i;
+        noise += perlinNoise(coords, frequency) / pow(i, octaves_decay);
         frequency *= 1.95;
     }
 

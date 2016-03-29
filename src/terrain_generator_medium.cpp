@@ -39,6 +39,8 @@ void TerrainGeneratorMedium::init(string dir)
 
     block_size_uni_2 = triangle_unpack_shader.getUniformLocation("block_size");
 	period_uni_marching = triangle_unpack_shader.getUniformLocation("period");
+	octaves_uni_marching = triangle_unpack_shader.getUniformLocation("octaves");
+	octaves_decay_uni_marching = triangle_unpack_shader.getUniformLocation("octaves_decay");
 	short_range_ambient_uni = triangle_unpack_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = triangle_unpack_shader.getUniformLocation("long_range_ambient");
 
@@ -137,6 +139,8 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
     triangle_unpack_shader.enable();
     {
         glUniform1f(period_uni_marching, period);
+        glUniform1i(octaves_uni_marching, octaves);
+        glUniform1f(octaves_decay_uni_marching, octaves_decay);
         glUniform1i(block_size_uni_2, BLOCK_SIZE);
         glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
         glUniform1f(long_range_ambient_uni, use_long_range_ambient_occlusion);

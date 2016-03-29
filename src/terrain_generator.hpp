@@ -18,6 +18,8 @@ public:
 
     virtual void generateTerrainBlock(Block& block) = 0;
 
+    int octaves;
+    float octaves_decay;
     float period;
     bool use_short_range_ambient_occlusion;
     bool use_long_range_ambient_occlusion;
@@ -32,5 +34,7 @@ private:
     GLuint block_texture;
 
     GLint period_uni;
+    GLint octaves_uni;
+    GLint octaves_decay_uni;
     GLint block_index_uni;
 };

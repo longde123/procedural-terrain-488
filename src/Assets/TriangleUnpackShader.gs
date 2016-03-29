@@ -8,6 +8,8 @@ in uint z6_y6_x6_edge1_edge2_edge3[];
 uniform bool short_range_ambient;
 uniform bool long_range_ambient;
 uniform float period;
+uniform int octaves;
+uniform float octaves_decay;
 
 out vec3 position;
 out vec3 normal;

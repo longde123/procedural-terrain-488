@@ -16,6 +16,8 @@ private:
 
     GLint block_size_uni;
     GLint period_uni_marching;
+    GLint octaves_uni_marching;
+    GLint octaves_decay_uni_marching;
     GLint short_range_ambient_uni;
     GLint long_range_ambient_uni;
 
