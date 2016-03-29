@@ -24,5 +24,13 @@ void main() {
     float density = terrainDensity((coords * block_index.w + block_index.xyz) * block_size,
                                    block_size, period, octaves, octaves_decay);
 
-    fragColor = vec4(vec3(0, 0, max(density, 0)) + vec3(max(-density, 0)), 1.0);
+    float transition_width = 0.02;
+
+    if (density >= 0.0 && density < transition_width) {
+        fragColor = vec4(vec3(1 - density / transition_width, 0, max(density, 0)), 0.8);
+    } else if (density < 0.0 && density > -transition_width) {
+        fragColor = vec4(vec3(1 + density / transition_width, 0, max(-density, 0)), 0.8);
+    } else {
+        fragColor = vec4(vec3(0, 0, max(density, 0)) + vec3(max(-density, 0)), 0.8);
+    }
 }

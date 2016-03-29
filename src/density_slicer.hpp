@@ -12,7 +12,7 @@ public:
     DensitySlicer();
 
     void init(std::string dir);
-    void draw(glm::mat4 P, glm::mat4 V, glm::mat4 M,
+    void draw(glm::mat4 P, glm::mat4 V, glm::mat4 M, float size,
               float period, int octaves, float octaves_decay);
 
 	GLint P_uni;    // Uniform location for Projection matrix.

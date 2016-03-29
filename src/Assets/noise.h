@@ -77,7 +77,7 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
         return 1.0;
     }
     if (coords.y / block_size > max_blocks_y - 0.1) {
-        return 0.0;
+        return -1.0;
     }
 
     // Air is negative, ground is positive.

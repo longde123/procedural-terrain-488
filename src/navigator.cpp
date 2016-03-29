@@ -272,7 +272,7 @@ void Navigator::draw()
     glEnable( GL_DEPTH_TEST );
 
     if (show_slicer) {
-        density_slicer.draw(proj, view, W,
+        density_slicer.draw(proj, view, W, 2.0f,
                             block_manager.terrain_generator->period,
                             block_manager.terrain_generator->octaves,
                             block_manager.terrain_generator->octaves_decay);

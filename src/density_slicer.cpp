@@ -2,6 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "cs488-framework/GlErrorCheck.hpp"
 
@@ -39,15 +40,17 @@ void DensitySlicer::init(string dir)
 	CHECK_GL_ERRORS;
 }
 
-void DensitySlicer::draw(mat4 P, mat4 V, mat4 M,
+void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float size,
                          float period, int octaves, float octaves_decay)
 {
     density_shader.enable();
 
+    mat4 transform = M * scale(vec3(size));
+
     glUniformMatrix4fv(P_uni, 1, GL_FALSE, value_ptr(P));
     glUniformMatrix4fv(V_uni, 1, GL_FALSE, value_ptr(V));
-    glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(M));
-    glUniform4i(block_index_uni, 0, 0, 0, 1);
+    glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(transform));
+    glUniform4i(block_index_uni, 0, 0, 0, 2);
     glUniform1f(block_size_uni, BLOCK_SIZE);
     glUniform1f(period_uni, period);
     glUniform1i(octaves_uni, octaves);
