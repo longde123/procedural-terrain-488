@@ -29,8 +29,12 @@ BlockManager::BlockManager()
     small_blocks = true;
     medium_blocks = true;
     large_blocks = true;
-    light_x = 0.0f;
     blocks_per_frame = 2;
+
+    light_x = 0.0f;
+    light_ambient = vec3(0.2);
+    light_diffuse = vec3(0.6);
+    light_specular = vec3(0.2);
 
     reused_block_count = 0;
 
@@ -348,7 +352,11 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         glUniform1f(terrain_renderer.clip_height_uni, water_height);
 
         glUniform3f(terrain_renderer.eye_position_uni, eye_position.x, eye_position.y, eye_position.z);
+
         glUniform3f(terrain_renderer.light_position_uni, 30.0f, 50.0f, light_x);
+        glUniform3f(terrain_renderer.light_ambient_uni, light_ambient.r, light_ambient.g, light_ambient.b);
+        glUniform3f(terrain_renderer.light_diffuse_uni, light_diffuse.r, light_diffuse.g, light_diffuse.b);
+        glUniform3f(terrain_renderer.light_specular_uni, light_specular.r, light_specular.g, light_specular.b);
 
         terrain_renderer.prepareRender();
 

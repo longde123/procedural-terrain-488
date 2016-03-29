@@ -54,7 +54,11 @@ public:
     bool large_blocks;
     int blocks_per_frame;
     float water_height;
+
     float light_x;
+    glm::vec3 light_ambient;
+    glm::vec3 light_diffuse;
+    glm::vec3 light_specular;
 
     BlockDisplayType block_display_type;
     TerrainGeneratorSelection generator_selection;

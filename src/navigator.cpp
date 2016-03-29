@@ -188,6 +188,10 @@ void Navigator::guiLogic()
                         &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
                 block_manager.regenerateAllBlocks();
             }
+
+            ImGui::ColorEdit3("Ambient", (float*)&block_manager.light_ambient);
+            ImGui::ColorEdit3("Diffuse", (float*)&block_manager.light_diffuse);
+            ImGui::ColorEdit3("Specular", (float*)&block_manager.light_specular);
         }
 
         if (ImGui::CollapsingHeader("Block Generation Options")) {

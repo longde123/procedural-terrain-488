@@ -28,7 +28,12 @@ public:
     GLint use_normal_map_uni;
     GLint debug_flag_uni;
     GLint eye_position_uni;
+
     GLint light_position_uni;
+    GLint light_ambient_uni;
+    GLint light_diffuse_uni;
+    GLint light_specular_uni;
+
     GLint alpha_uni;
 
     GLint pos_attrib;

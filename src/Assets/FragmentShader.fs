@@ -22,7 +22,11 @@ uniform bool use_ambient;
 uniform bool use_normal_map;
 uniform bool debug_flag;
 uniform vec3 eye_position;
+
 uniform vec3 light_position;
+uniform vec3 light_ambient;
+uniform vec3 light_diffuse;
+uniform vec3 light_specular;
 
 uniform float alpha;
 
@@ -52,10 +56,6 @@ vec3 calculateNormalMap(vec3 texture_normal)
 
 vec3 calculateLight(vec3 normal)
 {
-    // TODO: Pass these in as parameters.
-    vec3 light_ambient = vec3(0.0001);
-    vec3 light_diffuse = vec3(0.9);
-    vec3 light_specular = vec3(0.0001);
     float shininess = 2;
 
     // https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
