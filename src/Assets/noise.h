@@ -71,15 +71,6 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
 {
     float max_blocks_y = 2.0;
 
-    // Should make sure that there's a solid ground at the bottom
-    // and air at the top.
-    if (coords.y / block_size < 0.1) {
-        return 1.0;
-    }
-    if (coords.y / block_size > max_blocks_y - 0.1) {
-        return -1.0;
-    }
-
     // Air is negative, ground is positive.
     // Generate a gradient from [max to min]
     float min = -1.0;
@@ -95,6 +86,15 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
     }
 
     float density = height_gradient + noise * 1.5;
+
+    // Should make sure that there's a solid ground at the bottom
+    // and air at the top.
+    if (coords.y / block_size < 0.1) {
+        density += (0.1 - coords.y / block_size) * 10;
+    }
+    if (coords.y / block_size > max_blocks_y - 0.1) {
+        density -= (coords.y / block_size - (max_blocks_y - 0.1)) * 10;
+    }
 
     // For debugging : this is the density function for a sphere.
     //density = length(coords - ivec3(32, 32, 32)) - 16 + period * 0.0001;
