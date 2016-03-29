@@ -28,6 +28,8 @@ uniform vec3 light_ambient;
 uniform vec3 light_diffuse;
 uniform vec3 light_specular;
 
+uniform vec3 fog_params;
+
 uniform float alpha;
 
 vec3 calculateBlendWeights()
@@ -141,12 +143,16 @@ void main() {
             light3 = light1;
         }
 
+        float vertex_distance = length(eye_position - vertex_in.position);
+        float fog_falloff = clamp(fog_params.x * vertex_distance / fog_params.y - fog_params.z, 0.0, 1.0);
+
         vec3 color_x = texture(x_texture, x_uv).xyz * light1;
         vec3 color_y = texture(y_texture, y_uv).xyz * light2;
         vec3 color_z = texture(z_texture, z_uv).xyz * light3;
-        fragColor = vec4((color_x * blend_weights.x +
-                          color_y * blend_weights.y +
-                          color_z * blend_weights.z) * ambient_occlusion,
-                         alpha);
+        vec3 base_color = (color_x * blend_weights.x +
+                           color_y * blend_weights.y +
+                           color_z * blend_weights.z);
+        vec3 occluded = mix(base_color * ambient_occlusion, vec3(0.5, 0.5, 0.5), fog_falloff);
+        fragColor = vec4(occluded, alpha);
     }
 }

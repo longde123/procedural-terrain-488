@@ -25,6 +25,7 @@ void LodVisualizer::init(string dir)
 	V_uni = lod_shader.getUniformLocation("V");
 	M_uni = lod_shader.getUniformLocation("M");
 	color_uni = lod_shader.getUniformLocation("color");
+	fog_uni = lod_shader.getUniformLocation("fog_params");
 
     cube.init(lod_shader);
 
@@ -37,6 +38,7 @@ void LodVisualizer::draw(mat4 P, mat4 V, mat4 W, vec3 current_pos)
 
     glUniformMatrix4fv(P_uni, 1, GL_FALSE, value_ptr(P));
     glUniformMatrix4fv(V_uni, 1, GL_FALSE, value_ptr(V));
+    glUniform3f(fog_uni, 0, 0, 0);
     glBindVertexArray(cube.getVertices());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube.getIndices());
 

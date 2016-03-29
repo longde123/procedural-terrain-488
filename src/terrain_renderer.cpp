@@ -44,6 +44,8 @@ void TerrainRenderer::init(string dir)
     light_diffuse_uni = renderer_shader.getUniformLocation("light_diffuse");
     light_specular_uni = renderer_shader.getUniformLocation("light_specular");
 
+	fog_uni = renderer_shader.getUniformLocation("fog_params");
+
     alpha_uni = renderer_shader.getUniformLocation("alpha");
 
     pos_attrib = renderer_shader.getAttribLocation("position");

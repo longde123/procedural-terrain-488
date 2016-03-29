@@ -34,6 +34,8 @@ public:
     GLint light_diffuse_uni;
     GLint light_specular_uni;
 
+    GLint fog_uni;
+
     GLint alpha_uni;
 
     GLint pos_attrib;

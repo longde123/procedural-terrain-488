@@ -26,4 +26,5 @@ private:
 	GLint V_uni;    // Uniform location for View matrix.
 	GLint M_uni;    // Uniform location for Model matrix.
     GLint color_uni;
+    GLint fog_uni;
 };

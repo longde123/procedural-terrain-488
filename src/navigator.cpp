@@ -21,6 +21,7 @@ Navigator::Navigator()
     rotation_vertical = 0.0f;
     distance_factor = 1.0f;
     camera_speed = 5.0f;
+    far_plane = 20.0f;
     mouse_down = false;
     mouse_down_with_control = false;
 
@@ -44,7 +45,8 @@ Navigator::~Navigator()
 void Navigator::init()
 {
 	// Set the background colour.
-	glClearColor( 0.3, 0.5, 0.7, 1.0 );
+	glClearColor( 0.5, 0.5, 0.5, 1.0 );
+	//glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
     GLint result;
     glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &result);
@@ -57,11 +59,6 @@ void Navigator::init()
     block_manager.init(m_exec_dir + "/Assets/out/");
     density_slicer.init(m_exec_dir + "/Assets/out/");
     lod.init(m_exec_dir + "/Assets/out/");
-
-	proj = glm::perspective(
-		glm::radians( 45.0f ),
-		float( m_framebufferWidth ) / float( m_framebufferHeight ),
-		0.01f, 1000.0f );
 
     resetView();
 
@@ -85,6 +82,10 @@ void Navigator::resetView()
 
 void Navigator::makeView()
 {
+	proj = glm::perspective(
+		glm::radians( 45.0f ),
+		float( m_framebufferWidth ) / float( m_framebufferHeight ),
+		0.01f, far_plane);
     view = lookAt(eye_position, eye_position + eye_direction, eye_up);
 }
 
@@ -173,6 +174,9 @@ void Navigator::guiLogic()
                 makeView();
             }
             ImGui::SliderFloat("Camera Speed", &camera_speed, 0.5f, 20.0f);
+            if (ImGui::SliderFloat("Far Plane", &far_plane, 5.0f, 100.0f)) {
+                makeView();
+            }
         }
 
         if (ImGui::CollapsingHeader("Light Options")) {

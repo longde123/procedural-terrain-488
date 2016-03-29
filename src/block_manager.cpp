@@ -13,8 +13,6 @@
 using namespace glm;
 using namespace std;
 
-#define VIEW_RANGE 16
-
 static ivec4_set eight_blocks;
 
 BlockManager::BlockManager()
@@ -358,6 +356,8 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         glUniform3f(terrain_renderer.light_diffuse_uni, light_diffuse.r, light_diffuse.g, light_diffuse.b);
         glUniform3f(terrain_renderer.light_specular_uni, light_specular.r, light_specular.g, light_specular.b);
 
+        glUniform3f(terrain_renderer.fog_uni, FOG_MULTIPLIER, VIEW_RANGE, FOG_BIAS);
+
         terrain_renderer.prepareRender();
 
         glEnable(GL_CLIP_DISTANCE0);
@@ -403,7 +403,7 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
             vec3 position = vec3(kv.first.x, 0.0, kv.first.y);
             float alpha = kv.second;
             mat4 block_transform = translate(position) * W;
-            water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform, alpha);
+            water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform, eye_position, alpha);
         }
     }
 
