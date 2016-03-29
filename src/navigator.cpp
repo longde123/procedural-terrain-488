@@ -10,6 +10,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -56,9 +58,15 @@ void Navigator::init()
     system((m_exec_dir + "/Assets/include.py").c_str());
 
 	// Build the shaders
-    block_manager.init(m_exec_dir + "/Assets/out/");
-    density_slicer.init(m_exec_dir + "/Assets/out/");
-    lod.init(m_exec_dir + "/Assets/out/");
+    Timer shader_init_timer;
+    shader_init_timer.start();
+    {
+        block_manager.init(m_exec_dir + "/Assets/out/");
+        density_slicer.init(m_exec_dir + "/Assets/out/");
+        lod.init(m_exec_dir + "/Assets/out/");
+    }
+    shader_init_timer.stop();
+    printf("Compiling shaders took %.2f seconds\n", shader_init_timer.elapsedSeconds());
 
     resetView();
 

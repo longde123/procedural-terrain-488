@@ -8,3 +8,5 @@
 
 #define FOG_MULTIPLIER 1.1
 #define FOG_BIAS 0.2
+
+#define ONE_BLOCK_PROFILE false

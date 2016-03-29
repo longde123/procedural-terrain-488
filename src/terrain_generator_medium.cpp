@@ -123,6 +123,20 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
 
         glEndTransformFeedback();
 
+            // Detailed profiling.
+#if ONE_BLOCK_PROFILE
+            Timer timer2;
+            timer2.start();
+            for (int i = 0; i < 100; i++) {
+                glBeginTransformFeedback(GL_POINTS);
+                glDrawArraysInstanced(GL_POINTS, 0, BLOCK_SIZE * BLOCK_SIZE, BLOCK_SIZE);
+                glEndTransformFeedback();
+            }
+            glFinish();
+            timer2.stop();
+            printf("Medium - voxel edges - %.3f\n", timer2.elapsedSeconds());
+#endif
+
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
         glBindVertexArray(0);
     }
@@ -157,6 +171,20 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
             glDrawTransformFeedback(GL_POINTS, voxel_edges_feedback);
         }
         glEndTransformFeedback();
+
+            // Detailed profiling.
+#if ONE_BLOCK_PROFILE
+            Timer timer2;
+            timer2.start();
+            for (int i = 0; i < 100; i++) {
+                glBeginTransformFeedback(GL_TRIANGLES);
+                glDrawTransformFeedback(GL_POINTS, voxel_edges_feedback);
+                glEndTransformFeedback();
+            }
+            glFinish();
+            timer2.stop();
+            printf("Medium - triangle unpack - %.3f\n", timer2.elapsedSeconds());
+#endif
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);

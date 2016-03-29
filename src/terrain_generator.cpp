@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -90,6 +92,21 @@ void TerrainGenerator::generateDensity(Block& block)
 
         // Block until kernel/shader finishes execution.
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+#if ONE_BLOCK_PROFILE
+            Timer timer2;
+            timer2.start();
+            for (int i = 0; i < 100; i++) {
+                glDispatchCompute(BLOCK_RESOLUTION / LOCAL_DIM_X,
+                                  BLOCK_RESOLUTION / LOCAL_DIM_Y,
+                                  BLOCK_RESOLUTION / LOCAL_DIM_Z);
+
+                // Block until kernel/shader finishes execution.
+                glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+            }
+            timer2.stop();
+            printf("Generate block - %.3f\n", timer2.elapsedSeconds());
+#endif
 
         // For debugging, get the data out of the GPU.
         /*

@@ -4,6 +4,8 @@
 
 #include <glm/glm.hpp>
 
+#include "timer.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -64,6 +66,19 @@ void TerrainGeneratorSlow::generateTerrainBlock(Block& block)
             glDrawArraysInstanced(GL_POINTS, 0, BLOCK_SIZE * BLOCK_SIZE, BLOCK_SIZE);
         }
         glEndTransformFeedback();
+
+#if ONE_BLOCK_PROFILE
+            Timer timer2;
+            timer2.start();
+            for (int i = 0; i < 100; i++) {
+                glBeginTransformFeedback(GL_TRIANGLES);
+                glDrawArraysInstanced(GL_POINTS, 0, BLOCK_SIZE * BLOCK_SIZE, BLOCK_SIZE);
+                glEndTransformFeedback();
+            }
+            glFinish();
+            timer2.stop();
+            printf("Slow - all - %.3f\n", timer2.elapsedSeconds());
+#endif
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);
