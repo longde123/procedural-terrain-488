@@ -44,6 +44,7 @@ private:
     BlockManager block_manager;
     DensitySlicer density_slicer;
     LodVisualizer lod;
+    Swarm swarm;
 
 	// Matrices controlling the camera and projection.
     glm::vec3 eye_position;

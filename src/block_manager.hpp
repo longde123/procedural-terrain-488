@@ -12,6 +12,7 @@
 #include "terrain_renderer.hpp"
 
 #include "vec_hash.hpp"
+#include "swarm.hpp"
 #include "water.hpp"
 
 enum TerrainGeneratorSelection {

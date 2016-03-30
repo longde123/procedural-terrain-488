@@ -61,9 +61,13 @@ void Navigator::init()
     Timer shader_init_timer;
     shader_init_timer.start();
     {
-        block_manager.init(m_exec_dir + "/Assets/out/");
-        density_slicer.init(m_exec_dir + "/Assets/out/");
-        lod.init(m_exec_dir + "/Assets/out/");
+        string dir = m_exec_dir + "/Assets/out/";
+        block_manager.init(dir);
+        density_slicer.init(dir);
+        lod.init(dir);
+
+        swarm.init(dir);
+        swarm.initializeAttributes(*block_manager.terrain_generator);
     }
     shader_init_timer.stop();
     printf("Compiling shaders took %.2f seconds\n", shader_init_timer.elapsedSeconds());
@@ -329,6 +333,8 @@ void Navigator::draw()
     if (show_lod) {
         lod.draw(proj, view, W, eye_position);
     }
+
+    // swarm.draw(proj, view, W, eye_position, *block_manager.terrain_generator);
 
 	// Restore defaults
 	glBindVertexArray( 0 );

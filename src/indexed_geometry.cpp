@@ -19,6 +19,7 @@ void IndexedGeometry::initFromVertices(
 	GLint posAttrib = shader_program.getAttribLocation("position");
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribDivisor(posAttrib, 0); // in case this is instanced
 
     // Create indices buffer
     glGenBuffers(1, &indices_buffer);

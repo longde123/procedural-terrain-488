@@ -466,5 +466,6 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 
         water.end();
     }
+
     CHECK_GL_ERRORS;
 }
