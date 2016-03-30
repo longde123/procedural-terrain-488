@@ -23,6 +23,7 @@ BlockManager::BlockManager()
     use_normal_map = true;
     debug_flag = false;
     use_water = true;
+    use_stencil = false;
     water_height = -0.3f;
     small_blocks = true;
     medium_blocks = true;
@@ -291,10 +292,19 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
                          translate(vec3(block.index)) *
                          W * scale(vec3(block.size));
 
+        if (use_stencil && block_display_type != All) {
+            glEnable(GL_STENCIL_TEST);
+        }
+
+        // Draw the reflection.
         glUniform1i(terrain_renderer.water_clip_uni, false);
         glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
         glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
         glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+
+        if (use_stencil && block_display_type != All) {
+            glDisable(GL_STENCIL_TEST);
+        }
     } else {
         glUniform1i(terrain_renderer.water_clip_uni, false);
         glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
@@ -331,12 +341,53 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
     }
 }
 
+void BlockManager::renderStencil(mat4 P, mat4 V, mat4 W) {
+    // Refer to https://open.gl/depthstencils
+    glEnable(GL_STENCIL_TEST);
+
+    // Draw water in stencil mode.
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilMask(0xFF);                // Write to stencil buffer
+    glDepthMask(GL_FALSE);              // Don't write to depth buffer
+    glClear(GL_STENCIL_BUFFER_BIT);     // Clear stencil buffer (0 by default)
+
+    water.start();
+
+    mat4 stencil_transform;
+    if (block_display_type == OneBlock) {
+        stencil_transform = W;
+    } else {
+        stencil_transform = W * scale(vec3(2));
+    }
+    water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * stencil_transform,
+               vec3(0), 1.0);
+
+    water.end();
+
+    // Setup stencil to draw the reflection.
+    glStencilFunc(GL_EQUAL, 1, 0xFF);   // Pass test if stencil value is 1
+    glStencilMask(0x00);                // Don't write anything to stencil buffer
+    glDepthMask(GL_TRUE);               // Write to depth buffer
+
+    // Turn it and just leave the stencil there, the block renderer will turn it
+    // back on and off.
+    glDisable(GL_STENCIL_TEST);
+}
+
 void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
 {
     // We need to make sure not to draw water multiple times on the same grid
     // cell, because the overlapping will cause visual artifacts.
     // Keep track of the highest alpha at that cell.
     ivec2_map<float> needed_water_squares;
+
+    if (use_stencil && block_display_type != All) {
+        // We don't need stencils when all blocks are displayed since we
+        // won't see the bits of the reflected geometry that are beyond
+        // the water plane anyway.
+        renderStencil(P, V, W);
+    }
 
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
@@ -398,6 +449,8 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         // Highlight the active square.
     terrain_renderer.renderer_shader.disable();
 
+    water.start();
+
     if (use_water) {
         for (auto& kv : needed_water_squares) {
             vec3 position = vec3(kv.first.x, 0.0, kv.first.y);
@@ -406,6 +459,8 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
             water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform, eye_position, alpha);
         }
     }
+
+    water.end();
 
     CHECK_GL_ERRORS;
 }

@@ -13,6 +13,8 @@ public:
 
     void init(std::string dir);
     void draw(glm::mat4 P, glm::mat4 V, glm::mat4 M, glm::vec3 eye_position, float alpha);
+    void start();
+    void end();
 
 private:
     ShaderProgram water_shader;

@@ -171,6 +171,7 @@ void Navigator::guiLogic()
 
         ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
+        ImGui::Checkbox("Use Stencil", &block_manager.use_stencil);
 
         if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {}
         if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {}

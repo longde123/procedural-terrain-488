@@ -49,6 +49,7 @@ public:
     bool use_normal_map;
     bool debug_flag;
     bool use_water;
+    bool use_stencil;
     bool small_blocks;
     bool medium_blocks;
     bool large_blocks;
@@ -67,6 +68,7 @@ public:
     TerrainGenerator* terrain_generator;
 private:
     void renderBlock(glm::mat4 P, glm::mat4 V, glm::mat4 W, Block& block, float fadeAlpha);
+    void renderStencil(glm::mat4 P, glm::mat4 V, glm::mat4 W);
     void processBlockOfSize(glm::mat4 P, glm::mat4 V, glm::mat4 W,
                             ivec2_map<float>& water_squares,
                             glm::ivec3 position, int size, float alpha);

@@ -34,8 +34,6 @@ void Water::init(string dir)
 
 void Water::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, float alpha)
 {
-    water_shader.enable();
-
     glUniformMatrix4fv(P_uni, 1, GL_FALSE, value_ptr(P));
     glUniformMatrix4fv(V_uni, 1, GL_FALSE, value_ptr(V));
     glUniformMatrix4fv(M_uni, 1, GL_FALSE, value_ptr(M));
@@ -47,7 +45,15 @@ void Water::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, float alpha)
     glBindVertexArray(water_plane.getVertices());
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    water_shader.disable();
-
 	CHECK_GL_ERRORS;
+}
+
+void Water::start()
+{
+    water_shader.enable();
+}
+
+void Water::end()
+{
+    water_shader.disable();
 }
