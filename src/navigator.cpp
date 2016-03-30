@@ -175,9 +175,15 @@ void Navigator::guiLogic()
         ImGui::Checkbox("Use Water", &block_manager.use_water);
         ImGui::Checkbox("Use Stencil", &block_manager.use_stencil);
 
-        if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {}
-        if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {}
-        if (ImGui::RadioButton("All", (int*)&block_manager.block_display_type, 2)) {}
+        if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {
+            block_manager.regenerateAllBlocks();
+        }
+        if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {
+            block_manager.regenerateAllBlocks();
+        }
+        if (ImGui::RadioButton("All", (int*)&block_manager.block_display_type, 2)) {
+            block_manager.regenerateAllBlocks();
+        }
 
         if (ImGui::CollapsingHeader("Navigation Options")) {
             if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
@@ -226,7 +232,7 @@ void Navigator::guiLogic()
         }
 
         if (ImGui::CollapsingHeader("Block Generation Options")) {
-            // Need to all blocks since these parameters change the whole terrain.
+            // Need to regenerate all blocks since these parameters change the whole terrain.
             if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
                 block_manager.regenerateAllBlocks(false);
             }

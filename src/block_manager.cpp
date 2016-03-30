@@ -96,7 +96,10 @@ void BlockManager::regenerateAllBlocks(bool alpha_blend)
     for (auto& kv : blocks) {
         auto& block = kv.second;
         block->resetBlock(alpha_blend);
+        free_blocks.push(block);
     }
+
+    blocks.clear();
 
     // We might want to regenerate this block continuously when we show
     // only few blocks, so generate themn ow.
