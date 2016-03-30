@@ -40,10 +40,10 @@ vec3 edge_end[12] = {
     vec3(0, 0, 1), vec3(0, 1, 1), vec3(1, 1, 1), vec3(1, 0, 1)
 };
 
-vec3 edge_axis[12] = {
-    vec3(1, 0, 0), vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 0, 0),
-    vec3(1, 0, 0), vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 0, 0),
-    vec3(2, 0, 0), vec3(2, 0, 0), vec3(2, 0, 0), vec3(2, 0, 0)
+int edge_axis[12] = {
+    1, 0, 1, 0,
+    1, 0, 1, 0,
+    2, 2, 2, 2
 };
 
 // Lookup table for the triangles in each case.
