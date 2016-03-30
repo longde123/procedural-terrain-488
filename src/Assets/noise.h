@@ -71,12 +71,6 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
 {
     float max_blocks_y = 2.0;
 
-    // Air is negative, ground is positive.
-    // Generate a gradient from [max to min]
-    float min = -1.2;
-    float max = 0.5;
-    float height_gradient = max - (max - min) * (coords.y / max_blocks_y) / block_size;
-
     float noise = 0.0;
     float frequency = 1.0 / period;
 
@@ -84,10 +78,31 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
     warped_coords += perlinNoise(coords, warp_params.x) * warp_params.y;
     warped_coords += perlinNoise(coords, warp_params.x * 1.9) * (warp_params.y / 2);
 
+    /* Alternative pattern
+    for (int i = 1; i <= octaves; i++) {
+        noise += abs(perlinNoise(warped_coords, frequency) / pow(i, octaves_decay));
+        frequency *= 1.95;
+    }
+
+    // Air is negative, ground is positive.
+    // Generate a gradient from [max to min]
+    float min = -1.5;
+    float max = 0.0;
+    float height_gradient = max - (max - min) * (coords.y / max_blocks_y) / block_size;
+
+    float density = height_gradient + noise * 2.0;
+    */
+
     for (int i = 1; i <= octaves; i++) {
         noise += perlinNoise(warped_coords, frequency) / pow(i, octaves_decay);
         frequency *= 1.95;
     }
+
+    // Air is negative, ground is positive.
+    // Generate a gradient from [max to min]
+    float min = -1.2;
+    float max = 0.5;
+    float height_gradient = max - (max - min) * (coords.y / max_blocks_y) / block_size;
 
     float density = height_gradient + noise * 1.5;
 
