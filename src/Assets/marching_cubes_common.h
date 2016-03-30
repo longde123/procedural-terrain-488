@@ -1,5 +1,7 @@
 layout(binding = 0) uniform sampler3D density_map;
 
+// Extra space on both sides that will be sampled by ambient occlusion.
+uniform int block_padding;
 uniform int block_size;
 
 // first 3 components are the world coordinate
@@ -351,5 +353,6 @@ float density(vec3 coord)
     // Should be block_size, not block_resolution even though we're sampling
     // from a texture that's block_resolution x block_resolution.
     // The reason is that if resolution = 2, then we want (0, 1) / 1 = (0, 1)
-    return texture(density_map, coord / block_size).x;
+    int texture_size = block_size + 2 * block_padding;
+    return texture(density_map, (coord + vec3(block_padding)) / texture_size).x;
 }

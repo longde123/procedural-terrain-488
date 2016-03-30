@@ -21,6 +21,8 @@ private:
 
     GLint block_size_uni_1;
     GLint block_size_uni_2;
+    GLint block_padding_uni_1;
+    GLint block_padding_uni_2;
     GLint period_uni_marching;
     GLint octaves_uni_marching;
     GLint octaves_decay_uni_marching;

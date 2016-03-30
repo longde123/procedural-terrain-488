@@ -35,6 +35,7 @@ private:
     // A 3D cubic block of terrain.
     GLuint block_texture;
 
+    GLint block_padding_uni;
     GLint period_uni;
     GLint octaves_uni;
     GLint octaves_decay_uni;

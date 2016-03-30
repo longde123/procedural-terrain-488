@@ -1,6 +1,8 @@
 // N cubes => N + 1 grid points
 #define BLOCK_SIZE 31
 #define BLOCK_RESOLUTION (BLOCK_SIZE + 1)
+#define BLOCK_PADDING 8
+#define BLOCK_PADDED_RESOLUTION (BLOCK_RESOLUTION + 2 * BLOCK_PADDING)
 #define BLOCK_POOL_SIZE 100
 #define PI 3.14159265f
 

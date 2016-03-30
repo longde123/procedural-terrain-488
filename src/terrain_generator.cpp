@@ -11,9 +11,10 @@
 using namespace glm;
 using namespace std;
 
-#define LOCAL_DIM_X 32
-#define LOCAL_DIM_Y 32
-#define LOCAL_DIM_Z 1
+// NOTE: if you update this, update it on the GPU size too
+#define LOCAL_DIM_X 16
+#define LOCAL_DIM_Y 16
+#define LOCAL_DIM_Z 4
 
 TerrainGenerator::TerrainGenerator()
 : period(60.0f)
@@ -24,9 +25,9 @@ TerrainGenerator::TerrainGenerator()
 , use_short_range_ambient_occlusion(true)
 , use_long_range_ambient_occlusion(false)
 {
-    assert(BLOCK_RESOLUTION % LOCAL_DIM_X == 0);
-    assert(BLOCK_RESOLUTION % LOCAL_DIM_Y == 0);
-    assert(BLOCK_RESOLUTION % LOCAL_DIM_Z == 0);
+    assert(BLOCK_PADDED_RESOLUTION % LOCAL_DIM_X == 0);
+    assert(BLOCK_PADDED_RESOLUTION % LOCAL_DIM_Y == 0);
+    assert(BLOCK_PADDED_RESOLUTION % LOCAL_DIM_Z == 0);
 }
 
 void TerrainGenerator::init(string dir)
@@ -36,6 +37,7 @@ void TerrainGenerator::init(string dir)
     density_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
     density_shader.link();
 
+	block_padding_uni = density_shader.getUniformLocation("block_padding");
 	period_uni = density_shader.getUniformLocation("period");
 	octaves_uni = density_shader.getUniformLocation("octaves");
 	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
@@ -59,7 +61,7 @@ void TerrainGenerator::init(string dir)
     glTexImage3D(GL_TEXTURE_3D,
                  0,                         // level of detail
                  GL_R32F,                   // internal format
-                 BLOCK_RESOLUTION, BLOCK_RESOLUTION, BLOCK_RESOLUTION,
+                 BLOCK_PADDED_RESOLUTION, BLOCK_PADDED_RESOLUTION, BLOCK_PADDED_RESOLUTION,
                  0,                         // 0 is required
                  GL_RED, GL_FLOAT, NULL     // input format, not applicable
                 );
@@ -82,6 +84,7 @@ void TerrainGenerator::generateDensity(Block& block)
     // Generate the density values for the terrain block.
     density_shader.enable();
     {
+        glUniform1i(block_padding_uni, BLOCK_PADDING);
         glUniform1i(octaves_uni, octaves);
         glUniform1f(octaves_decay_uni, octaves_decay);
         glUniform2f(warp_params_uni, warp_frequency, warp_strength);
@@ -90,9 +93,9 @@ void TerrainGenerator::generateDensity(Block& block)
                     block.index.x, block.index.y,
                     block.index.z, block.size);
 
-        glDispatchCompute(BLOCK_RESOLUTION / LOCAL_DIM_X,
-                          BLOCK_RESOLUTION / LOCAL_DIM_Y,
-                          BLOCK_RESOLUTION / LOCAL_DIM_Z);
+        glDispatchCompute(BLOCK_PADDED_RESOLUTION / LOCAL_DIM_X,
+                          BLOCK_PADDED_RESOLUTION / LOCAL_DIM_Y,
+                          BLOCK_PADDED_RESOLUTION / LOCAL_DIM_Z);
 
         // Block until kernel/shader finishes execution.
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -101,9 +104,9 @@ void TerrainGenerator::generateDensity(Block& block)
             Timer timer2;
             timer2.start();
             for (int i = 0; i < 100; i++) {
-                glDispatchCompute(BLOCK_RESOLUTION / LOCAL_DIM_X,
-                                  BLOCK_RESOLUTION / LOCAL_DIM_Y,
-                                  BLOCK_RESOLUTION / LOCAL_DIM_Z);
+                glDispatchCompute(BLOCK_PADDED_RESOLUTION / LOCAL_DIM_X,
+                                  BLOCK_PADDED_RESOLUTION / LOCAL_DIM_Y,
+                                  BLOCK_PADDED_RESOLUTION / LOCAL_DIM_Z);
 
                 // Block until kernel/shader finishes execution.
                 glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
