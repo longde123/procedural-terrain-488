@@ -33,7 +33,6 @@ TerrainGenerator::TerrainGenerator()
 
 void TerrainGenerator::init(string dir)
 {
-
     density_shader.generateProgramObject();
     density_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
     density_shader.link();

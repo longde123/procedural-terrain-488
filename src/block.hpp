@@ -9,10 +9,12 @@
 class Block {
 public:
     Block(glm::ivec3 index, int size, bool alpha_blend = true);
+    virtual ~Block();
 
-    void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
+    virtual void init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib);
 
     void update(float time_elapsed);
+    virtual void draw();
 
     // Don't name this function "reset", the compiler won't catch the mistake // if the block is stored in a shared_ptr and we accidently do .reset
     // instead of ->reset.
@@ -32,6 +34,10 @@ public:
 
     // Careful, these cannot be reused for multiple buffers!
     GLuint feedback_object;
+
+protected:
+    size_t vertex_unit_size;
+    size_t vertex_data_size;
 
 private:
     bool generated;

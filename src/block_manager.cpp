@@ -288,7 +288,7 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
     if (use_water) {
         glUniform1i(terrain_renderer.water_clip_uni, true);
         glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+        block.draw();
 
         mat4 W_reflect = glm::translate(vec3(0, water_height, 0)) *
                          glm::scale(vec3(1.0f, -1.0f, 1.0f)) *
@@ -304,7 +304,7 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
         glUniform1i(terrain_renderer.water_clip_uni, false);
         glUniform1i(terrain_renderer.water_reflection_clip_uni, true);
         glUniformMatrix4fv( terrain_renderer.M_uni, 1, GL_FALSE, value_ptr(W_reflect));
-        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+        block.draw();
 
         if (use_stencil && block_display_type != All) {
             glDisable(GL_STENCIL_TEST);
@@ -312,7 +312,7 @@ void BlockManager::renderBlock(mat4 P, mat4 V, mat4 W, Block& block, float fadeA
     } else {
         glUniform1i(terrain_renderer.water_clip_uni, false);
         glUniform1i(terrain_renderer.water_reflection_clip_uni, false);
-        glDrawTransformFeedback(GL_TRIANGLES, block.feedback_object);
+        block.draw();
     }
 
     glBindVertexArray(0);
