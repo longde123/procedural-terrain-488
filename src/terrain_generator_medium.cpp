@@ -157,9 +157,8 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
 
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, block.feedback_object);
 
-        // Needed?
-        //glBindBuffer(GL_ARRAY_BUFFER, block.out_vbo);
-        //glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, block.out_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, block.out_vbo);
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, block.out_vbo);
 
         glBeginTransformFeedback(GL_TRIANGLES);
         {
