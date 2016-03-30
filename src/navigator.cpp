@@ -78,7 +78,7 @@ void Navigator::init()
 	// since it depends on the GLFW window being set up correctly).
     makeView();
 
-    background_music = unique_ptr<Sound>(new Sound("Assets/fieldofwind.wav"));
+    background_music = unique_ptr<Sound>(new Sound("Audio/Jungle_Village.wav"));
 }
 
 void Navigator::resetView()
