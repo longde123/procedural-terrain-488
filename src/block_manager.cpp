@@ -24,7 +24,7 @@ BlockManager::BlockManager()
     debug_flag = false;
     show_ambient = false;
     use_water = true;
-    use_stencil = false;
+    use_stencil = true;
     water_height = -0.3f;
     small_blocks = true;
     medium_blocks = true;
@@ -327,7 +327,7 @@ void BlockManager::processBlockOfSize(mat4 P, mat4 V, mat4 W,
     ivec4 index = vec4(position, size);
     if (blocks.count(index) > 0 && blocks[index]->isReady()) {
         // Don't draw blocks under water.
-        if (!use_water || (W * vec4(position, 1.0)).y + 1.0 >= water_height) {
+        if (!use_water || (W * vec4(position, 1.0)).y + size >= water_height) {
             renderBlock(P, V, W, *blocks[index], alpha);
         }
 
