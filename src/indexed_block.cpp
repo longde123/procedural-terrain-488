@@ -30,8 +30,6 @@ void IndexedBlock::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occ
     size_t index_data_size = BLOCK_SIZE * BLOCK_SIZE *
                              BLOCK_SIZE * index_unit_size * 15;
 
-    glBindVertexArray(out_vao);
-
     glGenBuffers(1, &index_buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     {
@@ -39,8 +37,6 @@ void IndexedBlock::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occ
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data_size, nullptr, GL_STATIC_COPY);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(0);
 
     glGenTransformFeedbacks(1, &index_feedback);
     {
@@ -56,6 +52,8 @@ void IndexedBlock::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occ
 
 void IndexedBlock::draw()
 {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+
     // Should double check the sign/unsigned thing...
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 }

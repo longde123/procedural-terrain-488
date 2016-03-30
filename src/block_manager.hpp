@@ -9,6 +9,7 @@
 
 #include "terrain_generator_slow.hpp"
 #include "terrain_generator_medium.hpp"
+#include "terrain_generator_fast.hpp"
 #include "terrain_renderer.hpp"
 
 #include "vec_hash.hpp"
@@ -87,6 +88,7 @@ private:
     Water water;
     TerrainGeneratorSlow terrain_generator_slow;
     TerrainGeneratorMedium terrain_generator_medium;
+    TerrainGeneratorFast terrain_generator_fast;
 
     std::queue<std::shared_ptr<Block>> free_blocks;
 };

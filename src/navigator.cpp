@@ -262,8 +262,15 @@ void Navigator::guiLogic()
             ImGui::Checkbox("Generate Blocks", &generate_blocks);
             ImGui::SliderInt("Blocks per Frame", &block_manager.blocks_per_frame, 1, 8);
 
-            if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {}
-            if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
+            if (ImGui::RadioButton("Slow Generator", (int*)&block_manager.generator_selection, 0)) {
+                block_manager.regenerateAllBlocks();
+            }
+            if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {
+                block_manager.regenerateAllBlocks();
+            }
+            if (ImGui::RadioButton("Fast Generator (do not use)", (int*)&block_manager.generator_selection, 2)) {
+                block_manager.regenerateAllBlocks();
+            }
         }
 
         if (ImGui::CollapsingHeader("Debug Options", "", true, true)) {

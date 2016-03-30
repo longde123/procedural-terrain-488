@@ -58,6 +58,7 @@ void BlockManager::init(string dir)
     terrain_renderer.init(dir);
     terrain_generator_slow.init(dir);
     terrain_generator_medium.init(dir);
+    terrain_generator_fast.init(dir);
     water.init(dir);
 }
 
@@ -196,6 +197,9 @@ void BlockManager::update(float time_elapsed, mat4 P, mat4 V, mat4 W, vec3 eye_p
             break;
         case Medium:
             terrain_generator = &terrain_generator_medium;
+            break;
+        case Fast:
+            terrain_generator = &terrain_generator_fast;
             break;
     }
 
