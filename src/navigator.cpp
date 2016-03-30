@@ -171,9 +171,9 @@ void Navigator::guiLogic()
 	float opacity(0.5f);
 
     // Without this, menu won't be visible.
-    windowFlags |= ImGuiWindowFlags_MenuBar;
+    // windowFlags |= ImGuiWindowFlags_MenuBar;
 
-	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100,300), opacity, windowFlags)) {
+	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100, 100), opacity, windowFlags)) {
 
         ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
@@ -184,12 +184,18 @@ void Navigator::guiLogic()
         }
         if (ImGui::RadioButton("Eight Blocks", (int*)&block_manager.block_display_type, 1)) {
             block_manager.regenerateAllBlocks();
+            resetView();
+            makeView();
+            first_person_mode = false;
         }
         if (ImGui::RadioButton("All", (int*)&block_manager.block_display_type, 2)) {
             block_manager.regenerateAllBlocks();
+            resetView();
+            makeView();
+            first_person_mode = false;
         }
 
-        if (ImGui::CollapsingHeader("Navigation Options")) {
+        if (ImGui::CollapsingHeader("Navigation Options", "", true, true)) {
             if (ImGui::Checkbox("First Person Mode", &first_person_mode)) {
                 resetView();
                 makeView();
@@ -200,7 +206,7 @@ void Navigator::guiLogic()
             }
         }
 
-        if (ImGui::CollapsingHeader("Light Options")) {
+        if (ImGui::CollapsingHeader("Light Options", "", true, true)) {
             ImGui::Checkbox("Ambient Occlusion", &block_manager.use_ambient);
             ImGui::Checkbox("Normal Maps", &block_manager.use_normal_map);
             ImGui::SliderFloat("Light X", &block_manager.light_x, 0.0f, 70.0f);
@@ -235,7 +241,7 @@ void Navigator::guiLogic()
             ImGui::ColorEdit3("Specular", (float*)&block_manager.light_specular);
         }
 
-        if (ImGui::CollapsingHeader("Block Generation Options")) {
+        if (ImGui::CollapsingHeader("Block Generation Options", "", true, true)) {
             // Need to regenerate all blocks since these parameters change the whole terrain.
             if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
                 block_manager.regenerateAllBlocks(false);
@@ -260,7 +266,7 @@ void Navigator::guiLogic()
             if (ImGui::RadioButton("Medium Generator", (int*)&block_manager.generator_selection, 1)) {}
         }
 
-        if (ImGui::CollapsingHeader("Debug Options")) {
+        if (ImGui::CollapsingHeader("Debug Options", "", true, true)) {
             ImGui::Checkbox("Show Level of Detail", &show_lod);
             ImGui::Checkbox("Show Slicer", &show_slicer);
             ImGui::Checkbox("Show Terrain", &show_terrain);
