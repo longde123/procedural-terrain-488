@@ -11,6 +11,7 @@ public:
 
     void init();
     void rebind();
+    void reload(std::string newpath);
 
     GLuint texture;
 private:

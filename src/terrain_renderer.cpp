@@ -73,3 +73,48 @@ void TerrainRenderer::prepareRender()
     y_normal_map.rebind();
     z_normal_map.rebind();
 }
+
+void TerrainRenderer::changeTopTexture(const char* name)
+{
+    string path = "Textures/";
+    path += name;
+    path += ".JPG";
+
+    y_texture.reload(path);
+
+    string normal_path = "Textures/Textures_N/";
+    normal_path += name;
+    normal_path += "_N.jpg";
+
+    y_normal_map.reload(normal_path);
+}
+
+void TerrainRenderer::changeFrontTexture(const char* name)
+{
+    string path = "Textures/";
+    path += name;
+    path += ".JPG";
+
+    z_texture.reload(path);
+
+    string normal_path = "Textures/Textures_N/";
+    normal_path += name;
+    normal_path += "_N.jpg";
+
+    z_normal_map.reload(normal_path);
+}
+
+void TerrainRenderer::changeSideTexture(const char* name)
+{
+    string path = "Textures/";
+    path += name;
+    path += ".JPG";
+
+    x_texture.reload(path);
+
+    string normal_path = "Textures/Textures_N/";
+    normal_path += name;
+    normal_path += "_N.jpg";
+
+    x_normal_map.reload(normal_path);
+}

@@ -12,6 +12,9 @@
 
 #include "timer.hpp"
 
+// From ImGui demo
+#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+
 using namespace glm;
 using namespace std;
 
@@ -33,6 +36,10 @@ Navigator::Navigator()
     show_slicer = false;
     show_terrain = true;
     generate_blocks = true;
+
+    selected_texture_top = -1;
+    selected_texture_front = -1;
+    selected_texture_side = -1;
 }
 
 //----------------------------------------------------------------------------------------
@@ -178,6 +185,44 @@ void Navigator::guiLogic()
         ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
         ImGui::Checkbox("Use Stencil", &block_manager.use_stencil);
+
+        const char* items[] = {
+            "Ancient Flooring",
+            "Boards",
+            "CherryBark",
+            "Chimeny",
+            "CliffRock",
+            "CliffRock2",
+            "Dirt",
+            "Grass",
+            "Grass2",
+            "GrassDry",
+            "GrassPurpleFlowers",
+            "GrassSparse",
+            "Gravel",
+            "GroundCover",
+            "Hay",
+            "LeafyGround",
+            "Mud",
+            "OakBark",
+            "PackedDirt",
+            "PineBarkYoung",
+            "PineNeedles",
+            "Roof1",
+            "Siding1",
+            "Siding2",
+            "Stone1",
+        };
+
+        if (ImGui::Combo("Top texture", &selected_texture_top, items, IM_ARRAYSIZE(items))) {
+            block_manager.terrain_renderer.changeTopTexture(items[selected_texture_top]);
+        }
+        if (ImGui::Combo("Front texture", &selected_texture_front, items, IM_ARRAYSIZE(items))) {
+            block_manager.terrain_renderer.changeFrontTexture(items[selected_texture_front]);
+        }
+        if (ImGui::Combo("Side texture", &selected_texture_side, items, IM_ARRAYSIZE(items))) {
+            block_manager.terrain_renderer.changeSideTexture(items[selected_texture_side]);
+        }
 
         if (ImGui::RadioButton("One Block", (int*)&block_manager.block_display_type, 0)) {
             block_manager.regenerateAllBlocks();

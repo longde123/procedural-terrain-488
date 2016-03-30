@@ -51,6 +51,19 @@ void Texture::init()
 	CHECK_GL_ERRORS;
 }
 
+void Texture::reload(string new_path)
+{
+    path = new_path;
+
+    init();
+    ifstream file(path);
+    if (!file) {
+        stringstream errorMessage;
+        errorMessage << "Texture file not found: " << path;
+        throw errorMessage.str();
+    }
+}
+
 void Texture::rebind()
 {
     assert(width > 0 && height > 0);

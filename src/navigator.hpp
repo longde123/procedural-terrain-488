@@ -79,4 +79,7 @@ private:
 
     // Misc
     std::unique_ptr<Sound> background_music;
+    int selected_texture_top;
+    int selected_texture_front;
+    int selected_texture_side;
 };

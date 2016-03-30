@@ -12,6 +12,10 @@ public:
     void init(std::string dir);
     void prepareRender();
 
+    void changeTopTexture(const char* name);
+    void changeFrontTexture(const char* name);
+    void changeSideTexture(const char* name);
+
     ShaderProgram renderer_shader;
 
 	GLint P_uni;    // Uniform location for Projection matrix.
