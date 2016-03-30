@@ -7,6 +7,7 @@ uniform ivec4 block_index;
 uniform int octaves;
 uniform float octaves_decay;
 uniform float period;
+uniform vec2 warp_params;
 
 // One work group = 1 slice
 // Note that 32x32 = 1024 which is the typical maximum work group size/block

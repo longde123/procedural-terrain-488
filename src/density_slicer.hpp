@@ -13,7 +13,8 @@ public:
 
     void init(std::string dir);
     void draw(glm::mat4 P, glm::mat4 V, glm::mat4 M, float size,
-              float period, int octaves, float octaves_decay);
+              float period, int octaves, float octaves_decay,
+              float warp_frequency, float warp_strength);
 
 	GLint P_uni;    // Uniform location for Projection matrix.
 	GLint V_uni;    // Uniform location for View matrix.
@@ -30,4 +31,5 @@ private:
     GLint period_uni;
     GLint octaves_uni;
     GLint octaves_decay_uni;
+    GLint warp_params_uni;
 };

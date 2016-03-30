@@ -20,6 +20,8 @@ public:
 
     int octaves;
     float octaves_decay;
+    float warp_frequency;
+    float warp_strength;
     float period;
     bool use_short_range_ambient_occlusion;
     bool use_long_range_ambient_occlusion;
@@ -36,5 +38,6 @@ private:
     GLint period_uni;
     GLint octaves_uni;
     GLint octaves_decay_uni;
+    GLint warp_params_uni;
     GLint block_index_uni;
 };

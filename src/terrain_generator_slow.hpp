@@ -18,6 +18,7 @@ private:
     GLint period_uni_marching;
     GLint octaves_uni_marching;
     GLint octaves_decay_uni_marching;
+    GLint warp_params_uni_marching;
     GLint short_range_ambient_uni;
     GLint long_range_ambient_uni;
 

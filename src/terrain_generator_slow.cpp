@@ -31,6 +31,7 @@ void TerrainGeneratorSlow::init(string dir)
 	period_uni_marching = marching_cubes_shader.getUniformLocation("period");
 	octaves_uni_marching = marching_cubes_shader.getUniformLocation("octaves");
 	octaves_decay_uni_marching = marching_cubes_shader.getUniformLocation("octaves_decay");
+	warp_params_uni_marching = marching_cubes_shader.getUniformLocation("warp_params");
 	short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
 

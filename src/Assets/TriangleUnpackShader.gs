@@ -10,6 +10,7 @@ uniform bool long_range_ambient;
 uniform float period;
 uniform int octaves;
 uniform float octaves_decay;
+uniform vec2 warp_params;
 
 out vec3 position;
 out vec3 normal;

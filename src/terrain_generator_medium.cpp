@@ -41,6 +41,7 @@ void TerrainGeneratorMedium::init(string dir)
 	period_uni_marching = triangle_unpack_shader.getUniformLocation("period");
 	octaves_uni_marching = triangle_unpack_shader.getUniformLocation("octaves");
 	octaves_decay_uni_marching = triangle_unpack_shader.getUniformLocation("octaves_decay");
+	warp_params_uni_marching = triangle_unpack_shader.getUniformLocation("warp_params");
 	short_range_ambient_uni = triangle_unpack_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = triangle_unpack_shader.getUniformLocation("long_range_ambient");
 

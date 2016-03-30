@@ -207,16 +207,20 @@ void Navigator::guiLogic()
         }
 
         if (ImGui::CollapsingHeader("Block Generation Options")) {
+            // Need to all blocks since these parameters change the whole terrain.
             if (ImGui::SliderFloat("Period", &block_manager.terrain_generator->period, 10.0f, 100.0f)) {
-                // Need to regenerate terrain.
                 block_manager.regenerateAllBlocks(false);
             }
             if (ImGui::SliderInt("Octaves", &block_manager.terrain_generator->octaves, 1, 10)) {
-                // Need to regenerate terrain.
                 block_manager.regenerateAllBlocks(false);
             }
             if (ImGui::SliderFloat("Octaves Decay", &block_manager.terrain_generator->octaves_decay, 1.0f, 4.0f)) {
-                // Need to regenerate terrain.
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Warp Frequency", &block_manager.terrain_generator->warp_frequency, 0.01f, 0.5f)) {
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Warp Strength", &block_manager.terrain_generator->warp_strength, 0.5f, 30.0f)) {
                 block_manager.regenerateAllBlocks(false);
             }
 
@@ -287,7 +291,9 @@ void Navigator::draw()
         density_slicer.draw(proj, view, W, 2.0f,
                             block_manager.terrain_generator->period,
                             block_manager.terrain_generator->octaves,
-                            block_manager.terrain_generator->octaves_decay);
+                            block_manager.terrain_generator->octaves_decay,
+                            block_manager.terrain_generator->warp_frequency,
+                            block_manager.terrain_generator->warp_strength);
     }
 
     if (show_terrain) {

@@ -73,15 +73,19 @@ float terrainDensity(vec3 coords, float block_size, float period, int octaves, f
 
     // Air is negative, ground is positive.
     // Generate a gradient from [max to min]
-    float min = -1.0;
+    float min = -1.2;
     float max = 0.5;
     float height_gradient = max - (max - min) * (coords.y / max_blocks_y) / block_size;
 
     float noise = 0.0;
     float frequency = 1.0 / period;
 
+    vec3 warped_coords = coords;
+    warped_coords += perlinNoise(coords, warp_params.x) * warp_params.y;
+    warped_coords += perlinNoise(coords, warp_params.x * 1.9) * (warp_params.y / 2);
+
     for (int i = 1; i <= octaves; i++) {
-        noise += perlinNoise(coords, frequency) / pow(i, octaves_decay);
+        noise += perlinNoise(warped_coords, frequency) / pow(i, octaves_decay);
         frequency *= 1.95;
     }
 

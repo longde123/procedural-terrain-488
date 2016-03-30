@@ -16,9 +16,11 @@ using namespace std;
 #define LOCAL_DIM_Z 1
 
 TerrainGenerator::TerrainGenerator()
-: period(50.0f)
-, octaves(4)
-, octaves_decay(2.0f)
+: period(60.0f)
+, octaves(8)
+, octaves_decay(2.35f)
+, warp_frequency(0.04f)
+, warp_strength(7.0f)
 , use_short_range_ambient_occlusion(true)
 , use_long_range_ambient_occlusion(false)
 {
@@ -37,6 +39,7 @@ void TerrainGenerator::init(string dir)
 	period_uni = density_shader.getUniformLocation("period");
 	octaves_uni = density_shader.getUniformLocation("octaves");
 	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
+	warp_params_uni = density_shader.getUniformLocation("warp_params");
 	block_index_uni = density_shader.getUniformLocation("block_index");
 
     // Generate texture object in which to store the terrain block.
@@ -81,6 +84,7 @@ void TerrainGenerator::generateDensity(Block& block)
     {
         glUniform1i(octaves_uni, octaves);
         glUniform1f(octaves_decay_uni, octaves_decay);
+        glUniform2f(warp_params_uni, warp_frequency, warp_strength);
         glUniform1f(period_uni, period);
         glUniform4i(block_index_uni,
                     block.index.x, block.index.y,
