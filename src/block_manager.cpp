@@ -451,19 +451,17 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         // Draw the cubes
         // Highlight the active square.
     terrain_renderer.renderer_shader.disable();
-
-    water.start();
-
     if (use_water) {
+        water.start();
+
         for (auto& kv : needed_water_squares) {
             vec3 position = vec3(kv.first.x, 0.0, kv.first.y);
             float alpha = kv.second;
             mat4 block_transform = translate(position) * W;
             water.draw(P, V, glm::translate(vec3(0, water_height + 0.5f, 0)) * block_transform, eye_position, alpha);
         }
+
+        water.end();
     }
-
-    water.end();
-
     CHECK_GL_ERRORS;
 }
