@@ -8,6 +8,7 @@
 
 #include "cs488-framework/GlErrorCheck.hpp"
 
+#include "indexed_block.hpp"
 #include "timer.hpp"
 
 using namespace glm;
@@ -69,7 +70,12 @@ void BlockManager::profileBlockGeneration()
     Timer timer;
     timer.start();
 
-    auto block = shared_ptr<Block>(new Block(ivec3(0), 1));
+    shared_ptr<Block> block;
+    if (generator_selection == Fast) {
+       block = shared_ptr<IndexedBlock>(new IndexedBlock(ivec3(0), 1));
+    } else {
+       block = shared_ptr<Block>(new Block(ivec3(0), 1));
+    }
     block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
                 terrain_renderer.ambient_occlusion_attrib);
 
@@ -257,7 +263,11 @@ shared_ptr<Block> BlockManager::newBlock(ivec3 index, int size)
 {
     shared_ptr<Block> block;
     if (free_blocks.empty()) {
-        block = shared_ptr<Block>(new Block(index, size));
+        if (generator_selection == Fast) {
+            block = shared_ptr<IndexedBlock>(new IndexedBlock(index, size));
+        } else {
+            block = shared_ptr<Block>(new Block(index, size));
+        }
         block->init(terrain_renderer.pos_attrib, terrain_renderer.normal_attrib,
                     terrain_renderer.ambient_occlusion_attrib);
     } else {
