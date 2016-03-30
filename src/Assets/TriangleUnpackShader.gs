@@ -45,7 +45,6 @@ void main() {
     ivec3 coords = ivec3((packed_triangle >> 12) & 0x3F,
                          (packed_triangle >> 18) & 0x3F,
                          (packed_triangle >> 24) & 0x3F);
-    uint is_poly = packed_triangle & 0x1;
 
     // Want to place the vertex where the density is approximately zero.
     // note that one side of the edge should always have a positive value
