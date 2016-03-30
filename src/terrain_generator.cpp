@@ -23,7 +23,8 @@ TerrainGenerator::TerrainGenerator()
 , warp_frequency(0.04f)
 , warp_strength(7.0f)
 , use_short_range_ambient_occlusion(true)
-, use_long_range_ambient_occlusion(false)
+, use_long_range_ambient_occlusion(true)
+, ambient_occlusion_param(vec4(0.3f, 0.2f, 1.0f, 9.0f))
 {
     assert(BLOCK_PADDED_RESOLUTION % LOCAL_DIM_X == 0);
     assert(BLOCK_PADDED_RESOLUTION % LOCAL_DIM_Y == 0);

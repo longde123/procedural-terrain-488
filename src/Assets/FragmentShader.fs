@@ -18,6 +18,7 @@ layout(binding = 5) uniform sampler2D y_normal_map;
 layout(binding = 6) uniform sampler2D z_normal_map;
 
 uniform bool triplanar_colors;
+uniform bool show_ambient_occlusion;
 uniform bool use_ambient;
 uniform bool use_normal_map;
 uniform bool debug_flag;
@@ -153,6 +154,11 @@ void main() {
                            color_y * blend_weights.y +
                            color_z * blend_weights.z);
         vec3 occluded = mix(base_color * ambient_occlusion, vec3(0.5, 0.5, 0.5), fog_falloff);
-        fragColor = vec4(occluded, alpha);
+
+        if (show_ambient_occlusion) {
+            fragColor = vec4(occluded * 0.0001 + vec3(ambient_occlusion), alpha);
+        } else {
+            fragColor = vec4(occluded, alpha);
+        }
     }
 }

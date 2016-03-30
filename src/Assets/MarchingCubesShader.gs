@@ -3,6 +3,8 @@
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
 
+uniform ivec4 block_index;
+
 uniform bool short_range_ambient;
 uniform bool long_range_ambient;
 
@@ -21,7 +23,11 @@ out float ambient_occlusion;
 
 void createVertex(vec3 vertex)
 {
-    ambient_occlusion = ambientOcclusion(vertex, short_range_ambient, long_range_ambient);
+    ambient_occlusion = ambientOcclusion(
+        vertex,
+        vertex * block_index.w + block_index.xyz * block_size,
+        block_index.w,
+        short_range_ambient, long_range_ambient);
 
     // Map vertices to range [0, 1]
     position = vertex / block_size;

@@ -19,6 +19,7 @@ private:
 
     GLuint voxel_edges_feedback;
 
+    GLint block_index_uni;
     GLint block_size_uni_1;
     GLint block_size_uni_2;
     GLint block_padding_uni_1;
@@ -29,6 +30,7 @@ private:
     GLint warp_params_uni_marching;
     GLint short_range_ambient_uni;
     GLint long_range_ambient_uni;
+    GLint ambient_occlusion_param_uni;
 
     GLint packed_attrib;
 

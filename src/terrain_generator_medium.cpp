@@ -38,6 +38,7 @@ void TerrainGeneratorMedium::init(string dir)
 	triangle_unpack_shader.attachGeometryShader((dir + "TriangleUnpackShader.gs").c_str());
 	triangle_unpack_shader.link();
 
+    block_index_uni = triangle_unpack_shader.getUniformLocation("block_index");
     block_size_uni_2 = triangle_unpack_shader.getUniformLocation("block_size");
 	block_padding_uni_2 = triangle_unpack_shader.getUniformLocation("block_padding");
 	period_uni_marching = triangle_unpack_shader.getUniformLocation("period");
@@ -46,6 +47,7 @@ void TerrainGeneratorMedium::init(string dir)
 	warp_params_uni_marching = triangle_unpack_shader.getUniformLocation("warp_params");
 	short_range_ambient_uni = triangle_unpack_shader.getUniformLocation("short_range_ambient");
 	long_range_ambient_uni = triangle_unpack_shader.getUniformLocation("long_range_ambient");
+	ambient_occlusion_param_uni = triangle_unpack_shader.getUniformLocation("ambient_occlusion_param");
 
     packed_attrib = triangle_unpack_shader.getAttribLocation("z6_y6_x6_edge1_edge2_edge3_in");
 
@@ -159,10 +161,14 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
         glUniform1f(period_uni_marching, period);
         glUniform1i(octaves_uni_marching, octaves);
         glUniform1f(octaves_decay_uni_marching, octaves_decay);
+        glUniform4i(block_index_uni, block.index.x, block.index.y, block.index.z, block.size);
         glUniform1i(block_size_uni_2, BLOCK_SIZE);
         glUniform1i(block_padding_uni_2, BLOCK_PADDING);
         glUniform1f(short_range_ambient_uni, use_short_range_ambient_occlusion);
         glUniform1f(long_range_ambient_uni, use_long_range_ambient_occlusion);
+        glUniform4f(ambient_occlusion_param_uni,
+                    ambient_occlusion_param.x, ambient_occlusion_param.y,
+                    ambient_occlusion_param.z, ambient_occlusion_param.w);
 
         glBindVertexArray(packed_triangles_vao);
 

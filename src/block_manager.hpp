@@ -45,6 +45,7 @@ public:
     ivec4_map<std::shared_ptr<Block>> blocks;
 
     bool triplanar_colors;
+    bool show_ambient;
     bool use_ambient;
     bool use_normal_map;
     bool debug_flag;

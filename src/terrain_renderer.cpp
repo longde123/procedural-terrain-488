@@ -34,6 +34,7 @@ void TerrainRenderer::init(string dir)
     clip_height_uni = renderer_shader.getUniformLocation("clip_height");
 
     triplanar_colors_uni = renderer_shader.getUniformLocation("triplanar_colors");
+    show_ambient_uni = renderer_shader.getUniformLocation("show_ambient_occlusion");
     use_ambient_uni = renderer_shader.getUniformLocation("use_ambient");
     use_normal_map_uni = renderer_shader.getUniformLocation("use_normal_map");
     debug_flag_uni = renderer_shader.getUniformLocation("debug_flag");

@@ -28,9 +28,9 @@ void main() {
     float transition_width = 0.02;
 
     if (density >= 0.0 && density < transition_width) {
-        fragColor = vec4(vec3(1 - density / transition_width, 0, max(density, 0)), 0.8);
+        fragColor = vec4(1 - density / transition_width, 0, max(density, 0), 0.8);
     } else if (density < 0.0 && density > -transition_width) {
-        fragColor = vec4(vec3(1 + density / transition_width, 0, max(-density, 0)), 0.8);
+        fragColor = vec4(1 + density / transition_width, 0, max(-density, 0), 0.8);
     } else {
         fragColor = vec4(vec3(0, 0, max(density, 0)) + vec3(max(-density, 0)), 0.8);
     }

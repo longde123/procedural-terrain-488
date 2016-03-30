@@ -25,6 +25,7 @@ public:
     float period;
     bool use_short_range_ambient_occlusion;
     bool use_long_range_ambient_occlusion;
+    glm::vec4 ambient_occlusion_param;
 
 protected:
     void generateDensity(Block& block);

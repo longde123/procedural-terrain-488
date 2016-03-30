@@ -22,6 +22,7 @@ BlockManager::BlockManager()
     use_ambient = true;
     use_normal_map = true;
     debug_flag = false;
+    show_ambient = false;
     use_water = true;
     use_stencil = false;
     water_height = -0.3f;
@@ -388,12 +389,14 @@ void BlockManager::renderBlocks(mat4 P, mat4 V, mat4 W, vec3 eye_position)
         // the water plane anyway.
         renderStencil(P, V, W);
     }
+    glClear(GL_STENCIL_BUFFER_BIT);     // Clear stencil buffer (0 by default)
 
     terrain_renderer.renderer_shader.enable();
         glUniformMatrix4fv(terrain_renderer.P_uni, 1, GL_FALSE, value_ptr(P));
         glUniformMatrix4fv(terrain_renderer.V_uni, 1, GL_FALSE, value_ptr(V));
 
         glUniform1i(terrain_renderer.triplanar_colors_uni, triplanar_colors);
+        glUniform1i(terrain_renderer.show_ambient_uni, show_ambient);
         glUniform1i(terrain_renderer.use_ambient_uni, use_ambient);
         glUniform1i(terrain_renderer.use_normal_map_uni, use_normal_map);
         glUniform1i(terrain_renderer.debug_flag_uni, debug_flag);

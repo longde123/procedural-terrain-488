@@ -24,6 +24,7 @@ public:
     GLint clip_height_uni;
 
     GLint triplanar_colors_uni;
+    GLint show_ambient_uni;
     GLint use_ambient_uni;
     GLint use_normal_map_uni;
     GLint debug_flag_uni;

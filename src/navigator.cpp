@@ -197,11 +197,27 @@ void Navigator::guiLogic()
 
             if (ImGui::Checkbox("Short Range Ambient Occlusion",
                         &block_manager.terrain_generator->use_short_range_ambient_occlusion)) {
-                block_manager.regenerateAllBlocks();
+                block_manager.regenerateAllBlocks(false);
             }
             if (ImGui::Checkbox("Long Range Ambient Occlusion",
                         &block_manager.terrain_generator->use_long_range_ambient_occlusion)) {
-                block_manager.regenerateAllBlocks();
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Ambient Occlusion Param 1",
+                    &block_manager.terrain_generator->ambient_occlusion_param.x, 0.0f, 1.0f)) {
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Ambient Occlusion Param 2",
+                    &block_manager.terrain_generator->ambient_occlusion_param.y, 0.0f, 15.0f)) {
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Ambient Occlusion Param 3",
+                    &block_manager.terrain_generator->ambient_occlusion_param.z, 0.0f, 1.0f)) {
+                block_manager.regenerateAllBlocks(false);
+            }
+            if (ImGui::SliderFloat("Ambient Occlusion Param 4",
+                    &block_manager.terrain_generator->ambient_occlusion_param.w, 0.0f, 15.0f)) {
+                block_manager.regenerateAllBlocks(false);
             }
 
             ImGui::ColorEdit3("Ambient", (float*)&block_manager.light_ambient);
@@ -244,6 +260,7 @@ void Navigator::guiLogic()
             ImGui::Checkbox("Large Blocks", &block_manager.large_blocks);
             ImGui::Checkbox("Wireframe", &wireframe);
             ImGui::Checkbox("Triplanar Colors", &block_manager.triplanar_colors);
+            ImGui::Checkbox("Show Ambient Occlusion", &block_manager.show_ambient);
         }
 
 
