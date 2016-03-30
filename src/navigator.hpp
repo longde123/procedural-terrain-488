@@ -9,6 +9,8 @@
 #include "cs488-framework/OpenGLImport.hpp"
 #include "cs488-framework/ShaderProgram.hpp"
 
+#include "sound.hpp"
+
 #include "block_manager.hpp"
 #include "density_slicer.hpp"
 #include "lod_visualizer.hpp"
@@ -73,4 +75,7 @@ private:
     bool mouse_down_with_control;
     double previous_mouse_x;
     double previous_mouse_y;
+
+    // Misc
+    std::unique_ptr<Sound> background_music;
 };

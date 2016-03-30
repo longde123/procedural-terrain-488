@@ -23,12 +23,16 @@ if not os.isfile("lib/libglfw3.a") then
     os.execute("cp shared/glfw-3.1.1/build/src/libglfw3.a lib/")
 end
 
+if not os.isfile("lib/libopenal.a") then
+    os.chdir("shared/openal-soft/build")
+    os.execute("cmake ..")
+    os.execute("make")
+    os.chdir("../../..")
+    os.execute("cp shared/openal-soft/build/libopenal.a lib/")
+end
+
 if not os.isfile("lib/libSOIL.a") then
     os.chdir("shared/soil/projects/makefile")
-    os.execute("mkdir -p obj")
-    os.execute("make")
-    os.chdir("../../../..")
-    os.execute("cp shared/soil/lib/libSOIL.a lib/")
 end
 
 --[[

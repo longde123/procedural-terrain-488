@@ -73,6 +73,8 @@ void Navigator::init()
 	// Set up initial view and projection matrices (need to do this here,
 	// since it depends on the GLFW window being set up correctly).
     makeView();
+
+    background_music = unique_ptr<Sound>(new Sound("Assets/fieldofwind.wav"));
 }
 
 void Navigator::resetView()

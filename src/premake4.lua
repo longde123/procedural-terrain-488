@@ -37,7 +37,9 @@ if os.get() == "linux" then
         "stdc++",
         "dl",
         "pthread",
-        "SOIL"
+        "SOIL",
+        "openal",
+        "audio"
     }
 end
 
