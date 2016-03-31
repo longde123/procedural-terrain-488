@@ -1,17 +1,25 @@
 # Generating Volumetric Terrain Procedurally Using the GPU
 
+![GitHub Logo](screenshot1.png)
+
+![GitHub Logo](screenshot2.png)
+
+![GitHub Logo](screenshot3.png)
+
 Based on Ryan's Geiss chapter in GPU Gems 3: http://http.developer.nvidia.com/GPUGems3/gpugems3_ch01.html
 
 Use to scroll around. If you toggle first-person mode, use the WASD keys to move forward/backwards left/right and Q/E to move up/down.
 
 ## Build
 
+```
 $ cd procedural-terrain-488
 procedural-terrain-488$ premake4 gmake
 procedural-terrain-488$ make
 procedural-terrain-488$ cd src
 procedural-terrain-488/src$ premake4 gmake
 procedural-terrain-488/src$ make
+```
 
 Tested to work on gl30.student.cs.uwaterloo.ca and any machine that has a GTX 980.
 
