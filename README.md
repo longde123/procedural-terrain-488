@@ -1,10 +1,10 @@
 # Generating Volumetric Terrain Procedurally Using the GPU
 
-![GitHub Logo](screenshot1.png)
+![GitHub Logo](screenshot1.jpg)
 
-![GitHub Logo](screenshot2.png)
+![GitHub Logo](screenshot2.jpg)
 
-![GitHub Logo](screenshot3.png)
+![GitHub Logo](screenshot3.jpg)
 
 Based on Ryan's Geiss chapter in GPU Gems 3: http://http.developer.nvidia.com/GPUGems3/gpugems3_ch01.html
 
