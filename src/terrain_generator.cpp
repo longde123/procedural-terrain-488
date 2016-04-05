@@ -37,12 +37,12 @@ void TerrainGenerator::init(string dir)
     density_shader.attachComputeShader((dir + "TerrainDensityShader.cs").c_str());
     density_shader.link();
 
-	block_padding_uni = density_shader.getUniformLocation("block_padding");
-	period_uni = density_shader.getUniformLocation("period");
-	octaves_uni = density_shader.getUniformLocation("octaves");
-	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
-	warp_params_uni = density_shader.getUniformLocation("warp_params");
-	block_index_uni = density_shader.getUniformLocation("block_index");
+    block_padding_uni = density_shader.getUniformLocation("block_padding");
+    period_uni = density_shader.getUniformLocation("period");
+    octaves_uni = density_shader.getUniformLocation("octaves");
+    octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
+    warp_params_uni = density_shader.getUniformLocation("warp_params");
+    block_index_uni = density_shader.getUniformLocation("block_index");
 
     // Generate texture object in which to store the terrain block.
     glGenTextures(1, &block_texture);
@@ -76,7 +76,7 @@ void TerrainGenerator::init(string dir)
                        GL_READ_WRITE,   // access
                        GL_R32F);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void TerrainGenerator::generateDensity(Block& block)
@@ -132,5 +132,5 @@ void TerrainGenerator::generateDensity(Block& block)
     }
     density_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }

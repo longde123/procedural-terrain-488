@@ -35,15 +35,6 @@ if not os.isfile("lib/libSOIL.a") then
     os.chdir("shared/soil/projects/makefile")
 end
 
---[[
-if not os.isfile("lib/libjpeg.a") then
-    os.chdir("shared/jpeg-9b")
-    os.execute("./configure --disable-shared")
-    os.execute("make")
-    os.execute("cp shared/jpeg-9b/.libs/libjpeg.a lib/")
-end
-]]--
-
 solution "BuildStaticLibs"
     configurations { "Debug", "Release" }
 

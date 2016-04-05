@@ -18,10 +18,10 @@ public:
 
     ShaderProgram renderer_shader;
 
-	GLint P_uni;    // Uniform location for Projection matrix.
-	GLint V_uni;    // Uniform location for View matrix.
-	GLint M_uni;    // Uniform location for Model matrix.
-	GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
+    GLint P_uni;    // Uniform location for Projection matrix.
+    GLint V_uni;    // Uniform location for View matrix.
+    GLint M_uni;    // Uniform location for Model matrix.
+    GLint NormalMatrix_uni;     // Uniform location for Normal matrix.
 
     GLint water_clip_uni;
     GLint water_reflection_clip_uni;

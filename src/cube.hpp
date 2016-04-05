@@ -5,7 +5,7 @@
 class Cube : public IndexedGeometry
 {
 public:
-	Cube(float size);
+    Cube(float size);
 
     // Initialize a cube with corners (0, 0, 0) and (size, size, size)
     void init(ShaderProgram& shaderProgram);

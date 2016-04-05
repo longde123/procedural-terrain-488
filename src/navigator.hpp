@@ -17,42 +17,42 @@
 
 class Navigator : public CS488Window {
 public:
-	Navigator();
-	virtual ~Navigator();
+    Navigator();
+    virtual ~Navigator();
 
 protected:
-	virtual void init() override;
-	virtual void appLogic() override;
-	virtual void guiLogic() override;
-	virtual void draw() override;
-	virtual void cleanup() override;
+    virtual void init() override;
+    virtual void appLogic() override;
+    virtual void guiLogic() override;
+    virtual void draw() override;
+    virtual void cleanup() override;
 
-	virtual bool cursorEnterWindowEvent(int entered) override;
-	virtual bool mouseMoveEvent(double xPos, double yPos) override;
-	virtual bool mouseButtonInputEvent(int button, int actions, int mods) override;
-	virtual bool mouseScrollEvent(double xOffSet, double yOffSet) override;
-	virtual bool windowResizeEvent(int width, int height) override;
-	virtual bool keyInputEvent(int key, int action, int mods) override;
+    virtual bool cursorEnterWindowEvent(int entered) override;
+    virtual bool mouseMoveEvent(double xPos, double yPos) override;
+    virtual bool mouseButtonInputEvent(int button, int actions, int mods) override;
+    virtual bool mouseScrollEvent(double xOffSet, double yOffSet) override;
+    virtual bool windowResizeEvent(int width, int height) override;
+    virtual bool keyInputEvent(int key, int action, int mods) override;
 
 private:
     void resetView();
     void makeView();
 
-	// Fields related to the shader and uniforms.
-	ShaderProgram m_shader;
+    // Fields related to the shader and uniforms.
+    ShaderProgram m_shader;
 
     BlockManager block_manager;
     DensitySlicer density_slicer;
     LodVisualizer lod;
     Swarm swarm;
 
-	// Matrices controlling the camera and projection.
+    // Matrices controlling the camera and projection.
     glm::vec3 eye_position;
     glm::vec3 eye_direction;
     glm::vec3 eye_up;
     glm::mat4 W;
-	glm::mat4 proj;
-	glm::mat4 view;
+    glm::mat4 proj;
+    glm::mat4 view;
 
     // First person stuff
     std::unordered_set<int> pressed_keys;

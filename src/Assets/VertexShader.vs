@@ -35,5 +35,5 @@ void main() {
     // interpolation anyway.
     vertex_out.normal = NormalMatrix * normal;
 
-	gl_Position = P * V * world_position;
+    gl_Position = P * V * world_position;
 }

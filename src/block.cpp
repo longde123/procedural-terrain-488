@@ -26,9 +26,9 @@ Block::~Block()
 
 void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_attrib)
 {
-	glGenVertexArrays(1, &out_vao);
+    glGenVertexArrays(1, &out_vao);
     glGenBuffers(1, &out_vbo);
-	glBindVertexArray(out_vao);
+    glBindVertexArray(out_vao);
     glBindBuffer(GL_ARRAY_BUFFER, out_vbo);
     {
         // TODO: Investigate performance of different usage flags.
@@ -46,7 +46,7 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
                 vertex_unit_size, (void*)(sizeof(vec3) * 2));
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 
     glGenTransformFeedbacks(1, &feedback_object);
     {
@@ -57,7 +57,7 @@ void Block::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occlusion_
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Block::update(float time_elapsed)

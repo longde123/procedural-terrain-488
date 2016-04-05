@@ -48,7 +48,7 @@ void Texture::init()
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Texture::reload(string new_path)

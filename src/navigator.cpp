@@ -53,9 +53,9 @@ Navigator::~Navigator()
  */
 void Navigator::init()
 {
-	// Set the background colour.
-	glClearColor( 0.5, 0.5, 0.5, 1.0 );
-	//glClearColor( 0.3, 0.5, 0.7, 1.0 );
+    // Set the background colour.
+    glClearColor( 0.5, 0.5, 0.5, 1.0 );
+    //glClearColor( 0.3, 0.5, 0.7, 1.0 );
 
     GLint result;
     glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &result);
@@ -64,7 +64,7 @@ void Navigator::init()
     // Call the script that will include shader code into other shaders.
     system((m_exec_dir + "/Assets/include.py").c_str());
 
-	// Build the shaders
+    // Build the shaders
     Timer shader_init_timer;
     shader_init_timer.start();
     {
@@ -81,8 +81,8 @@ void Navigator::init()
 
     resetView();
 
-	// Set up initial view and projection matrices (need to do this here,
-	// since it depends on the GLFW window being set up correctly).
+    // Set up initial view and projection matrices (need to do this here,
+    // since it depends on the GLFW window being set up correctly).
     makeView();
 
     background_music = unique_ptr<Sound>(new Sound("Audio/Jungle_Village.wav"));
@@ -103,10 +103,10 @@ void Navigator::resetView()
 
 void Navigator::makeView()
 {
-	proj = glm::perspective(
-		glm::radians( 45.0f ),
-		float( m_framebufferWidth ) / float( m_framebufferHeight ),
-		0.01f, far_plane);
+    proj = glm::perspective(
+        glm::radians( 45.0f ),
+        float( m_framebufferWidth ) / float( m_framebufferHeight ),
+        0.01f, far_plane);
     view = lookAt(eye_position, eye_position + eye_direction, eye_up);
 }
 
@@ -152,9 +152,9 @@ void Navigator::appLogic()
         makeView();
     }
 
-	// Create a global transformation for the model.
+    // Create a global transformation for the model.
     float offset = -0.5f;
-	W = glm::translate(mat4(), vec3(offset, offset, offset));
+    W = glm::translate(mat4(), vec3(offset, offset, offset));
 
 
     block_manager.update(time_elapsed, proj, view, W, eye_position, generate_blocks);
@@ -166,21 +166,21 @@ void Navigator::appLogic()
  */
 void Navigator::guiLogic()
 {
-	// We already know there's only going to be one window, so for
-	// simplicity we'll store button states in static local variables.
-	// If there was ever a possibility of having multiple instances of
-	// Navigator running simultaneously, this would break; you'd want to make
-	// this into instance fields of Navigator.
-	static bool showTestWindow(false);
-	static bool showDebugWindow(true);
+    // We already know there's only going to be one window, so for
+    // simplicity we'll store button states in static local variables.
+    // If there was ever a possibility of having multiple instances of
+    // Navigator running simultaneously, this would break; you'd want to make
+    // this into instance fields of Navigator.
+    static bool showTestWindow(false);
+    static bool showDebugWindow(true);
 
-	ImGuiWindowFlags windowFlags(ImGuiWindowFlags_AlwaysAutoResize);
-	float opacity(0.5f);
+    ImGuiWindowFlags windowFlags(ImGuiWindowFlags_AlwaysAutoResize);
+    float opacity(0.5f);
 
     // Without this, menu won't be visible.
     // windowFlags |= ImGuiWindowFlags_MenuBar;
 
-	if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100, 100), opacity, windowFlags)) {
+    if (ImGui::Begin("Debug Window", &showDebugWindow, ImVec2(100, 100), opacity, windowFlags)) {
 
         ImGui::SliderFloat("Water Height", &block_manager.water_height, -0.5f, 1.5f);
         ImGui::Checkbox("Use Water", &block_manager.use_water);
@@ -332,35 +332,35 @@ void Navigator::guiLogic()
         }
 
 
-		if (ImGui::Button("Profile Block Generation")) {
+        if (ImGui::Button("Profile Block Generation")) {
             block_manager.profileBlockGeneration();
-		}
+        }
 
-		if (ImGui::Button("Quit Application")) {
-			glfwSetWindowShouldClose(m_window, GL_TRUE);
-		}
+        if (ImGui::Button("Quit Application")) {
+            glfwSetWindowShouldClose(m_window, GL_TRUE);
+        }
 
 /*
-		// For convenience, you can uncomment this to show ImGui's massive
-		// demonstration window right in your application.  Very handy for
-		// browsing around to get the widget you want.  Then look in
-		// shared/imgui/imgui_demo.cpp to see how it's done.
-		if( ImGui::Button( "Test Window" ) ) {
-			showTestWindow = !showTestWindow;
-		}
+        // For convenience, you can uncomment this to show ImGui's massive
+        // demonstration window right in your application.  Very handy for
+        // browsing around to get the widget you want.  Then look in
+        // shared/imgui/imgui_demo.cpp to see how it's done.
+        if( ImGui::Button( "Test Window" ) ) {
+            showTestWindow = !showTestWindow;
+        }
 */
 
-		ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
-		ImGui::Text("Blocks to render: %d", block_manager.blocksInQueue());
-		ImGui::Text("Blocks in view: %d", block_manager.blocksInView());
-		ImGui::Text("Allocated blocks: %d", block_manager.allocatedBlocks());
-		ImGui::Text("Reused blocks: %d", block_manager.reusedBlockCount());
+        ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
+        ImGui::Text("Blocks to render: %d", block_manager.blocksInQueue());
+        ImGui::Text("Blocks in view: %d", block_manager.blocksInView());
+        ImGui::Text("Allocated blocks: %d", block_manager.allocatedBlocks());
+        ImGui::Text("Reused blocks: %d", block_manager.reusedBlockCount());
     }
-	ImGui::End();
+    ImGui::End();
 
-	if (showTestWindow) {
-		ImGui::ShowTestWindow(&showTestWindow);
-	}
+    if (showTestWindow) {
+        ImGui::ShowTestWindow(&showTestWindow);
+    }
 }
 
 //----------------------------------------------------------------------------------------
@@ -394,11 +394,11 @@ void Navigator::draw()
 
     // swarm.draw(proj, view, W, eye_position, *block_manager.terrain_generator);
 
-	// Restore defaults
-	glBindVertexArray( 0 );
+    // Restore defaults
+    glBindVertexArray( 0 );
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 //----------------------------------------------------------------------------------------
@@ -413,13 +413,13 @@ void Navigator::cleanup()
  * Event handler.  Handles cursor entering the window area events.
  */
 bool Navigator::cursorEnterWindowEvent (
-		int entered
+        int entered
 ) {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	// Fill in with event handling code...
+    // Fill in with event handling code...
 
-	return eventHandled;
+    return eventHandled;
 }
 
 //----------------------------------------------------------------------------------------
@@ -478,18 +478,18 @@ bool Navigator::mouseMoveEvent(double xPos, double yPos)
 bool Navigator::mouseButtonInputEvent(int button, int actions, int mods) {
     bool eventHandled(false);
 
-	if (actions == GLFW_PRESS) {
-		if (!ImGui::IsMouseHoveringAnyWindow()) {
-			mouse_down = true;
+    if (actions == GLFW_PRESS) {
+        if (!ImGui::IsMouseHoveringAnyWindow()) {
+            mouse_down = true;
 
             // For rotation in the other angle.
             mouse_down_with_control = (mods & GLFW_MOD_CONTROL);
-		}
-	}
+        }
+    }
 
-	if (actions == GLFW_RELEASE) {
-		mouse_down = false;
-	}
+    if (actions == GLFW_RELEASE) {
+        mouse_down = false;
+    }
 
     return eventHandled;
 }
@@ -499,9 +499,9 @@ bool Navigator::mouseButtonInputEvent(int button, int actions, int mods) {
  * Event handler.  Handles mouse scroll wheel events.
  */
 bool Navigator::mouseScrollEvent(double xOffSet, double yOffSet) {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	// Zoom in or out.
+    // Zoom in or out.
     distance_factor *= exp(-yOffSet / 10.0f);
     // Put reasonable bounds.
     distance_factor = std::max(0.1f, std::min(100.0f, distance_factor));
@@ -509,7 +509,7 @@ bool Navigator::mouseScrollEvent(double xOffSet, double yOffSet) {
     resetView();
     makeView();
 
-	return eventHandled;
+    return eventHandled;
 }
 
 //----------------------------------------------------------------------------------------
@@ -517,11 +517,11 @@ bool Navigator::mouseScrollEvent(double xOffSet, double yOffSet) {
  * Event handler.  Handles window resize events.
  */
 bool Navigator::windowResizeEvent(int width, int height) {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	// Fill in with event handling code...
+    // Fill in with event handling code...
 
-	return eventHandled;
+    return eventHandled;
 }
 
 //----------------------------------------------------------------------------------------
@@ -529,9 +529,9 @@ bool Navigator::windowResizeEvent(int width, int height) {
  * Event handler.  Handles key input events.
  */
 bool Navigator::keyInputEvent(int key, int action, int mods) {
-	bool eventHandled(false);
+    bool eventHandled(false);
 
-	if (action == GLFW_PRESS) {
+    if (action == GLFW_PRESS) {
         if (key == GLFW_KEY_ESCAPE) {
             glfwSetWindowShouldClose(m_window, GL_TRUE);
 
@@ -554,11 +554,11 @@ bool Navigator::keyInputEvent(int key, int action, int mods) {
         }
 
         pressed_keys.insert(key);
-	}
+    }
 
-	if (action == GLFW_RELEASE) {
+    if (action == GLFW_RELEASE) {
         pressed_keys.erase(key);
-	}
+    }
 
-	return eventHandled;
+    return eventHandled;
 }

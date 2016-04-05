@@ -16,9 +16,9 @@ void IndexedGeometry::initFromVertices(
     glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(float), vertices, GL_STATIC_DRAW);
 
     // Specify the means of extracting the position values properly.
-	GLint posAttrib = shader_program.getAttribLocation("position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    GLint posAttrib = shader_program.getAttribLocation("position");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glVertexAttribDivisor(posAttrib, 0); // in case this is instanced
 
     // Create indices buffer

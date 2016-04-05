@@ -23,18 +23,18 @@ void TerrainGeneratorSlow::init(string dir)
     TerrainGenerator::init(dir);
 
     marching_cubes_shader.generateProgramObject();
-	marching_cubes_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
-	marching_cubes_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
-	marching_cubes_shader.link();
+    marching_cubes_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
+    marching_cubes_shader.attachGeometryShader((dir + "MarchingCubesShader.gs").c_str());
+    marching_cubes_shader.link();
 
     block_size_uni = marching_cubes_shader.getUniformLocation("block_size");
-	block_padding_uni_marching = marching_cubes_shader.getUniformLocation("block_padding");
-	period_uni_marching = marching_cubes_shader.getUniformLocation("period");
-	octaves_uni_marching = marching_cubes_shader.getUniformLocation("octaves");
-	octaves_decay_uni_marching = marching_cubes_shader.getUniformLocation("octaves_decay");
-	warp_params_uni_marching = marching_cubes_shader.getUniformLocation("warp_params");
-	short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
-	long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
+    block_padding_uni_marching = marching_cubes_shader.getUniformLocation("block_padding");
+    period_uni_marching = marching_cubes_shader.getUniformLocation("period");
+    octaves_uni_marching = marching_cubes_shader.getUniformLocation("octaves");
+    octaves_decay_uni_marching = marching_cubes_shader.getUniformLocation("octaves_decay");
+    warp_params_uni_marching = marching_cubes_shader.getUniformLocation("warp_params");
+    short_range_ambient_uni = marching_cubes_shader.getUniformLocation("short_range_ambient");
+    long_range_ambient_uni = marching_cubes_shader.getUniformLocation("long_range_ambient");
 
     grid.init(marching_cubes_shader);
 }
@@ -92,5 +92,5 @@ void TerrainGeneratorSlow::generateTerrainBlock(Block& block)
     }
     marching_cubes_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }

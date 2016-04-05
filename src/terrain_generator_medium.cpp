@@ -26,28 +26,28 @@ void TerrainGeneratorMedium::init(string dir)
     TerrainGenerator::init(dir);
 
     voxel_edges_shader.generateProgramObject();
-	voxel_edges_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
-	voxel_edges_shader.attachGeometryShader((dir + "VoxelEdgesShader.gs").c_str());
-	voxel_edges_shader.link();
+    voxel_edges_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
+    voxel_edges_shader.attachGeometryShader((dir + "VoxelEdgesShader.gs").c_str());
+    voxel_edges_shader.link();
 
     block_size_uni_1 = voxel_edges_shader.getUniformLocation("block_size");
-	block_padding_uni_1 = voxel_edges_shader.getUniformLocation("block_padding");
+    block_padding_uni_1 = voxel_edges_shader.getUniformLocation("block_padding");
 
     triangle_unpack_shader.generateProgramObject();
-	triangle_unpack_shader.attachVertexShader((dir + "TriangleUnpackShader.vs").c_str());
-	triangle_unpack_shader.attachGeometryShader((dir + "TriangleUnpackShader.gs").c_str());
-	triangle_unpack_shader.link();
+    triangle_unpack_shader.attachVertexShader((dir + "TriangleUnpackShader.vs").c_str());
+    triangle_unpack_shader.attachGeometryShader((dir + "TriangleUnpackShader.gs").c_str());
+    triangle_unpack_shader.link();
 
     block_index_uni = triangle_unpack_shader.getUniformLocation("block_index");
     block_size_uni_2 = triangle_unpack_shader.getUniformLocation("block_size");
-	block_padding_uni_2 = triangle_unpack_shader.getUniformLocation("block_padding");
-	period_uni_marching = triangle_unpack_shader.getUniformLocation("period");
-	octaves_uni_marching = triangle_unpack_shader.getUniformLocation("octaves");
-	octaves_decay_uni_marching = triangle_unpack_shader.getUniformLocation("octaves_decay");
-	warp_params_uni_marching = triangle_unpack_shader.getUniformLocation("warp_params");
-	short_range_ambient_uni = triangle_unpack_shader.getUniformLocation("short_range_ambient");
-	long_range_ambient_uni = triangle_unpack_shader.getUniformLocation("long_range_ambient");
-	ambient_occlusion_param_uni = triangle_unpack_shader.getUniformLocation("ambient_occlusion_param");
+    block_padding_uni_2 = triangle_unpack_shader.getUniformLocation("block_padding");
+    period_uni_marching = triangle_unpack_shader.getUniformLocation("period");
+    octaves_uni_marching = triangle_unpack_shader.getUniformLocation("octaves");
+    octaves_decay_uni_marching = triangle_unpack_shader.getUniformLocation("octaves_decay");
+    warp_params_uni_marching = triangle_unpack_shader.getUniformLocation("warp_params");
+    short_range_ambient_uni = triangle_unpack_shader.getUniformLocation("short_range_ambient");
+    long_range_ambient_uni = triangle_unpack_shader.getUniformLocation("long_range_ambient");
+    ambient_occlusion_param_uni = triangle_unpack_shader.getUniformLocation("ambient_occlusion_param");
 
     packed_attrib = triangle_unpack_shader.getAttribLocation("z6_y6_x6_edge1_edge2_edge3_in");
 
@@ -62,9 +62,9 @@ void TerrainGeneratorMedium::initPackedStorage()
     size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
                        BLOCK_SIZE * unit_size * 5;
 
-	glGenVertexArrays(1, &packed_triangles_vao);
+    glGenVertexArrays(1, &packed_triangles_vao);
     glGenBuffers(1, &packed_triangles_vbo);
-	glBindVertexArray(packed_triangles_vao);
+    glBindVertexArray(packed_triangles_vao);
     glBindBuffer(GL_ARRAY_BUFFER, packed_triangles_vbo);
     {
         // TODO: Investigate performance of different usage flags.
@@ -81,7 +81,7 @@ void TerrainGeneratorMedium::initPackedStorage()
         glVertexAttribIPointer(packed_attrib, 1, GL_UNSIGNED_INT, unit_size, 0);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 
     // TODO: If we do this multiple times, make sure we clean up old copies....
     // Should probably benchmark GPU memory usage.
@@ -94,7 +94,7 @@ void TerrainGeneratorMedium::initPackedStorage()
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
@@ -137,7 +137,7 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
     }
     voxel_edges_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     triangle_unpack_shader.enable();
     {
@@ -189,5 +189,5 @@ void TerrainGeneratorMedium::generateTerrainBlock(Block& block)
 
     glDisable(GL_RASTERIZER_DISCARD);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }

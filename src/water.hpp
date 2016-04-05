@@ -21,9 +21,9 @@ private:
 
     Plane water_plane;
 
-	GLint P_uni;    // Uniform location for Projection matrix.
-	GLint V_uni;    // Uniform location for View matrix.
-	GLint M_uni;    // Uniform location for Model matrix.
+    GLint P_uni;    // Uniform location for Projection matrix.
+    GLint V_uni;    // Uniform location for View matrix.
+    GLint M_uni;    // Uniform location for Model matrix.
     GLint color_uni;
     GLint eye_position_uni;
     GLint fog_uni;

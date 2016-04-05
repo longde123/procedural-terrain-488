@@ -28,12 +28,12 @@ void Swarm::init(string dir)
 
     cube.init(update_shader);
 
-	block_size_uni = initialization_shader.getUniformLocation("block_size");
-	period_uni = initialization_shader.getUniformLocation("period");
-	warp_params_uni = initialization_shader.getUniformLocation("warp_params");
+    block_size_uni = initialization_shader.getUniformLocation("block_size");
+    period_uni = initialization_shader.getUniformLocation("period");
+    warp_params_uni = initialization_shader.getUniformLocation("warp_params");
 
-	P_uni = update_shader.getUniformLocation("P");
-	V_uni = update_shader.getUniformLocation("V");
+    P_uni = update_shader.getUniformLocation("P");
+    V_uni = update_shader.getUniformLocation("V");
     M_uni = update_shader.getUniformLocation("M");
 
     pos_attrib = update_shader.getAttribLocation("instance_pos");
@@ -62,7 +62,7 @@ void Swarm::init(string dir)
     }
     glBindVertexArray(0);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Swarm::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, TerrainGenerator& terrain_generator)
@@ -81,7 +81,7 @@ void Swarm::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, TerrainGenerator& te
     }
     update_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Swarm::initializeAttributes(TerrainGenerator& terrain_generator)
@@ -99,5 +99,5 @@ void Swarm::initializeAttributes(TerrainGenerator& terrain_generator)
     }
     initialization_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }

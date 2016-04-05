@@ -19,26 +19,26 @@ DensitySlicer::DensitySlicer()
 void DensitySlicer::init(string dir)
 {
     density_shader.generateProgramObject();
-	density_shader.attachVertexShader((dir + "DensitySliceShader.vs").c_str());
-	density_shader.attachFragmentShader((dir + "DensitySliceShader.fs").c_str());
-	density_shader.link();
+    density_shader.attachVertexShader((dir + "DensitySliceShader.vs").c_str());
+    density_shader.attachFragmentShader((dir + "DensitySliceShader.fs").c_str());
+    density_shader.link();
 
-	P_uni = density_shader.getUniformLocation("P");
-	V_uni = density_shader.getUniformLocation("V");
-	M_uni = density_shader.getUniformLocation("M");
-	block_index_uni = density_shader.getUniformLocation("block_index");
-	block_size_uni = density_shader.getUniformLocation("block_size");
-	period_uni = density_shader.getUniformLocation("period");
-	octaves_uni = density_shader.getUniformLocation("octaves");
-	octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
-	warp_params_uni = density_shader.getUniformLocation("warp_params");
+    P_uni = density_shader.getUniformLocation("P");
+    V_uni = density_shader.getUniformLocation("V");
+    M_uni = density_shader.getUniformLocation("M");
+    block_index_uni = density_shader.getUniformLocation("block_index");
+    block_size_uni = density_shader.getUniformLocation("block_size");
+    period_uni = density_shader.getUniformLocation("period");
+    octaves_uni = density_shader.getUniformLocation("octaves");
+    octaves_decay_uni = density_shader.getUniformLocation("octaves_decay");
+    warp_params_uni = density_shader.getUniformLocation("warp_params");
 
     mat4 translation = translate(mat4(), vec3(0.5f));
     xy_grid.init(density_shader, translation * rotate(mat4(), PI / 2, vec3(1.0f, 0, 0)));
     yz_grid.init(density_shader, translation * rotate(mat4(), PI / 2, vec3(0, 0, 1.0f)));
     xz_grid.init(density_shader, translation);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float size,
@@ -66,7 +66,7 @@ void DensitySlicer::draw(mat4 P, mat4 V, mat4 M, float size,
     glBindVertexArray(xz_grid.getVertices());
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     density_shader.disable();
 }

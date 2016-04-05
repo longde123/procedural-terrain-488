@@ -13,5 +13,5 @@ out vertexData
 
 void main() {
     vertex_out.position = position;
-	gl_Position = P * V * M * vec4(position, 1.0);
+    gl_Position = P * V * M * vec4(position, 1.0);
 }

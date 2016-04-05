@@ -17,19 +17,19 @@ LodVisualizer::LodVisualizer()
 void LodVisualizer::init(string dir)
 {
     lod_shader.generateProgramObject();
-	lod_shader.attachVertexShader((dir + "ColorShader.vs").c_str());
-	lod_shader.attachFragmentShader((dir + "ColorShader.fs").c_str());
-	lod_shader.link();
+    lod_shader.attachVertexShader((dir + "ColorShader.vs").c_str());
+    lod_shader.attachFragmentShader((dir + "ColorShader.fs").c_str());
+    lod_shader.link();
 
-	P_uni = lod_shader.getUniformLocation("P");
-	V_uni = lod_shader.getUniformLocation("V");
-	M_uni = lod_shader.getUniformLocation("M");
-	color_uni = lod_shader.getUniformLocation("color");
-	fog_uni = lod_shader.getUniformLocation("fog_params");
+    P_uni = lod_shader.getUniformLocation("P");
+    V_uni = lod_shader.getUniformLocation("V");
+    M_uni = lod_shader.getUniformLocation("M");
+    color_uni = lod_shader.getUniformLocation("color");
+    fog_uni = lod_shader.getUniformLocation("fog_params");
 
     cube.init(lod_shader);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void LodVisualizer::draw(mat4 P, mat4 V, mat4 W, vec3 current_pos)
@@ -75,5 +75,5 @@ void LodVisualizer::draw(mat4 P, mat4 V, mat4 W, vec3 current_pos)
 
     lod_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }

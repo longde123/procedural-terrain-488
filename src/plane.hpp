@@ -10,7 +10,7 @@
 class Plane : public Geometry
 {
 public:
-	Plane(float dim);
+    Plane(float dim);
 
     // Initialize a grid of size dim x dim on the x-z plane.
     void init(ShaderProgram& shaderProgram, glm::mat4 transform = glm::mat4());

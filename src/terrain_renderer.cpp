@@ -19,15 +19,15 @@ TerrainRenderer::TerrainRenderer()
 void TerrainRenderer::init(string dir)
 {
     renderer_shader.generateProgramObject();
-	renderer_shader.attachVertexShader((dir + "VertexShader.vs").c_str());
-	renderer_shader.attachFragmentShader((dir + "FragmentShader.fs").c_str());
-	renderer_shader.link();
+    renderer_shader.attachVertexShader((dir + "VertexShader.vs").c_str());
+    renderer_shader.attachFragmentShader((dir + "FragmentShader.fs").c_str());
+    renderer_shader.link();
 
-	// Set up the uniforms
-	P_uni = renderer_shader.getUniformLocation( "P" );
-	V_uni = renderer_shader.getUniformLocation( "V" );
-	M_uni = renderer_shader.getUniformLocation( "M" );
-	NormalMatrix_uni = renderer_shader.getUniformLocation( "NormalMatrix" );
+    // Set up the uniforms
+    P_uni = renderer_shader.getUniformLocation( "P" );
+    V_uni = renderer_shader.getUniformLocation( "V" );
+    M_uni = renderer_shader.getUniformLocation( "M" );
+    NormalMatrix_uni = renderer_shader.getUniformLocation( "NormalMatrix" );
 
     water_clip_uni = renderer_shader.getUniformLocation("water_clip");
     water_reflection_clip_uni = renderer_shader.getUniformLocation("water_reflection_clip");
@@ -45,7 +45,7 @@ void TerrainRenderer::init(string dir)
     light_diffuse_uni = renderer_shader.getUniformLocation("light_diffuse");
     light_specular_uni = renderer_shader.getUniformLocation("light_specular");
 
-	fog_uni = renderer_shader.getUniformLocation("fog_params");
+    fog_uni = renderer_shader.getUniformLocation("fog_params");
 
     alpha_uni = renderer_shader.getUniformLocation("alpha");
 
@@ -61,7 +61,7 @@ void TerrainRenderer::init(string dir)
     y_normal_map.init();
     z_normal_map.init();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void TerrainRenderer::prepareRender()

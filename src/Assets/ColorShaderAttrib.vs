@@ -16,6 +16,6 @@ flat out int InstanceID;
 void main() {
     world_position = vec3(M * vec4(position + instance_pos, 1.0));
     obj_color = vec4(color, 1.0);
-	gl_Position = P * V * vec4(world_position, 1.0);
+    gl_Position = P * V * vec4(world_position, 1.0);
     InstanceID = gl_InstanceID;
 }

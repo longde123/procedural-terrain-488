@@ -16,9 +16,9 @@ public:
               float period, int octaves, float octaves_decay,
               float warp_frequency, float warp_strength);
 
-	GLint P_uni;    // Uniform location for Projection matrix.
-	GLint V_uni;    // Uniform location for View matrix.
-	GLint M_uni;    // Uniform location for Model matrix.
+    GLint P_uni;    // Uniform location for Projection matrix.
+    GLint V_uni;    // Uniform location for View matrix.
+    GLint M_uni;    // Uniform location for Model matrix.
 
 private:
     ShaderProgram density_shader;

@@ -12,9 +12,9 @@ Grid::Grid(size_t resolution)
 
 void Grid::init(ShaderProgram& shaderProgram, mat4 transform)
 {
-	size_t vertex_count = 3 * resolution * resolution;
+    size_t vertex_count = 3 * resolution * resolution;
 
-	float *verts = new float[vertex_count];
+    float *verts = new float[vertex_count];
 
     // Need <=. A grid of resolution 1x1
     for (int y = 0; y < resolution; y++) {
@@ -30,6 +30,6 @@ void Grid::init(ShaderProgram& shaderProgram, mat4 transform)
 
     initFromVertices(shaderProgram, verts, vertex_count);
 
-	// OpenGL has the buffer now, there's no need for us to keep a copy.
-	delete [] verts;
+    // OpenGL has the buffer now, there's no need for us to keep a copy.
+    delete [] verts;
 }

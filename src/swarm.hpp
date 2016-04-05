@@ -26,16 +26,16 @@ private:
     GLuint velocities_buffer;
     GLuint colors_buffer;
 
-	GLint block_size_uni;
-	GLint period_uni;
-	GLint warp_params_uni;
+    GLint block_size_uni;
+    GLint period_uni;
+    GLint warp_params_uni;
 
-	GLint P_uni;    // Uniform location for Projection matrix.
-	GLint V_uni;    // Uniform location for View matrix.
-	GLint M_uni;    // Uniform location for Model matrix.
+    GLint P_uni;    // Uniform location for Projection matrix.
+    GLint V_uni;    // Uniform location for View matrix.
+    GLint M_uni;    // Uniform location for Model matrix.
 
-	GLint pos_attrib;
-	GLint color_attrib;
+    GLint pos_attrib;
+    GLint color_attrib;
 
     Cube cube;
 };

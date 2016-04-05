@@ -16,20 +16,20 @@ Water::Water()
 void Water::init(string dir)
 {
     water_shader.generateProgramObject();
-	water_shader.attachVertexShader((dir + "ColorShader.vs").c_str());
-	water_shader.attachFragmentShader((dir + "ColorShader.fs").c_str());
-	water_shader.link();
+    water_shader.attachVertexShader((dir + "ColorShader.vs").c_str());
+    water_shader.attachFragmentShader((dir + "ColorShader.fs").c_str());
+    water_shader.link();
 
-	P_uni = water_shader.getUniformLocation("P");
-	V_uni = water_shader.getUniformLocation("V");
-	M_uni = water_shader.getUniformLocation("M");
-	color_uni = water_shader.getUniformLocation("color");
-	eye_position_uni = water_shader.getUniformLocation("eye_position");
-	fog_uni = water_shader.getUniformLocation("fog_params");
+    P_uni = water_shader.getUniformLocation("P");
+    V_uni = water_shader.getUniformLocation("V");
+    M_uni = water_shader.getUniformLocation("M");
+    color_uni = water_shader.getUniformLocation("color");
+    eye_position_uni = water_shader.getUniformLocation("eye_position");
+    fog_uni = water_shader.getUniformLocation("fog_params");
 
     water_plane.init(water_shader, translate(mat4(), vec3(0.5f, 0.0f, 0.5f)));
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Water::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, float alpha)
@@ -45,7 +45,7 @@ void Water::draw(mat4 P, mat4 V, mat4 M, vec3 eye_position, float alpha)
     glBindVertexArray(water_plane.getVertices());
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void Water::start()

@@ -47,7 +47,7 @@ void IndexedBlock::init(GLint pos_attrib, GLint normal_attrib, GLint ambient_occ
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void IndexedBlock::draw()

@@ -14,5 +14,5 @@ out vec4 obj_color;
 void main() {
     world_position = vec3(M * vec4(position, 1.0));
     obj_color = color;
-	gl_Position = P * V * vec4(world_position, 1.0);
+    gl_Position = P * V * vec4(world_position, 1.0);
 }

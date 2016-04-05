@@ -284,12 +284,12 @@ shared_ptr<CS488Window> CS488Window::getInstance()
 
 //----------------------------------------------------------------------------------------
 void CS488Window::launch (
-		int argc, 
+		int argc,
 		char **argv,
 		CS488Window *window,
 		int width,
 		int height,
-		const std::string& title, 
+		const std::string& title,
 		float fps
 ) {
 	char * slash = strrchr( argv[0], '/' );
@@ -362,7 +362,7 @@ void CS488Window::run (
     centerWindow();
     glfwMakeContextCurrent(m_window);
 	gl3wInit();
-    
+
 #ifdef DEBUG_GL
     printGLInfo();
 #endif
@@ -415,7 +415,7 @@ void CS488Window::run (
             }
 
         }
-        
+
     } catch (const  std::exception & e) {
         std::cerr << "Exception Thrown: ";
         std::cerr << e.what() << endl;

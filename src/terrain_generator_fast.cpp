@@ -31,54 +31,54 @@ void TerrainGeneratorFast::init(string dir)
     TerrainGenerator::init(dir);
 
     list_non_empties_shader.generateProgramObject();
-	list_non_empties_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
-	list_non_empties_shader.attachGeometryShader((dir + "ListNonEmpties.gs").c_str());
-	list_non_empties_shader.link();
+    list_non_empties_shader.attachVertexShader((dir + "GridPointShader.vs").c_str());
+    list_non_empties_shader.attachGeometryShader((dir + "ListNonEmpties.gs").c_str());
+    list_non_empties_shader.link();
 
     glGenQueries(1, &non_empties_query);
 
     grid.init(list_non_empties_shader);
 
     voxel_unique_edges_shader.generateProgramObject();
-	voxel_unique_edges_shader.attachVertexShader((dir + "VoxelUniqueEdges.vs").c_str());
-	voxel_unique_edges_shader.attachGeometryShader((dir + "VoxelUniqueEdges.gs").c_str());
-	voxel_unique_edges_shader.link();
+    voxel_unique_edges_shader.attachVertexShader((dir + "VoxelUniqueEdges.vs").c_str());
+    voxel_unique_edges_shader.attachGeometryShader((dir + "VoxelUniqueEdges.gs").c_str());
+    voxel_unique_edges_shader.link();
 
     case_attrib = voxel_unique_edges_shader.getAttribLocation("z6_y6_x6_case8_in");
     glGenQueries(1, &edge_count_query);
 
     unique_vertex_shader.generateProgramObject();
-	unique_vertex_shader.attachVertexShader((dir + "UniqueVertex.vs").c_str());
-	unique_vertex_shader.link();
+    unique_vertex_shader.attachVertexShader((dir + "UniqueVertex.vs").c_str());
+    unique_vertex_shader.link();
 
     edge_attrib = unique_vertex_shader.getAttribLocation("z6_y6_x6_edge4_in");
 
     block_index_uni = unique_vertex_shader.getUniformLocation("block_index");
     block_size_uni = unique_vertex_shader.getUniformLocation("block_size");
-	block_padding_uni = unique_vertex_shader.getUniformLocation("block_padding");
-	period_uni_marching = unique_vertex_shader.getUniformLocation("period");
-	octaves_uni_marching = unique_vertex_shader.getUniformLocation("octaves");
-	octaves_decay_uni_marching = unique_vertex_shader.getUniformLocation("octaves_decay");
-	warp_params_uni_marching = unique_vertex_shader.getUniformLocation("warp_params");
-	short_range_ambient_uni = unique_vertex_shader.getUniformLocation("short_range_ambient");
-	long_range_ambient_uni = unique_vertex_shader.getUniformLocation("long_range_ambient");
-	ambient_occlusion_param_uni = unique_vertex_shader.getUniformLocation("ambient_occlusion_param");
+    block_padding_uni = unique_vertex_shader.getUniformLocation("block_padding");
+    period_uni_marching = unique_vertex_shader.getUniformLocation("period");
+    octaves_uni_marching = unique_vertex_shader.getUniformLocation("octaves");
+    octaves_decay_uni_marching = unique_vertex_shader.getUniformLocation("octaves_decay");
+    warp_params_uni_marching = unique_vertex_shader.getUniformLocation("warp_params");
+    short_range_ambient_uni = unique_vertex_shader.getUniformLocation("short_range_ambient");
+    long_range_ambient_uni = unique_vertex_shader.getUniformLocation("long_range_ambient");
+    ambient_occlusion_param_uni = unique_vertex_shader.getUniformLocation("ambient_occlusion_param");
 
     initUIntStorage(case_vao, case_vbo, non_empties_feedback, case_attrib);
     initUIntStorage(unique_edges_vao, unique_edges_vbo, unique_edges_feedback, edge_attrib);
 
     index_shader.generateProgramObject();
-	index_shader.attachComputeShader((dir + "ConstructIndexLookup.cs").c_str());
-	index_shader.link();
+    index_shader.attachComputeShader((dir + "ConstructIndexLookup.cs").c_str());
+    index_shader.link();
 
-	total_items_uni = index_shader.getUniformLocation("total_items");
+    total_items_uni = index_shader.getUniformLocation("total_items");
 
     triangle_shader.generateProgramObject();
-	triangle_shader.attachVertexShader((dir + "VoxelUniqueEdges.vs").c_str());
-	triangle_shader.attachGeometryShader((dir + "ConstructTriangles.gs").c_str());
-	triangle_shader.link();
+    triangle_shader.attachVertexShader((dir + "VoxelUniqueEdges.vs").c_str());
+    triangle_shader.attachGeometryShader((dir + "ConstructTriangles.gs").c_str());
+    triangle_shader.link();
 
-	texture_size_uni = triangle_shader.getUniformLocation("texture_size");
+    texture_size_uni = triangle_shader.getUniformLocation("texture_size");
     glGenQueries(1, &index_count_query);
 
     initVertexLookup();
@@ -90,9 +90,9 @@ void TerrainGeneratorFast::initUIntStorage(GLuint& vao, GLuint& vbo, GLuint& fee
     size_t data_size = BLOCK_SIZE * BLOCK_SIZE *
                        BLOCK_SIZE * unit_size;
 
-	glGenVertexArrays(1, &vao);
+    glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
-	glBindVertexArray(vao);
+    glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     {
         // TODO: Investigate performance of different usage flags.
@@ -107,7 +107,7 @@ void TerrainGeneratorFast::initUIntStorage(GLuint& vao, GLuint& vbo, GLuint& fee
         glVertexAttribIPointer(attrib, 1, GL_UNSIGNED_INT, unit_size, 0);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 
     // TODO: If we do this multiple times, make sure we clean up old copies....
     // Should probably benchmark GPU memory usage.
@@ -120,7 +120,7 @@ void TerrainGeneratorFast::initUIntStorage(GLuint& vao, GLuint& vbo, GLuint& fee
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void TerrainGeneratorFast::initVertexLookup()
@@ -157,7 +157,7 @@ void TerrainGeneratorFast::initVertexLookup()
                        GL_READ_WRITE,   // access
                        GL_R32I);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
 
 void TerrainGeneratorFast::generateTerrainBlock(Block& block)
@@ -189,7 +189,7 @@ void TerrainGeneratorFast::generateTerrainBlock(Block& block)
     }
     list_non_empties_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     GLint unique_edges_count;
     voxel_unique_edges_shader.enable();
@@ -213,7 +213,7 @@ void TerrainGeneratorFast::generateTerrainBlock(Block& block)
     }
     voxel_unique_edges_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     index_shader.enable();
     {
@@ -241,7 +241,7 @@ void TerrainGeneratorFast::generateTerrainBlock(Block& block)
     }
     index_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     triangle_shader.enable();
     {
@@ -280,7 +280,7 @@ void TerrainGeneratorFast::generateTerrainBlock(Block& block)
     }
     triangle_shader.disable();
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 
     unique_vertex_shader.enable();
     {
@@ -314,5 +314,5 @@ void TerrainGeneratorFast::generateTerrainBlock(Block& block)
 
     glDisable(GL_RASTERIZER_DISCARD);
 
-	CHECK_GL_ERRORS;
+    CHECK_GL_ERRORS;
 }
