@@ -252,6 +252,7 @@ void CS488Window::centerWindow() {
 	x = (x - windowWidth) / 2;
 	y = (y - windowHeight) / 2;
 
+	//glfwSetWindowPos(m_window, 100, 100);
 	glfwSetWindowPos(m_window, x, y);
 }
 
