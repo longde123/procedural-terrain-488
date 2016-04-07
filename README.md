@@ -1,5 +1,8 @@
 # Generating Volumetric Terrain Procedurally Using the GPU
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Bg6tdbdMTVg/0.jpg)](https://www.youtube.com/watch?v=Bg6tdbdMTVg)
+YouTube video
+
 ![GitHub Logo](screenshot1.jpg)
 
 ![GitHub Logo](screenshot2.jpg)
