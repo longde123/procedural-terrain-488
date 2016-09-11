@@ -24,7 +24,9 @@ if not os.isfile("lib/libglfw3.a") then
 end
 
 if not os.isfile("lib/libopenal.a") then
-    os.chdir("shared/openal-soft/build")
+    os.chdir("shared/openal-soft")
+    os.mkdir("build")
+    os.chdir("build")
     os.execute("cmake ..")
     os.execute("make")
     os.chdir("../../..")
@@ -33,6 +35,10 @@ end
 
 if not os.isfile("lib/libSOIL.a") then
     os.chdir("shared/soil/projects/makefile")
+    os.execute("mkdir -p obj")
+    os.execute("make")
+    os.chdir("../../../..")
+    os.execute("cp shared/soil/lib/libSOIL.a lib/")
 end
 
 solution "BuildStaticLibs"
